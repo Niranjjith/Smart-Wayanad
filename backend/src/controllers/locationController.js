@@ -1,18 +1,33 @@
 import Location from "../models/Location.js";
 
-export async function getAllLocations(req, res) {
-  res.json(await Location.find().sort({ createdAt: -1 }));
-}
+// Get all locations
+export const getAllLocations = async (req, res) => {
+  try {
+    const locations = await Location.find();
+    res.json(locations);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
 
-export async function createLocation(req, res) {
-  res.status(201).json(await Location.create(req.body));
-}
+// Add new location
+export const addLocation = async (req, res) => {
+  try {
+    const location = new Location(req.body);
+    await location.save();
+    res.status(201).json(location);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+};
 
-export async function updateLocation(req, res) {
-  res.json(await Location.findByIdAndUpdate(req.params.id, req.body, { new: true }));
-}
-
-export async function deleteLocation(req, res) {
-  await Location.findByIdAndDelete(req.params.id);
-  res.json({ message: "Deleted" });
-}
+// Filter by type
+export const getByType = async (req, res) => {
+  try {
+    const type = req.params.type;
+    const locations = await Location.find({ type });
+    res.json(locations);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};

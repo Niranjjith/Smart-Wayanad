@@ -2,158 +2,167 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 
-/// Smart Wayanad API Service
-/// Connects Flutter app ↔ Node.js backend.
-/// Supports: signup, login, help alerts, bus routes, chatbot, climate
-
+/// 🌿 Smart Wayanad API Service
+/// Handles all backend communication between Flutter app ↔ Node.js backend.
 class ApiService {
-  // 🟢 Change this to YOUR system's IP address (from ipconfig)
-  // Example: "http://192.168.1.2:5000/api"
-  static String baseUrl = "http://192.168.1.2:5000/api";
+  static const _mobileBase = "http://192.168.1.2:5000/api";
+  static const _desktopBase = "http://localhost:5000/api";
 
-  /// Automatically select correct base URL for desktop/mobile
-  static String get fullBaseUrl {
-    if (Platform.isWindows || Platform.isMacOS) {
-      return "http://localhost:5000/api";
-    }
-    return baseUrl;
-  }
+  static String get _baseUrl =>
+      (Platform.isWindows || Platform.isMacOS) ? _desktopBase : _mobileBase;
 
-  // ----------------- USER ENDPOINTS -----------------
+  // ---------------------------------------------------------------------------
+  // 🧩 Generic helpers
+  // ---------------------------------------------------------------------------
 
-  /// 🔹 Register a new user
-  static Future<Map?> registerUser(String name, String email, String password) async {
+  static Future<Map<String, dynamic>?> _post(String endpoint, Map body) async {
     try {
       final res = await http.post(
-        Uri.parse("$fullBaseUrl/users"),
+        Uri.parse("$_baseUrl/$endpoint"),
         headers: {"Content-Type": "application/json"},
-        body: jsonEncode({
-          "name": name,
-          "email": email,
-          "password": password,
-        }),
+        body: jsonEncode(body),
       );
-
-      if (res.statusCode == 201) {
-        return jsonDecode(res.body);
-      } else {
-        print("❌ Register failed: ${res.statusCode} ${res.body}");
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        final data = jsonDecode(res.body);
+        if (data is Map<String, dynamic>) return data;
       }
+      print("❌ POST /$endpoint → ${res.statusCode}: ${res.body}");
     } catch (e) {
-      print("❌ registerUser error: $e");
+      print("⚠️ POST /$endpoint error: $e");
     }
     return null;
   }
 
-  /// 🔹 Login existing user (email + password)
-  static Future<Map?> loginUser(String email, String password) async {
+  static Future<dynamic> _get(String endpoint) async {
     try {
-      final res = await http.post(
-        Uri.parse("$fullBaseUrl/auth/login"),
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode({
-          "email": email,
-          "password": password,
-        }),
-      );
-
-      if (res.statusCode == 200) {
-        return jsonDecode(res.body);
-      } else {
-        print("❌ Login failed: ${res.statusCode} ${res.body}");
-      }
-    } catch (e) {
-      print("❌ loginUser error: $e");
-    }
-    return null;
-  }
-
-  /// 🔹 Fetch all registered users
-  static Future<List> getUsers() async {
-    try {
-      final res = await http.get(Uri.parse("$fullBaseUrl/users"));
+      final res = await http.get(Uri.parse("$_baseUrl/$endpoint"));
       if (res.statusCode == 200) return jsonDecode(res.body);
+      print("❌ GET /$endpoint → ${res.statusCode}: ${res.body}");
     } catch (e) {
-      print("❌ getUsers error: $e");
+      print("⚠️ GET /$endpoint error: $e");
     }
-    return [];
+    return null;
   }
 
-  // ----------------- HELP ALERTS -----------------
-  /// 🔹 Send SOS help alert
+  // ---------------------------------------------------------------------------
+  // 👤 USER MANAGEMENT
+  // ---------------------------------------------------------------------------
+
+  static Future<Map<String, dynamic>?> registerUser(
+      String name, String email, String password) async {
+    return await _post("users", {
+      "name": name,
+      "email": email,
+      "password": password,
+    });
+  }
+
+  static Future<Map<String, dynamic>?> loginUser(
+      String email, String password) async {
+    return await _post("auth/login", {
+      "email": email,
+      "password": password,
+    });
+  }
+
+  static Future<List<dynamic>> getUsers() async {
+    final data = await _get("users");
+    return data is List ? data : [];
+  }
+
+  // ---------------------------------------------------------------------------
+  // 🚨 HELP ALERTS
+  // ---------------------------------------------------------------------------
+
   static Future<bool> sendHelp({
     required String name,
     required String message,
     required double lat,
     required double lng,
   }) async {
+    final res = await _post("help", {
+      "name": name,
+      "message": message,
+      "location": {"lat": lat, "lng": lng},
+    });
+    return res != null;
+  }
+
+  // ---------------------------------------------------------------------------
+  // 🚌 BUS ROUTES
+  // ---------------------------------------------------------------------------
+
+  static Future<List<dynamic>> getBusRoutes() async {
+    final data = await _get("bus");
+    return data is List ? data : [];
+  }
+
+  // ---------------------------------------------------------------------------
+  // 🌤 CLIMATE INFO
+  // ---------------------------------------------------------------------------
+
+  static Future<Map<String, dynamic>?> getClimate(
+      [String city = "Wayanad"]) async {
+    final data = await _get("climate/current?city=$city");
+    return data is Map<String, dynamic> ? data : null;
+  }
+
+  // ---------------------------------------------------------------------------
+  // 💬 CHATBOT
+  // ---------------------------------------------------------------------------
+
+  static Future<List<dynamic>> getChatLogs() async {
+    final data = await _get("chat");
+    return data is List ? data : [];
+  }
+
+  static Future<Map<String, dynamic>?> sendChat(
+      String user, String message) async {
+    return await _post("chat", {"user": user, "message": message});
+  }
+
+  // ---------------------------------------------------------------------------
+  // 🏥 LOCATIONS (Hospitals, Clinics, Taxi, Helpline)
+  // ---------------------------------------------------------------------------
+
+  static Future<List<dynamic>> getAllLocations() async {
+    final data = await _get("location");
+    return data is List ? data : [];
+  }
+
+  static Future<List<dynamic>> getLocationsByType(String type) async {
+    final data = await _get("location/$type");
+    return data is List ? data : [];
+  }
+
+  static Future<Map<String, dynamic>?> addLocation({
+    required String name,
+    required String type,
+    required String contact,
+    required String address,
+    double? latitude,
+    double? longitude,
+  }) async {
+    return await _post("location", {
+      "name": name,
+      "type": type,
+      "contact": contact,
+      "address": address,
+      "latitude": latitude,
+      "longitude": longitude,
+    });
+  }
+
+  // ---------------------------------------------------------------------------
+  // 🧭 UTILITIES
+  // ---------------------------------------------------------------------------
+
+  static Future<bool> pingServer() async {
     try {
-      final res = await http.post(
-        Uri.parse("$fullBaseUrl/help"),
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode({
-          "name": name,
-          "message": message,
-          "location": {"lat": lat, "lng": lng},
-        }),
-      );
-      return res.statusCode == 201 || res.statusCode == 200;
-    } catch (e) {
-      print("❌ sendHelp error: $e");
+      final res = await http.get(Uri.parse(_baseUrl));
+      return res.statusCode == 200;
+    } catch (_) {
       return false;
     }
-  }
-
-  // ----------------- BUS ROUTES -----------------
-  /// 🔹 Get all bus routes
-  static Future<List> getBusRoutes() async {
-    try {
-      final res = await http.get(Uri.parse("$fullBaseUrl/bus"));
-      if (res.statusCode == 200) return jsonDecode(res.body);
-    } catch (e) {
-      print("❌ getBusRoutes error: $e");
-    }
-    return [];
-  }
-
-  // ----------------- CLIMATE -----------------
-  /// 🔹 Get current weather data
-  static Future<Map?> getClimate([String city = "Wayanad"]) async {
-    try {
-      final res = await http.get(Uri.parse("$fullBaseUrl/climate/current?city=$city"));
-      if (res.statusCode == 200) return jsonDecode(res.body);
-    } catch (e) {
-      print("❌ getClimate error: $e");
-    }
-    return null;
-  }
-
-  // ----------------- CHATBOT -----------------
-  /// 🔹 Fetch all chat logs
-  static Future<List> getChatLogs() async {
-    try {
-      final res = await http.get(Uri.parse("$fullBaseUrl/chat"));
-      if (res.statusCode == 200) return jsonDecode(res.body);
-    } catch (e) {
-      print("❌ getChatLogs error: $e");
-    }
-    return [];
-  }
-
-  /// 🔹 Send message to chatbot
-  static Future<Map?> sendChat(String user, String message) async {
-    try {
-      final res = await http.post(
-        Uri.parse("$fullBaseUrl/chat"),
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode({"user": user, "message": message}),
-      );
-      if (res.statusCode == 201 || res.statusCode == 200) {
-        return jsonDecode(res.body);
-      }
-    } catch (e) {
-      print("❌ sendChat error: $e");
-    }
-    return null;
   }
 }

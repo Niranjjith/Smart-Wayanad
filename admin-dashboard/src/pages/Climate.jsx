@@ -1,47 +1,74 @@
 import { useEffect, useState } from "react";
+import { Box, Typography, Paper } from "@mui/material";
 import Sidebar from "../layout/Sidebar.jsx";
-import Topbar from "../layout/Topbar.jsx";
-import { Box, Toolbar, Paper, Typography, Stack, TextField, Button } from "@mui/material";
+import Footer from "../layout/Footer.jsx";
 import API from "../services/api.js";
 import { toast } from "react-toastify";
 
 export default function Climate() {
-  const [city, setCity] = useState("Wayanad");
-  const [data, setData] = useState(null);
+  const [climate, setClimate] = useState(null);
 
-  const load = async () => {
-    try {
-      const res = await API.get(`/climate/current?city=${encodeURIComponent(city)}`);
-      setData(res.data);
-    } catch {
-      setData(null);
-    }
-  };
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    const fetchWeather = async () => {
+      try {
+        // ✅ You can later replace this with your backend proxy API endpoint: /api/climate
+        const { data } = await API.get(
+          "https://api.open-meteo.com/v1/forecast?latitude=11.6854&longitude=76.1320&current_weather=true"
+        );
+        setClimate(data.current_weather);
+      } catch (err) {
+        console.error(err);
+        toast.error("Failed to fetch weather data");
+      }
+    };
+    fetchWeather();
+  }, []);
 
   return (
-    <Box sx={{ display: "flex" }}>
+    <Box sx={{ display: "flex", bgcolor: "#f4f6f8", minHeight: "100vh" }}>
+      {/* ✅ Left Sidebar */}
       <Sidebar />
-      <Topbar title="Climate" />
-      <Box component="main" sx={{ flexGrow: 1, p: 3, ml: "260px" }}>
-        <Toolbar />
-        <Paper sx={{ p: 3, borderRadius: 3 }}>
-          <Stack direction="row" spacing={2} alignItems="center">
-            <TextField label="City" value={city} onChange={(e) => setCity(e.target.value)} />
-            <Button variant="contained" onClick={load}>Refresh</Button>
-          </Stack>
-          <Box sx={{ mt: 3 }}>
-            {data ? (
-              <>
-                <Typography variant="h5" fontWeight={800}>{data.city || city}</Typography>
-                <Typography variant="h6" sx={{ mt: 1 }}>{data.temp ? `${data.temp}°C` : "--"} • {data.description || "—"}</Typography>
-                <Typography sx={{ mt: 1, color: "text.secondary" }}>Humidity: {data.humidity ?? "--"}% | Wind: {data.wind ?? "--"} km/h</Typography>
-              </>
-            ) : (
-              <Typography color="text.secondary">No climate data yet — implement `/api/climate/current` in backend to feed this card.</Typography>
-            )}
-          </Box>
-        </Paper>
+
+      {/* ✅ Main Content */}
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          ml: "260px", // same width as sidebar
+          p: 4,
+          mt: 2,
+          minHeight: "100vh",
+        }}
+      >
+        <Typography
+          variant="h5"
+          fontWeight={700}
+          sx={{ mb: 3, color: "#1e293b" }}
+        >
+          🌤 Current Climate in Wayanad
+        </Typography>
+
+        {climate ? (
+          <Paper
+            elevation={2}
+            sx={{
+              p: 3,
+              borderRadius: 3,
+              maxWidth: 600,
+              bgcolor: "white",
+            }}
+          >
+            <Typography variant="h6" fontWeight={600}>
+              Temperature: {climate.temperature}°C
+            </Typography>
+            <Typography>Windspeed: {climate.windspeed} km/h</Typography>
+            <Typography>Weather Code: {climate.weathercode}</Typography>
+          </Paper>
+        ) : (
+          <Typography>Loading...</Typography>
+        )}
+
+        <Footer />
       </Box>
     </Box>
   );

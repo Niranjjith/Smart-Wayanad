@@ -1,18 +1,10 @@
-// routes/locationRoutes.js
 import express from "express";
-import {
-  getAllLocations,
-  createLocation,
-  updateLocation,
-  deleteLocation,
-} from "../controllers/locationController.js";
-import { protect } from "../middleware/authMiddleware.js";
+import { getAllLocations, addLocation, getByType } from "../controllers/locationController.js";
 
 const router = express.Router();
 
-router.get("/", protect, getAllLocations);
-router.post("/", protect, createLocation);
-router.put("/:id", protect, updateLocation);
-router.delete("/:id", protect, deleteLocation);
+router.get("/", getAllLocations);
+router.post("/", addLocation);
+router.get("/:type", getByType); // e.g. /api/location/hospital
 
 export default router;

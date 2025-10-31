@@ -1,136 +1,140 @@
 import { useEffect, useState } from "react";
-import Sidebar from "../layout/Sidebar.jsx";
-import Topbar from "../layout/Topbar.jsx";
-import API from "../services/api.js";
 import {
-  Box, Toolbar, Paper, Typography, Button, Dialog, DialogTitle,
-  DialogContent, DialogActions, TextField, MenuItem, Stack
+  Box,
+  Typography,
+  Paper,
+  Button,
+  TextField,
+  MenuItem,
+  Stack,
 } from "@mui/material";
-import { Add, Edit, Delete } from "@mui/icons-material";
-import { DataGrid } from "@mui/x-data-grid";
-import ConfirmDialog from "../components/ConfirmDialog.jsx";
+import Sidebar from "../layout/Sidebar.jsx";
+import Footer from "../layout/Footer.jsx";
+import API from "../services/api.js";
 import { toast } from "react-toastify";
 
-const TYPES = [
-  { value: "police", label: "Police" },
-  { value: "hospital", label: "Hospital" },
-  { value: "taxi", label: "Taxi Stand" },
-  { value: "auto", label: "Auto Stand" },
-  { value: "bus", label: "Bus Stop" },
-];
-
 export default function Locations() {
-  const [rows, setRows] = useState([]);
-  const [open, setOpen] = useState(false);
-  const [confirm, setConfirm] = useState({ open: false, id: null });
-  const [editId, setEditId] = useState(null);
-  const [form, setForm] = useState({ type: "", name: "", contact: "", lat: "", lng: "", extraInfo: "" });
+  const [locations, setLocations] = useState([]);
+  const [form, setForm] = useState({
+    name: "",
+    type: "",
+    contact: "",
+    address: "",
+  });
 
-  const load = async () => {
-    const { data } = await API.get("/location");
-    setRows(data || []);
-  };
-
-  useEffect(() => { load(); }, []);
-
-  const columns = [
-    { field: "type", headerName: "Type", flex: 1 },
-    { field: "name", headerName: "Name", flex: 1 },
-    { field: "contact", headerName: "Contact", flex: 1 },
-    { field: "lat", headerName: "Lat", flex: .6 },
-    { field: "lng", headerName: "Lng", flex: .6 },
-    {
-      field: "actions", headerName: "Actions", flex: 1, renderCell: (params) => (
-        <Stack direction="row" spacing={1}>
-          <Button size="small" variant="outlined" startIcon={<Edit />} onClick={() => onEdit(params.row)}>
-            Edit
-          </Button>
-          <Button size="small" color="error" variant="outlined" startIcon={<Delete />} onClick={() => setConfirm({ open: true, id: params.row._id })}>
-            Delete
-          </Button>
-        </Stack>
-      )
-    }
-  ];
-
-  const onEdit = (row) => {
-    setEditId(row._id);
-    setForm({
-      type: row.type, name: row.name, contact: row.contact,
-      lat: row.lat, lng: row.lng, extraInfo: row.extraInfo || ""
-    });
-    setOpen(true);
-  };
-
-  const onSave = async () => {
+  const fetchLocations = async () => {
     try {
-      if (!form.type || !form.name) return toast.error("Type & Name are required");
-      if (editId) await API.put(`/location/${editId}`, form);
-      else await API.post("/location", form);
-      setOpen(false);
-      setEditId(null);
-      setForm({ type: "", name: "", contact: "", lat: "", lng: "", extraInfo: "" });
-      load();
-      toast.success("Saved");
-    } catch (e) {
-      toast.error(e?.response?.data?.message || "Save failed");
+      const { data } = await API.get("/location");
+      setLocations(data);
+    } catch (err) {
+      toast.error("Failed to load locations");
     }
   };
 
-  const onDelete = async () => {
+  const handleAdd = async () => {
     try {
-      await API.delete(`/location/${confirm.id}`);
-      setConfirm({ open: false, id: null });
-      load();
-      toast.success("Deleted");
+      await API.post("/location", form);
+      toast.success("Location added successfully");
+      setForm({ name: "", type: "", contact: "", address: "" });
+      fetchLocations();
     } catch {
-      toast.error("Delete failed");
+      toast.error("Failed to add location");
     }
   };
+
+  useEffect(() => {
+    fetchLocations();
+  }, []);
 
   return (
-    <Box sx={{ display: "flex" }}>
+    <Box sx={{ display: "flex", bgcolor: "#f4f6f8", minHeight: "100vh" }}>
+      {/* ✅ Sidebar */}
       <Sidebar />
-      <Topbar title="Locations" />
-      <Box component="main" sx={{ flexGrow: 1, p: 3, ml: "260px" }}>
-        <Toolbar />
-        <Paper sx={{ p: 2, borderRadius: 3 }}>
-          <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
-            <Typography variant="h6" fontWeight={700}>Manage Locations</Typography>
-            <Button variant="contained" startIcon={<Add />} onClick={() => setOpen(true)}>Add Location</Button>
+
+      {/* ✅ Main Content */}
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          ml: "260px", // matches Sidebar width
+          p: 4,
+          mt: 2,
+        }}
+      >
+        <Typography
+          variant="h5"
+          fontWeight={700}
+          sx={{ mb: 3, color: "#1e293b" }}
+        >
+          📍 Manage Locations
+        </Typography>
+
+        {/* Form to Add New Location */}
+        <Paper sx={{ p: 3, mb: 4, borderRadius: 3 }}>
+          <Stack spacing={2}>
+            <TextField
+              label="Name"
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+            />
+            <TextField
+              select
+              label="Type"
+              value={form.type}
+              onChange={(e) => setForm({ ...form, type: e.target.value })}
+            >
+              <MenuItem value="hospital">Hospital</MenuItem>
+              <MenuItem value="taxi">Taxi Stand</MenuItem>
+              <MenuItem value="clinic">Clinic</MenuItem>
+              <MenuItem value="helpline">Helpline</MenuItem>
+            </TextField>
+            <TextField
+              label="Contact Number"
+              value={form.contact}
+              onChange={(e) => setForm({ ...form, contact: e.target.value })}
+            />
+            <TextField
+              label="Address"
+              multiline
+              rows={2}
+              value={form.address}
+              onChange={(e) => setForm({ ...form, address: e.target.value })}
+            />
+            <Button
+              variant="contained"
+              sx={{
+                bgcolor: "#16a34a",
+                "&:hover": { bgcolor: "#15803d" },
+                width: "fit-content",
+              }}
+              onClick={handleAdd}
+            >
+              Add Location
+            </Button>
           </Stack>
-          <Box sx={{ height: 620 }}>
-            <DataGrid rows={rows} columns={columns} getRowId={(r) => r._id} pageSize={10} />
-          </Box>
         </Paper>
 
-        <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="sm">
-          <DialogTitle>{editId ? "Edit Location" : "Add Location"}</DialogTitle>
-          <DialogContent>
-            <TextField select label="Type" fullWidth margin="dense" value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })}>
-              {TYPES.map((t) => <MenuItem key={t.value} value={t.value}>{t.label}</MenuItem>)}
-            </TextField>
-            <TextField label="Name" fullWidth margin="dense" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-            <TextField label="Contact" fullWidth margin="dense" value={form.contact} onChange={(e) => setForm({ ...form, contact: e.target.value })} />
-            <Stack direction="row" spacing={2}>
-              <TextField label="Latitude" fullWidth margin="dense" value={form.lat} onChange={(e) => setForm({ ...form, lat: e.target.value })} />
-              <TextField label="Longitude" fullWidth margin="dense" value={form.lng} onChange={(e) => setForm({ ...form, lng: e.target.value })} />
-            </Stack>
-            <TextField label="Extra Info" fullWidth margin="dense" multiline minRows={2} value={form.extraInfo} onChange={(e) => setForm({ ...form, extraInfo: e.target.value })} />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setOpen(false)}>Cancel</Button>
-            <Button variant="contained" onClick={onSave}>Save</Button>
-          </DialogActions>
-        </Dialog>
+        {/* List of All Locations */}
+        <Typography variant="h6" fontWeight={700} sx={{ mb: 2 }}>
+          All Locations
+        </Typography>
+        {locations.length === 0 ? (
+          <Typography color="text.secondary">
+            No locations found. Add a new one above.
+          </Typography>
+        ) : (
+          locations.map((l, i) => (
+            <Paper key={i} sx={{ p: 2, mb: 1, borderRadius: 2 }}>
+              <Typography variant="subtitle1" fontWeight={600}>
+                {l.name} ({l.type})
+              </Typography>
+              <Typography variant="body2">📍 {l.address}</Typography>
+              <Typography variant="body2">📞 {l.contact}</Typography>
+            </Paper>
+          ))
+        )}
 
-        <ConfirmDialog
-          open={confirm.open}
-          onClose={() => setConfirm({ open: false, id: null })}
-          onConfirm={onDelete}
-          title="Delete Location"
-          message="This will permanently delete the location."
-        />
+        <Footer />
       </Box>
     </Box>
   );

@@ -7,13 +7,46 @@ import 'chatbot_page.dart';
 import 'bus_routes_page.dart';
 import 'profile_page.dart';
 import 'splash_page.dart';
+import 'helpline_page.dart';
+import 'hospital_page.dart';
+import 'taxi_page.dart';
+import 'clinic_page.dart';
+import 'notifications_page.dart'; // 🆕 optional if you create a notifications page later
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   final Map user;
   const HomePage({super.key, required this.user});
 
   @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  int _selectedIndex = 0;
+
+  void _onItemTapped(int index) {
+    if (index == 1) {
+      // 🔔 Notifications page
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const NotificationsPage()),
+      );
+    } else if (index == 2) {
+      // 👤 Profile page
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => ProfilePage(user: widget.user)),
+      );
+    } else {
+      // 🏠 Home stays on same page
+      setState(() => _selectedIndex = 0);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final user = widget.user;
+
     final features = [
       {
         "title": "Send Help Alert",
@@ -44,6 +77,30 @@ class HomePage extends StatelessWidget {
         "icon": Icons.person_rounded,
         "color": const Color(0xFFFFA000),
         "page": ProfilePage(user: user)
+      },
+      {
+        "title": "Helpline Numbers",
+        "icon": Icons.call_rounded,
+        "color": const Color(0xFF00ACC1),
+        "page": const HelplinePage(),
+      },
+      {
+        "title": "Taxi Stands",
+        "icon": Icons.local_taxi_rounded,
+        "color": const Color(0xFF3949AB),
+        "page": const TaxiPage(),
+      },
+      {
+        "title": "Hospitals",
+        "icon": Icons.local_hospital_rounded,
+        "color": const Color(0xFFD32F2F),
+        "page": const HospitalPage(),
+      },
+      {
+        "title": "Clinics",
+        "icon": Icons.health_and_safety_rounded,
+        "color": const Color(0xFF2E7D32),
+        "page": const ClinicPage(),
       },
     ];
 
@@ -87,6 +144,8 @@ class HomePage extends StatelessWidget {
           ),
         ],
       ),
+
+      // 🧭 Body content
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -122,7 +181,8 @@ class HomePage extends StatelessWidget {
                         const CircleAvatar(
                           radius: 30,
                           backgroundColor: Colors.white,
-                          child: Icon(Icons.public, color: Colors.green, size: 30),
+                          child:
+                              Icon(Icons.public, color: Colors.green, size: 30),
                         ),
                         const SizedBox(width: 16),
                         Expanded(
@@ -155,7 +215,8 @@ class HomePage extends StatelessWidget {
                     physics: const NeverScrollableScrollPhysics(),
                     shrinkWrap: true,
                     itemCount: features.length,
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 3,
                       childAspectRatio: 0.9,
                       crossAxisSpacing: 14,
@@ -230,30 +291,54 @@ class HomePage extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 30),
-
-                  // Footer
-                  Center(
-                    child: Text(
-                      "© 2025 Smart Wayanad | Developed by Niranjan",
-                      style: GoogleFonts.poppins(
-                        fontSize: 12,
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 80), // leave space for bottom nav
                 ],
               ),
             ),
           ),
         ),
       ),
+
+      // 🌙 Bottom Navigation Bar
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: Colors.green.shade900,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 6,
+              offset: const Offset(0, -2),
+            ),
+          ],
+        ),
+        child: BottomNavigationBar(
+          backgroundColor: Colors.green.shade900,
+          currentIndex: _selectedIndex,
+          onTap: _onItemTapped,
+          selectedItemColor: Colors.white,
+          unselectedItemColor: Colors.white70,
+          type: BottomNavigationBarType.fixed,
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home_rounded),
+              label: "Home",
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.notifications_rounded),
+              label: "Alerts",
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person_rounded),
+              label: "Profile",
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
 
-// 🌿 Feature Card (clean white-green glass look)
+// 🌿 Feature Card
 class _FeatureCard extends StatelessWidget {
   final String title;
   final IconData icon;
