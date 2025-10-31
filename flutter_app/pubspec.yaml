@@ -1,0 +1,42 @@
+name: smart_wayanad
+description: Smart Wayanad Citizen App
+publish_to: "none"
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # 🌐 Networking + APIs
+  http: ^1.2.2
+
+  # 📍 Location access
+  geolocator: ^13.0.1
+
+  # 💬 Notifications (works on Android/iOS, not Windows)
+  fluttertoast: ^8.2.4
+
+  # 🧠 State management
+  provider: ^6.1.2
+
+  # 🖋 Google Fonts for a clean look
+  google_fonts: ^6.2.1
+
+  # 🔗 External link launcher
+  url_launcher: ^6.3.0
+
+  # ⚡ Real-time updates (for chat/help alerts)
+  socket_io_client: ^2.0.3+1
+
+  # 🎡 Loading animations / spinners
+  flutter_spinkit: ^5.2.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
