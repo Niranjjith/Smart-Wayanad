@@ -7,14 +7,14 @@ export async function createAlert(req, res) {
   try {
     const { name, message, lat, lng, phone } = req.body;
 
-    // Validate required inputs
+    // Required validation
     if (!name || !message || lat == null || lng == null) {
       return res.status(400).json({
         message: "Name, message, lat and lng are required",
       });
     }
 
-    // Create the alert
+    // Create the alert entry
     const alert = await Alert.create({
       name,
       phone: phone || "",
@@ -26,7 +26,7 @@ export async function createAlert(req, res) {
       },
     });
 
-    // Emit real-time event to admin dashboard
+    // Emit real-time event
     const io = req.app.get("io");
     if (io) io.emit("help:new", alert);
 
@@ -65,7 +65,6 @@ export async function updateAlert(req, res) {
       return res.status(404).json({ message: "Alert not found" });
     }
 
-    // Real-time update event
     const io = req.app.get("io");
     if (io) io.emit("help:update", updated);
 
@@ -87,7 +86,6 @@ export async function deleteAlert(req, res) {
       return res.status(404).json({ message: "Alert not found" });
     }
 
-    // Real-time delete event
     const io = req.app.get("io");
     if (io) io.emit("help:delete", deleted._id);
 

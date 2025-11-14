@@ -38,7 +38,10 @@ class ApiService {
   static Future<dynamic> _get(String endpoint) async {
     try {
       final res = await http.get(Uri.parse("$_baseUrl/$endpoint"));
-      if (res.statusCode == 200) return jsonDecode(res.body);
+
+      if (res.statusCode == 200) {
+        return jsonDecode(res.body);
+      }
 
       print("❌ GET /$endpoint → ${res.statusCode}: ${res.body}");
     } catch (e) {
@@ -74,7 +77,7 @@ class ApiService {
   }
 
   // ---------------------------------------------------------------------------
-  // 🚨 HELP ALERTS (FIXED)
+  // 🚨 HELP ALERTS
   // ---------------------------------------------------------------------------
 
   static Future<bool> sendHelp({
@@ -93,6 +96,11 @@ class ApiService {
     });
 
     return res != null;
+  }
+
+  static Future<List<dynamic>> getAlerts() async {
+    final data = await _get("help");
+    return data is List ? data : [];
   }
 
   // ---------------------------------------------------------------------------
