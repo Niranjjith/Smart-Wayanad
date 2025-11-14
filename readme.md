@@ -15,14 +15,7 @@ It combines **public transport details**, **emergency alerts**, **climate update
 
 ---
 
-## 🧩 System Architecture
 
-```mermaid
-graph TD;
-A[Flutter Mobile App] -->|API Calls| B[(Express.js Backend)];
-C[Admin Dashboard (React)] -->|REST API| B;
-B --> D[(MongoDB Database)];
-B -->|Real-time Socket.IO| A;
 ⚙️ Installation & Setup
 🟢 1. Clone Repository
 bash
