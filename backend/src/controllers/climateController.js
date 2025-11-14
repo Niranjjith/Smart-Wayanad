@@ -1,12 +1,25 @@
+// backend/src/controllers/climateController.js
+
 export async function getClimate(req, res) {
-  const { city = "Wayanad" } = req.query;
-  // Simulated response (replace with real API if needed)
-  const mock = {
-    city,
-    temp: 25 + Math.floor(Math.random() * 5),
-    humidity: 60 + Math.floor(Math.random() * 10),
-    wind: 5 + Math.floor(Math.random() * 5),
-    description: "Partly cloudy",
-  };
-  res.json(mock);
+  try {
+    const { city = "Wayanad" } = req.query;
+
+    // ✅ Mock/sample climate data (always works)
+    const sampleClimate = {
+      city,
+      temp: 26,            // temperature in °C
+      humidity: 72,        // %
+      wind: 5.4,           // km/h
+      description: "Partly cloudy with mild breeze",
+      code: 2              // mock weather code
+    };
+
+    res.json(sampleClimate);
+
+  } catch (error) {
+    res.status(500).json({
+      error: "Failed to fetch climate data",
+      details: error.message,
+    });
+  }
 }

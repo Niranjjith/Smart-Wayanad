@@ -26,18 +26,19 @@ class _HelpPageState extends State<HelpPage> {
       return;
     }
 
-    final position = await LocationService.currentPosition();
-    if (position != null) {
+    final pos = await LocationService.currentPosition();
+    if (pos != null) {
       setState(() {
-        _lat = position.latitude;
-        _lng = position.longitude;
+        _lat = pos.latitude;
+        _lng = pos.longitude;
       });
+
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Location detected (${_lat!.toStringAsFixed(3)}, ${_lng!.toStringAsFixed(3)})")),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Unable to fetch location")),
+        SnackBar(
+          content: Text(
+            "Location: ${_lat!.toStringAsFixed(3)}, ${_lng!.toStringAsFixed(3)}",
+          ),
+        ),
       );
     }
   }
@@ -61,24 +62,26 @@ class _HelpPageState extends State<HelpPage> {
     setState(() => _loading = true);
 
     final success = await ApiService.sendHelp(
-      name: widget.user['name'] ?? 'User',
+      name: widget.user['name'],
       message: _messageController.text.trim(),
       lat: _lat!,
       lng: _lng!,
     );
 
-    if (success) {
+    setState(() => _loading = false);
+
+    if (!success) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("✅ Help alert sent successfully!")),
+        const SnackBar(content: Text("❌ Failed to send alert")),
       );
-      _messageController.clear();
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("❌ Failed to send help alert.")),
-      );
+      return;
     }
 
-    setState(() => _loading = false);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("✅ Alert sent successfully")),
+    );
+
+    _messageController.clear();
   }
 
   @override
@@ -99,12 +102,14 @@ class _HelpPageState extends State<HelpPage> {
               "Need Immediate Help?",
               style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 10),
             const Text(
-              "Send an SOS alert with your location and a short message. Admin will be notified immediately.",
+              "Send an SOS alert with your location. Admin will be notified instantly.",
               style: TextStyle(color: Colors.black54),
             ),
             const SizedBox(height: 24),
+
+            // Emergency Message Box
             TextField(
               controller: _messageController,
               decoration: const InputDecoration(
@@ -115,35 +120,39 @@ class _HelpPageState extends State<HelpPage> {
               minLines: 2,
               maxLines: 5,
             ),
+
             const SizedBox(height: 24),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: _getLocation,
-                    icon: const Icon(Icons.location_on_outlined),
-                    label: const Text("Get My Location"),
-                    style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: Colors.green.shade700),
-                      foregroundColor: Colors.green.shade800,
-                      minimumSize: const Size.fromHeight(48),
-                    ),
-                  ),
-                ),
-              ],
+
+            // Get location button
+            OutlinedButton.icon(
+              onPressed: _getLocation,
+              icon: const Icon(Icons.my_location),
+              label: Text(
+                _lat == null
+                    ? "Get My Location"
+                    : "Location: ${_lat!.toStringAsFixed(3)}, ${_lng!.toStringAsFixed(3)}",
+              ),
+              style: OutlinedButton.styleFrom(
+                side: BorderSide(color: Colors.green.shade700),
+                foregroundColor: Colors.green.shade800,
+                minimumSize: const Size.fromHeight(50),
+              ),
             ),
+
             const SizedBox(height: 24),
+
+            // Send Alert Button
             _loading
                 ? const Center(child: CircularProgressIndicator())
                 : ElevatedButton.icon(
                     onPressed: _sendHelp,
-                    icon: const Icon(Icons.send_rounded),
+                    icon: const Icon(Icons.sos),
                     label: const Text(
                       "Send Help Alert",
                       style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green[700],
+                      backgroundColor: Colors.red[700],
                       foregroundColor: Colors.white,
                       minimumSize: const Size.fromHeight(55),
                       shape: RoundedRectangleBorder(

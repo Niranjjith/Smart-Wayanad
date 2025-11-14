@@ -12,7 +12,7 @@ class ApiService {
       (Platform.isWindows || Platform.isMacOS) ? _desktopBase : _mobileBase;
 
   // ---------------------------------------------------------------------------
-  // 🧩 Generic helpers
+  // 🧩 GENERIC HELPERS
   // ---------------------------------------------------------------------------
 
   static Future<Map<String, dynamic>?> _post(String endpoint, Map body) async {
@@ -22,10 +22,12 @@ class ApiService {
         headers: {"Content-Type": "application/json"},
         body: jsonEncode(body),
       );
+
       if (res.statusCode == 200 || res.statusCode == 201) {
         final data = jsonDecode(res.body);
         if (data is Map<String, dynamic>) return data;
       }
+
       print("❌ POST /$endpoint → ${res.statusCode}: ${res.body}");
     } catch (e) {
       print("⚠️ POST /$endpoint error: $e");
@@ -37,6 +39,7 @@ class ApiService {
     try {
       final res = await http.get(Uri.parse("$_baseUrl/$endpoint"));
       if (res.statusCode == 200) return jsonDecode(res.body);
+
       print("❌ GET /$endpoint → ${res.statusCode}: ${res.body}");
     } catch (e) {
       print("⚠️ GET /$endpoint error: $e");
@@ -71,7 +74,7 @@ class ApiService {
   }
 
   // ---------------------------------------------------------------------------
-  // 🚨 HELP ALERTS
+  // 🚨 HELP ALERTS (FIXED)
   // ---------------------------------------------------------------------------
 
   static Future<bool> sendHelp({
@@ -79,12 +82,16 @@ class ApiService {
     required String message,
     required double lat,
     required double lng,
+    String phone = "",
   }) async {
     final res = await _post("help", {
       "name": name,
+      "phone": phone,
       "message": message,
-      "location": {"lat": lat, "lng": lng},
+      "lat": lat,
+      "lng": lng,
     });
+
     return res != null;
   }
 

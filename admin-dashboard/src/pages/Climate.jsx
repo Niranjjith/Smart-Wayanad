@@ -11,40 +11,34 @@ export default function Climate() {
   useEffect(() => {
     const fetchWeather = async () => {
       try {
-        // ✅ You can later replace this with your backend proxy API endpoint: /api/climate
-        const { data } = await API.get(
-          "https://api.open-meteo.com/v1/forecast?latitude=11.6854&longitude=76.1320&current_weather=true"
-        );
-        setClimate(data.current_weather);
+        // ⬅️ Now fetching from your backend
+        const { data } = await API.get("/climate/current?city=Wayanad");
+
+        setClimate(data);
       } catch (err) {
         console.error(err);
-        toast.error("Failed to fetch weather data");
+        toast.error("Failed to fetch climate data");
       }
     };
+
     fetchWeather();
   }, []);
 
   return (
     <Box sx={{ display: "flex", bgcolor: "#f4f6f8", minHeight: "100vh" }}>
-      {/* ✅ Left Sidebar */}
       <Sidebar />
 
-      {/* ✅ Main Content */}
       <Box
         component="main"
         sx={{
           flexGrow: 1,
-          ml: "260px", // same width as sidebar
+          ml: "260px",
           p: 4,
           mt: 2,
           minHeight: "100vh",
         }}
       >
-        <Typography
-          variant="h5"
-          fontWeight={700}
-          sx={{ mb: 3, color: "#1e293b" }}
-        >
+        <Typography variant="h5" fontWeight={700} sx={{ mb: 3, color: "#1e293b" }}>
           🌤 Current Climate in Wayanad
         </Typography>
 
@@ -59,10 +53,11 @@ export default function Climate() {
             }}
           >
             <Typography variant="h6" fontWeight={600}>
-              Temperature: {climate.temperature}°C
+              Temperature: {climate.temp}°C
             </Typography>
-            <Typography>Windspeed: {climate.windspeed} km/h</Typography>
-            <Typography>Weather Code: {climate.weathercode}</Typography>
+            <Typography>Humidity: {climate.humidity}%</Typography>
+            <Typography>Wind Speed: {climate.wind} km/h</Typography>
+            <Typography>Description: {climate.description}</Typography>
           </Paper>
         ) : (
           <Typography>Loading...</Typography>
