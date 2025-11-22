@@ -1,11 +1,11 @@
 import Alert from "../models/Alert.js";
 
 // ----------------------------------------
-// CREATE ALERT
+// CREATE ALERT (User Emergency)
 // ----------------------------------------
 export async function createAlert(req, res) {
   try {
-    const { name, message, lat, lng, phone } = req.body;
+    const { name, message, lat, lng, phone, alertType } = req.body;
 
     // Required validation
     if (!name || !message || lat == null || lng == null) {
@@ -20,6 +20,9 @@ export async function createAlert(req, res) {
       phone: phone || "",
       message,
       status: "pending",
+      alertType: alertType || "emergency",
+      source: "user",
+      priority: "high",
       location: {
         type: "Point",
         coordinates: [lng, lat], // GeoJSON format (lng, lat)
@@ -29,10 +32,67 @@ export async function createAlert(req, res) {
     // Emit real-time event
     const io = req.app.get("io");
     if (io) io.emit("help:new", alert);
+    if (io) io.emit("alert:new", alert); // For notifications
 
     res.status(201).json(alert);
   } catch (err) {
     console.error("❌ createAlert error:", err);
+    res.status(500).json({ message: err.message });
+  }
+}
+
+// ----------------------------------------
+// CREATE ADMIN ALERT (Broadcast)
+// ----------------------------------------
+export async function createAdminAlert(req, res) {
+  try {
+    const { message, alertType, priority } = req.body;
+
+    // Required validation
+    if (!message || !alertType) {
+      return res.status(400).json({
+        message: "Message and alertType are required",
+      });
+    }
+
+    // Create the admin alert entry (without location)
+    // First create the alert
+    const alert = await Alert.create({
+      name: "Admin",
+      phone: "",
+      message,
+      status: "active",
+      alertType: alertType || "other",
+      source: "admin",
+      priority: priority || "high",
+    });
+    
+    // Immediately remove location field from database using $unset
+    await Alert.findByIdAndUpdate(
+      alert._id,
+      { $unset: { location: "" } },
+      { new: true }
+    );
+    
+    // Reload the alert to get the clean version without location
+    const cleanAlert = await Alert.findById(alert._id).lean();
+    if (cleanAlert && cleanAlert.location) {
+      delete cleanAlert.location;
+    }
+    
+    // Use the clean alert for response
+    const finalAlert = cleanAlert || alert;
+
+    // Emit real-time event to all users
+    const io = req.app.get("io");
+    if (io) {
+      io.emit("alert:new", finalAlert); // For notifications page
+      io.emit("admin:alert", finalAlert); // For real-time notifications
+    }
+
+    res.status(201).json(finalAlert);
+  } catch (err) {
+    console.error("❌ createAdminAlert error:", err);
     res.status(500).json({ message: err.message });
   }
 }

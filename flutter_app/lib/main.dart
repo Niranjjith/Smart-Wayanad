@@ -19,22 +19,58 @@ class SmartWayanadApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Define a unified app theme
+    // Define a premium unified app theme
     final theme = ThemeData(
       useMaterial3: true, // Modern Material You design
-      colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: const Color(0xFF667EEA),
+        brightness: Brightness.light,
+      ),
       textTheme: GoogleFonts.interTextTheme(),
       appBarTheme: AppBarTheme(
-        backgroundColor: Colors.green.shade800,
+        backgroundColor: const Color(0xFF667EEA),
         foregroundColor: Colors.white,
         elevation: 0,
+        centerTitle: true,
         titleTextStyle: GoogleFonts.poppins(
           fontSize: 20,
-          fontWeight: FontWeight.w600,
+          fontWeight: FontWeight.w700,
           color: Colors.white,
+          letterSpacing: -0.5,
         ),
       ),
-      scaffoldBackgroundColor: Colors.white,
+      scaffoldBackgroundColor: const Color(0xFFF5F7FA),
+      cardTheme: CardThemeData(
+        elevation: 2,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        shadowColor: Colors.black.withValues(alpha: 0.1),
+      ),
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+        backgroundColor: const Color(0xFF667EEA),
+        foregroundColor: Colors.white,
+        elevation: 4,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: Colors.white,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.grey.shade300),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.grey.shade300),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFF667EEA), width: 2),
+        ),
+      ),
     );
 
     return MaterialApp(

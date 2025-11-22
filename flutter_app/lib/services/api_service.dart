@@ -26,13 +26,24 @@ class ApiService {
       if (res.statusCode == 200 || res.statusCode == 201) {
         final data = jsonDecode(res.body);
         if (data is Map<String, dynamic>) return data;
+        if (data is List) return {"success": true, "data": data};
+        return {"success": true, "data": data};
       }
 
       print("❌ POST /$endpoint → ${res.statusCode}: ${res.body}");
+      try {
+        final errorData = jsonDecode(res.body);
+        if (errorData is Map<String, dynamic>) {
+          throw Exception(errorData['message'] ?? 'Request failed');
+        }
+      } catch (_) {
+        // If parsing fails, use the raw body or default message
+      }
+      throw Exception('Request failed with status ${res.statusCode}');
     } catch (e) {
       print("⚠️ POST /$endpoint error: $e");
+      rethrow;
     }
-    return null;
   }
 
   static Future<dynamic> _get(String endpoint) async {
@@ -87,15 +98,19 @@ class ApiService {
     required double lng,
     String phone = "",
   }) async {
-    final res = await _post("help", {
-      "name": name,
-      "phone": phone,
-      "message": message,
-      "lat": lat,
-      "lng": lng,
-    });
-
-    return res != null;
+    try {
+      final res = await _post("help", {
+        "name": name,
+        "phone": phone,
+        "message": message,
+        "lat": lat,
+        "lng": lng,
+      });
+      return res != null;
+    } catch (e) {
+      print("Error sending help: $e");
+      return false;
+    }
   }
 
   static Future<List<dynamic>> getAlerts() async {
@@ -134,6 +149,35 @@ class ApiService {
   static Future<Map<String, dynamic>?> sendChat(
       String user, String message) async {
     return await _post("chat", {"user": user, "message": message});
+  }
+
+  // AI Chatbot
+  static Future<Map<String, dynamic>?> sendChatbotMessage(
+      String message, String? userId) async {
+    try {
+      return await _post("chatbot", {"message": message, "userId": userId});
+    } catch (e) {
+      print("Chatbot error: $e");
+      return null;
+    }
+  }
+
+  // Analytics
+  static Future<Map<String, dynamic>?> getAlertPredictions() async {
+    final data = await _get("analytics/alerts/predictions");
+    return data is Map<String, dynamic> ? data : null;
+  }
+
+  static Future<Map<String, dynamic>?> getRouteRecommendations(
+      String origin, String destination) async {
+    final data = await _get(
+        "analytics/routes/recommendations?origin=$origin&destination=$destination");
+    return data is Map<String, dynamic> ? data : null;
+  }
+
+  static Future<Map<String, dynamic>?> detectAnomalies() async {
+    final data = await _get("analytics/alerts/anomalies");
+    return data is Map<String, dynamic> ? data : null;
   }
 
   // ---------------------------------------------------------------------------

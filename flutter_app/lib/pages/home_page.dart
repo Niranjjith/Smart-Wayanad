@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'dart:math' as math;
 
 // Import pages
 import 'help_page.dart';
@@ -13,6 +14,9 @@ import 'hospital_page.dart';
 import 'taxi_page.dart';
 import 'clinic_page.dart';
 import 'notifications_page.dart';
+import 'smart_route_page.dart';
+import 'ai_ml_page.dart';
+import '../services/api_service.dart';
 
 class HomePage extends StatefulWidget {
   final Map user;
@@ -22,10 +26,50 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-// ============================================================================
-
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   int _selectedIndex = 0;
+  late AnimationController _pulseController;
+  late AnimationController _slideController;
+  late Animation<double> _pulseAnimation;
+  late Animation<Offset> _slideAnimation;
+  bool _isServerOnline = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkServerStatus();
+    
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    )..repeat(reverse: true);
+    
+    _slideController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    )..forward();
+    
+    _pulseAnimation = Tween<double>(begin: 0.95, end: 1.05).animate(
+      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+    );
+    
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.3),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(parent: _slideController, curve: Curves.easeOut));
+  }
+
+  Future<void> _checkServerStatus() async {
+    final isOnline = await ApiService.pingServer();
+    setState(() => _isServerOnline = isOnline);
+  }
+
+  @override
+  void dispose() {
+    _pulseController.dispose();
+    _slideController.dispose();
+    super.dispose();
+  }
 
   void _onItemTapped(int index) {
     if (index == 1) {
@@ -45,289 +89,365 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final user = widget.user;
+    final size = MediaQuery.of(context).size;
 
-    // -----------------------------------------------------------------------
-    // FIXED STRONGLY TYPED FEATURES LIST
-    // -----------------------------------------------------------------------
-    final List<Map<String, Object>> features = [
+    // Premium feature cards with gradients
+    final List<Map<String, dynamic>> features = [
       {
         "title": "SOS Emergency",
-        "icon": Icons.sos,
-        "color": Colors.red,
+        "icon": Icons.sos_rounded,
+        "gradient": [const Color(0xFFE53935), const Color(0xFFC62828)],
         "page": HelpPage(user: user),
+        "badge": "24/7",
       },
       {
         "title": "Bus Routes",
         "icon": Icons.directions_bus_rounded,
-        "color": Colors.blue,
+        "gradient": [const Color(0xFF667EEA), const Color(0xFF764BA2)],
         "page": const BusRoutesPage(),
+        "badge": null,
+      },
+      {
+        "title": "Smart Route",
+        "icon": Icons.route_rounded,
+        "gradient": [const Color(0xFF43E97B), const Color(0xFF38F9D7)],
+        "page": const SmartRoutePage(),
+        "badge": "AI",
+      },
+      {
+        "title": "AI/ML Features",
+        "icon": Icons.psychology_rounded,
+        "gradient": [const Color(0xFF667EEA), const Color(0xFF764BA2)],
+        "page": const AIMLPage(),
+        "badge": "NEW",
       },
       {
         "title": "Weather",
-        "icon": Icons.cloud_rounded,
-        "color": Colors.green,
+        "icon": Icons.wb_sunny_rounded,
+        "gradient": [const Color(0xFFF093FB), const Color(0xFFF5576C)],
         "page": const ClimatePage(),
+        "badge": "Live",
       },
       {
-        "title": "Chatbot",
+        "title": "AI Chatbot",
         "icon": Icons.smart_toy_rounded,
-        "color": Colors.deepPurple,
+        "gradient": [const Color(0xFF4FACFE), const Color(0xFF00F2FE)],
         "page": const ChatbotPage(),
+        "badge": "AI",
       },
       {
         "title": "Helpline",
-        "icon": Icons.call_rounded,
-        "color": Colors.teal,
+        "icon": Icons.phone_in_talk_rounded,
+        "gradient": [const Color(0xFF43E97B), const Color(0xFF38F9D7)],
         "page": const HelplinePage(),
+        "badge": null,
       },
       {
         "title": "Hospitals",
         "icon": Icons.local_hospital_rounded,
-        "color": Colors.redAccent,
+        "gradient": [const Color(0xFFFA709A), const Color(0xFFFEE140)],
         "page": const HospitalPage(),
+        "badge": null,
       },
       {
         "title": "Clinics",
         "icon": Icons.healing_rounded,
-        "color": Colors.green,
+        "gradient": [const Color(0xFF30CFD0), const Color(0xFF330867)],
         "page": const ClinicPage(),
+        "badge": null,
       },
       {
         "title": "Taxi Stands",
         "icon": Icons.local_taxi_rounded,
-        "color": Colors.indigo,
+        "gradient": [const Color(0xFFA8EDEA), const Color(0xFFFED6E3)],
         "page": const TaxiPage(),
+        "badge": null,
       },
-      {
-        "title": "My Profile",
-        "icon": Icons.person_rounded,
-        "color": Colors.orange,
-        "page": ProfilePage(user: user),
-      },
-    ];
-
-    // District rules
-    final List<String> rules = [
-      "Respect natural habitats & wildlife.",
-      "Avoid littering, especially in eco-sensitive zones.",
-      "Drive safely & follow traffic rules.",
-      "Support eco-tourism & local businesses.",
-      "Use SOS for immediate emergency assistance.",
-      "Stay updated about weather alerts.",
     ];
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFF5F7FA),
       extendBodyBehindAppBar: true,
-
-      // -------------------------------------------------------------------
-      // TOP APP BAR
-      // -------------------------------------------------------------------
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        centerTitle: true,
-        title: Text(
-          "Smart Wayanad",
-          style: GoogleFonts.poppins(
-            color: Colors.white,
-            fontWeight: FontWeight.w700,
-            fontSize: 22,
-          ),
-        ),
-        actions: [
-          IconButton(
-            tooltip: "Logout",
-            icon: const Icon(Icons.logout, color: Colors.white),
-            onPressed: () {
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (_) => const SplashPage()),
-                (route) => false,
-              );
-            },
-          ),
-        ],
-      ),
-
-      // -------------------------------------------------------------------
-      // BODY
-      // -------------------------------------------------------------------
-      body: Stack(
-        children: [
-          // Green gradient header background
-          Container(
-            height: 260,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Colors.green.shade800,
-                  Colors.green.shade600,
-                  Colors.green.shade400,
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
+      body: CustomScrollView(
+        slivers: [
+          // Premium App Bar with Gradient
+          SliverAppBar(
+            expandedHeight: 280,
+            floating: false,
+            pinned: true,
+            elevation: 0,
+            backgroundColor: Colors.transparent,
+            flexibleSpace: FlexibleSpaceBar(
+              background: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      const Color(0xFF667EEA),
+                      const Color(0xFF764BA2),
+                      const Color(0xFFF093FB),
+                    ],
+                  ),
+                ),
+                child: SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        // Status indicator
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 6,
+                              ),
+                              decoration: BoxDecoration(
+                                color: _isServerOnline
+                                    ? Colors.green.withValues(alpha: 0.2)
+                                    : Colors.red.withValues(alpha: 0.2),
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color: _isServerOnline
+                                      ? Colors.green
+                                      : Colors.red,
+                                  width: 1.5,
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Container(
+                                    width: 8,
+                                    height: 8,
+                                    decoration: BoxDecoration(
+                                      color: _isServerOnline
+                                          ? Colors.green
+                                          : Colors.red,
+                                      shape: BoxShape.circle,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    _isServerOnline ? 'Online' : 'Offline',
+                                    style: GoogleFonts.poppins(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const Spacer(),
+                            IconButton(
+                              icon: const Icon(Icons.logout_rounded,
+                                  color: Colors.white),
+                              onPressed: () {
+                                Navigator.pushAndRemoveUntil(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (_) => const SplashPage()),
+                                  (route) => false,
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        // Welcome section
+                        Row(
+                          children: [
+                            ScaleTransition(
+                              scale: _pulseAnimation,
+                              child: Container(
+                                width: 70,
+                                height: 70,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      Colors.white.withValues(alpha: 0.3),
+                                      Colors.white.withValues(alpha: 0.1),
+                                    ],
+                                  ),
+                                  border: Border.all(
+                                    color: Colors.white.withValues(alpha: 0.5),
+                                    width: 2,
+                                  ),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    (user["name"]?[0] ?? "U").toUpperCase(),
+                                    style: GoogleFonts.poppins(
+                                      color: Colors.white,
+                                      fontSize: 28,
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "Hello, ${user["name"] ?? "Citizen"} 👋",
+                                    style: GoogleFonts.poppins(
+                                      color: Colors.white,
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.w800,
+                                      letterSpacing: -0.5,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    "Welcome to Smart Wayanad",
+                                    style: GoogleFonts.poppins(
+                                      color: Colors.white.withValues(alpha: 0.9),
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ),
             ),
           ),
 
-          SafeArea(
-            child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              child: Column(
+          // Quick Stats Section
+          SliverToBoxAdapter(
+            child: SlideTransition(
+              position: _slideAnimation,
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: _StatCard(
+                        icon: Icons.directions_bus_rounded,
+                        value: "50+",
+                        label: "Bus Routes",
+                        color: const Color(0xFF667EEA),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _StatCard(
+                        icon: Icons.local_hospital_rounded,
+                        value: "20+",
+                        label: "Hospitals",
+                        color: const Color(0xFFF5576C),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _StatCard(
+                        icon: Icons.wb_sunny_rounded,
+                        value: "24°C",
+                        label: "Weather",
+                        color: const Color(0xFF4FACFE),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          // Services Section
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: Row(
                 children: [
-                  const SizedBox(height: 15),
-
-                  // ------------------------------------------------------
-                  // WELCOME CARD
-                  // ------------------------------------------------------
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Container(
-                      padding: const EdgeInsets.all(18),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        color: Colors.white.withOpacity(0.2),
-                        border: Border.all(color: Colors.white30, width: 1),
-                      ),
-                      child: Row(
-                        children: [
-                          const CircleAvatar(
-                            radius: 34,
-                            backgroundColor: Colors.white,
-                            child: Icon(Icons.account_circle,
-                                size: 40, color: Colors.green),
-                          ),
-                          const SizedBox(width: 15),
-                          Expanded(
-                            child: Text(
-                              "Hello, ${user["name"] ?? "Citizen"} 👋\nWelcome to Smart Wayanad",
-                              style: GoogleFonts.poppins(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 16,
-                              ),
-                            ),
-                          ),
-                        ],
+                  Text(
+                    "Services",
+                    style: GoogleFonts.poppins(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.grey.shade900,
+                    ),
+                  ),
+                  const Spacer(),
+                  TextButton.icon(
+                    onPressed: _checkServerStatus,
+                    icon: const Icon(Icons.refresh_rounded, size: 18),
+                    label: Text(
+                      "Refresh",
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
+                ],
+              ),
+            ),
+          ),
 
-                  const SizedBox(height: 30),
-
-                  // ------------------------------------------------------
-                  // FEATURE GRID
-                  // ------------------------------------------------------
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 18),
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        "Explore Services",
-                        style: GoogleFonts.poppins(
-                          color: Colors.green.shade900,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 18,
+          // Features Grid
+          SliverPadding(
+            padding: const EdgeInsets.all(20.0),
+            sliver: SliverGrid(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                childAspectRatio: 1.1,
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 16,
+              ),
+              delegate: SliverChildBuilderDelegate(
+                (context, index) {
+                  final feature = features[index];
+                  return _PremiumFeatureCard(
+                    title: feature["title"],
+                    icon: feature["icon"],
+                    gradient: feature["gradient"],
+                    badge: feature["badge"],
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => feature["page"] as Widget,
                         ),
-                      ),
+                      );
+                    },
+                  );
+                },
+                childCount: features.length,
+              ),
+            ),
+          ),
+
+          // District Guidelines
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "District Guidelines",
+                    style: GoogleFonts.poppins(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.grey.shade900,
                     ),
                   ),
-
-                  const SizedBox(height: 15),
-
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 18),
-                    child: GridView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: features.length,
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 3,
-                        childAspectRatio: 0.95,
-                        crossAxisSpacing: 16,
-                        mainAxisSpacing: 16,
-                      ),
-                      itemBuilder: (_, index) {
-                        final f = features[index];
-
-                        return _FeatureCard(
-                          title: f["title"] as String,
-                          icon: f["icon"] as IconData,
-                          color: f["color"] as Color,
-                          onTap: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (_) => f["page"] as Widget),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-
-                  const SizedBox(height: 30),
-
-                  // ------------------------------------------------------
-                  // DISTRICT RULES BOX
-                  // ------------------------------------------------------
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 18),
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        "District Guidelines",
-                        style: GoogleFonts.poppins(
-                          color: Colors.green.shade900,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 18,
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 10),
-
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 18),
-                    child: Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        color: Colors.green.shade50,
-                        border: Border.all(color: Colors.green.shade200),
-                      ),
-                      child: Column(
-                        children: rules
-                            .map((rule) => Padding(
-                                  padding: const EdgeInsets.only(bottom: 8),
-                                  child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        "•  ",
-                                        style: TextStyle(
-                                            color: Colors.green.shade900,
-                                            fontSize: 16),
-                                      ),
-                                      Expanded(
-                                        child: Text(
-                                          rule,
-                                          style: GoogleFonts.poppins(
-                                            fontSize: 14,
-                                            color: Colors.green.shade900,
-                                            height: 1.4,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ))
-                            .toList(),
-                      ),
-                    ),
-                  ),
-
+                  const SizedBox(height: 16),
+                  _GuidelinesCard(),
                   const SizedBox(height: 100),
                 ],
               ),
@@ -336,33 +456,73 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
 
-      // -------------------------------------------------------------------
-      // BOTTOM NAV
-      // -------------------------------------------------------------------
+      // Premium Bottom Navigation
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: Colors.green.shade900,
+          gradient: LinearGradient(
+            colors: [
+              const Color(0xFF667EEA),
+              const Color(0xFF764BA2),
+            ],
+          ),
           boxShadow: [
             BoxShadow(
-              blurRadius: 10,
-              color: Colors.black26,
-              offset: const Offset(0, -2),
-            )
+              color: Colors.black.withValues(alpha: 0.1),
+              blurRadius: 20,
+              offset: const Offset(0, -5),
+            ),
           ],
         ),
         child: BottomNavigationBar(
-          backgroundColor: Colors.green.shade900,
+          backgroundColor: Colors.transparent,
+          elevation: 0,
           selectedItemColor: Colors.white,
-          unselectedItemColor: Colors.white70,
+          unselectedItemColor: Colors.white.withValues(alpha: 0.6),
           currentIndex: _selectedIndex,
           onTap: _onItemTapped,
-          items: const [
+          type: BottomNavigationBarType.fixed,
+          selectedFontSize: 12,
+          unselectedFontSize: 12,
+          items: [
             BottomNavigationBarItem(
-                icon: Icon(Icons.home_rounded), label: "Home"),
+              icon: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: _selectedIndex == 0
+                      ? Colors.white.withValues(alpha: 0.2)
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(Icons.home_rounded, size: 24),
+              ),
+              label: "Home",
+            ),
             BottomNavigationBarItem(
-                icon: Icon(Icons.notifications_rounded), label: "Alerts"),
+              icon: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: _selectedIndex == 1
+                      ? Colors.white.withValues(alpha: 0.2)
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(Icons.notifications_rounded, size: 24),
+              ),
+              label: "Alerts",
+            ),
             BottomNavigationBarItem(
-                icon: Icon(Icons.person_rounded), label: "Profile"),
+              icon: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: _selectedIndex == 2
+                      ? Colors.white.withValues(alpha: 0.2)
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(Icons.person_rounded, size: 24),
+              ),
+              label: "Profile",
+            ),
           ],
         ),
       ),
@@ -370,62 +530,298 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-// ============================================================================
-// FEATURE CARD WIDGET
-// ============================================================================
-
-class _FeatureCard extends StatelessWidget {
+// Premium Feature Card Widget
+class _PremiumFeatureCard extends StatefulWidget {
   final String title;
   final IconData icon;
-  final Color color;
+  final List<Color> gradient;
+  final String? badge;
   final VoidCallback onTap;
 
-  const _FeatureCard({
+  const _PremiumFeatureCard({
     required this.title,
     required this.icon,
-    required this.color,
+    required this.gradient,
+    this.badge,
     required this.onTap,
   });
 
   @override
+  State<_PremiumFeatureCard> createState() => _PremiumFeatureCardState();
+}
+
+class _PremiumFeatureCardState extends State<_PremiumFeatureCard>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  bool _isPressed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 150),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(18),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 15),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(18),
-          color: Colors.white,
-          border: Border.all(color: color.withOpacity(0.2)),
-          boxShadow: [
-            BoxShadow(
-              color: color.withOpacity(0.15),
-              blurRadius: 12,
-              offset: const Offset(2, 4),
-            ),
-          ],
+    return GestureDetector(
+      onTapDown: (_) {
+        setState(() => _isPressed = true);
+        _controller.forward();
+      },
+      onTapUp: (_) {
+        setState(() => _isPressed = false);
+        _controller.reverse();
+        widget.onTap();
+      },
+      onTapCancel: () {
+        setState(() => _isPressed = false);
+        _controller.reverse();
+      },
+      child: ScaleTransition(
+        scale: Tween<double>(begin: 1.0, end: 0.95).animate(
+          CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircleAvatar(
-              radius: 26,
-              backgroundColor: color.withOpacity(0.15),
-              child: Icon(icon, color: color, size: 26),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: widget.gradient,
             ),
-            const SizedBox(height: 10),
-            Text(
-              title,
-              textAlign: TextAlign.center,
-              style: GoogleFonts.poppins(
-                fontSize: 13,
-                color: Colors.black87,
-                fontWeight: FontWeight.w600,
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [
+              BoxShadow(
+                color: widget.gradient[0].withValues(alpha: 0.4),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
               ),
+            ],
+          ),
+          child: Stack(
+            children: [
+              // Decorative circles
+              Positioned(
+                top: -20,
+                right: -20,
+                child: Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white.withValues(alpha: 0.1),
+                  ),
+                ),
+              ),
+              Positioned(
+                bottom: -30,
+                left: -30,
+                child: Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white.withValues(alpha: 0.05),
+                  ),
+                ),
+              ),
+              // Content
+              Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.2),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Icon(
+                            widget.icon,
+                            color: Colors.white,
+                            size: 28,
+                          ),
+                        ),
+                        if (widget.badge != null)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.3),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              widget.badge!,
+                              style: GoogleFonts.poppins(
+                                color: Colors.white,
+                                fontSize: 10,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                    Text(
+                      widget.title,
+                      style: GoogleFonts.poppins(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: -0.3,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// Stat Card Widget
+class _StatCard extends StatelessWidget {
+  final IconData icon;
+  final String value;
+  final String label;
+  final Color color;
+
+  const _StatCard({
+    required this.icon,
+    required this.value,
+    required this.label,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
             ),
+            child: Icon(icon, color: color, size: 24),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            value,
+            style: GoogleFonts.poppins(
+              fontSize: 20,
+              fontWeight: FontWeight.w800,
+              color: Colors.grey.shade900,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: GoogleFonts.poppins(
+              fontSize: 12,
+              color: Colors.grey.shade600,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// Guidelines Card Widget
+class _GuidelinesCard extends StatelessWidget {
+  final List<String> rules = [
+    "Respect natural habitats & wildlife",
+    "Avoid littering in eco-sensitive zones",
+    "Drive safely & follow traffic rules",
+    "Support eco-tourism & local businesses",
+    "Use SOS for immediate emergency assistance",
+    "Stay updated about weather alerts",
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            const Color(0xFF43E97B).withValues(alpha: 0.1),
+            const Color(0xFF38F9D7).withValues(alpha: 0.1),
           ],
         ),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: const Color(0xFF43E97B).withValues(alpha: 0.3),
+          width: 1.5,
+        ),
+      ),
+      child: Column(
+        children: rules
+            .map((rule) => Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        margin: const EdgeInsets.only(top: 6),
+                        width: 6,
+                        height: 6,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF43E97B),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          rule,
+                          style: GoogleFonts.poppins(
+                            fontSize: 14,
+                            color: Colors.grey.shade800,
+                            fontWeight: FontWeight.w500,
+                            height: 1.5,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ))
+            .toList(),
       ),
     );
   }

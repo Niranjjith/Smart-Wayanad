@@ -10,10 +10,13 @@ import connectDB from "./config/db.js";
 
 // Routes
 import adminRoutes from "./routes/adminRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
 import alertRoutes from "./routes/alertRoutes.js";
 import locationRoutes from "./routes/locationRoutes.js";
-import busRoutes from "./routes/busRoutes.js";
+import busRoutes from "./routes/BusRoutes.js";
 import chatRoutes from "./routes/chatRoutes.js";
+import chatbotRoutes from "./routes/chatbotRoutes.js";
+import analyticsRoutes from "./routes/analyticsRoutes.js";
 import climateRoutes from "./routes/climateRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 
@@ -33,10 +36,13 @@ app.get("/", (req, res) => res.send("🌍 Smart Wayanad API running successfully
 
 // Mount routes
 app.use("/api/admin", adminRoutes);
+app.use("/api/auth", authRoutes);
 app.use("/api/help", alertRoutes);
 app.use("/api/location", locationRoutes);
 app.use("/api/bus", busRoutes);
 app.use("/api/chat", chatRoutes);
+app.use("/api/chatbot", chatbotRoutes);
+app.use("/api/analytics", analyticsRoutes);
 app.use("/api/climate", climateRoutes);
 app.use("/api/users", userRoutes);
 

@@ -104,9 +104,26 @@ app.set("io", io);
 io.on("connection", (socket) => {
   console.log("⚡ Client connected:", socket.id);
 
+  // Send initial analytics on connection
+  socket.on("analytics:subscribe", async () => {
+    try {
+      const { getRealtimeAnalytics } = await import("./src/services/realtimeService.js");
+      const analytics = await getRealtimeAnalytics();
+      socket.emit("analytics:update", analytics);
+    } catch (err) {
+      console.error("Error sending initial analytics:", err);
+    }
+  });
+
   socket.on("disconnect", () =>
     console.log("❌ Client disconnected:", socket.id)
   );
+});
+
+// Initialize real-time service
+import("./src/services/realtimeService.js").then(({ initializeRealtime }) => {
+  initializeRealtime(io);
+  console.log("✅ Real-time analytics service initialized");
 });
 
 // Start Server

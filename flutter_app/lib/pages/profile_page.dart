@@ -1,41 +1,566 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../services/api_service.dart';
+import 'splash_page.dart';
+import 'help_page.dart';
+import 'notifications_page.dart';
+import 'bus_routes_page.dart';
+import 'climate_page.dart';
+import 'hospital_page.dart';
+import 'clinic_page.dart';
+import 'helpline_page.dart';
+import 'taxi_page.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   final Map user;
   const ProfilePage({super.key, required this.user});
 
   @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  bool _loading = false;
+
+  Future<void> _logout() async {
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (_) => const SplashPage()),
+      (route) => false,
+    );
+  }
+
+  Future<void> _callNumber(String number) async {
+    final uri = Uri.parse('tel:$number');
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Cannot call $number')),
+      );
+    }
+  }
+
+  Future<void> _openEmail(String email) async {
+    final uri = Uri.parse('mailto:$email');
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final name = user['name'] ?? 'User';
-    final email = user['email'] ?? '—';
-    final phone = user['phone'] ?? '—';
+    final name = widget.user['name'] ?? 'User';
+    final email = widget.user['email'] ?? '—';
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Profile")),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          children: [
-            const CircleAvatar(
-              radius: 40,
-              child: Icon(Icons.person, size: 40),
+      backgroundColor: const Color(0xFFF5F7FA),
+      body: CustomScrollView(
+        slivers: [
+          // Premium App Bar
+          SliverAppBar(
+            expandedHeight: 220,
+            floating: false,
+            pinned: true,
+            elevation: 0,
+            backgroundColor: Colors.transparent,
+            flexibleSpace: FlexibleSpaceBar(
+              background: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      const Color(0xFF667EEA),
+                      const Color(0xFF764BA2),
+                      const Color(0xFFF093FB),
+                    ],
+                  ),
+                ),
+                child: SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        CircleAvatar(
+                          radius: 50,
+                          backgroundColor: Colors.white.withValues(alpha: 0.2),
+                          child: Text(
+                            name[0].toUpperCase(),
+                            style: GoogleFonts.poppins(
+                              color: Colors.white,
+                              fontSize: 36,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          name,
+                          style: GoogleFonts.poppins(
+                            color: Colors.white,
+                            fontSize: 24,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          email,
+                          style: GoogleFonts.poppins(
+                            color: Colors.white.withValues(alpha: 0.9),
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             ),
-            const SizedBox(height: 16),
-            Text(
-              name,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+
+          // Content
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Quick Actions
+                  Text(
+                    "Quick Actions",
+                    style: GoogleFonts.poppins(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.grey.shade900,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  GridView.count(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    crossAxisCount: 3,
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                    childAspectRatio: 1.1,
+                    children: [
+                      _ActionButton(
+                        icon: Icons.sos_rounded,
+                        label: "SOS",
+                        color: const Color(0xFFE53935),
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => HelpPage(user: widget.user),
+                          ),
+                        ),
+                      ),
+                      _ActionButton(
+                        icon: Icons.notifications_rounded,
+                        label: "Alerts",
+                        color: const Color(0xFF667EEA),
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const NotificationsPage(),
+                          ),
+                        ),
+                      ),
+                      _ActionButton(
+                        icon: Icons.directions_bus_rounded,
+                        label: "Routes",
+                        color: const Color(0xFF4FACFE),
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const BusRoutesPage(),
+                          ),
+                        ),
+                      ),
+                      _ActionButton(
+                        icon: Icons.wb_sunny_rounded,
+                        label: "Weather",
+                        color: const Color(0xFFF5576C),
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const ClimatePage(),
+                          ),
+                        ),
+                      ),
+                      _ActionButton(
+                        icon: Icons.local_hospital_rounded,
+                        label: "Hospitals",
+                        color: const Color(0xFFFA709A),
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const HospitalPage(),
+                          ),
+                        ),
+                      ),
+                      _ActionButton(
+                        icon: Icons.healing_rounded,
+                        label: "Clinics",
+                        color: const Color(0xFF43E97B),
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const ClinicPage(),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 32),
+
+                  // Emergency Contacts
+                  Text(
+                    "Emergency Contacts",
+                    style: GoogleFonts.poppins(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.grey.shade900,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  _EmergencyButton(
+                    icon: Icons.local_police_rounded,
+                    label: "Police",
+                    number: "100",
+                    color: const Color(0xFF667EEA),
+                    onTap: () => _callNumber("100"),
+                  ),
+                  _EmergencyButton(
+                    icon: Icons.local_hospital_rounded,
+                    label: "Ambulance",
+                    number: "108",
+                    color: const Color(0xFFE53935),
+                    onTap: () => _callNumber("108"),
+                  ),
+                  _EmergencyButton(
+                    icon: Icons.fire_extinguisher_rounded,
+                    label: "Fire Department",
+                    number: "101",
+                    color: const Color(0xFFF5576C),
+                    onTap: () => _callNumber("101"),
+                  ),
+                  _EmergencyButton(
+                    icon: Icons.phone_rounded,
+                    label: "Women Helpline",
+                    number: "1091",
+                    color: const Color(0xFFF093FB),
+                    onTap: () => _callNumber("1091"),
+                  ),
+                  _EmergencyButton(
+                    icon: Icons.child_care_rounded,
+                    label: "Child Helpline",
+                    number: "1098",
+                    color: const Color(0xFF4FACFE),
+                    onTap: () => _callNumber("1098"),
+                  ),
+                  const SizedBox(height: 32),
+
+                  // District Services
+                  Text(
+                    "District Services",
+                    style: GoogleFonts.poppins(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.grey.shade900,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  _ServiceButton(
+                    icon: Icons.call_rounded,
+                    label: "Helpline",
+                    subtitle: "District helpline numbers",
+                    color: const Color(0xFF43E97B),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const HelplinePage(),
+                      ),
+                    ),
+                  ),
+                  _ServiceButton(
+                    icon: Icons.local_taxi_rounded,
+                    label: "Taxi Stands",
+                    subtitle: "Find nearby taxi stands",
+                    color: const Color(0xFFFA709A),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const TaxiPage(),
+                      ),
+                    ),
+                  ),
+                  _ServiceButton(
+                    icon: Icons.info_rounded,
+                    label: "About Smart Wayanad",
+                    subtitle: "Learn more about the app",
+                    color: const Color(0xFF667EEA),
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (_) => AlertDialog(
+                          title: Text(
+                            "Smart Wayanad",
+                            style: GoogleFonts.poppins(fontWeight: FontWeight.w700),
+                          ),
+                          content: Text(
+                            "A comprehensive digital platform for citizens of Wayanad District, Kerala. Providing emergency assistance, transport information, healthcare services, and more.",
+                            style: GoogleFonts.poppins(),
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text("Close"),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 32),
+
+                  // Logout Button
+                  Container(
+                    width: double.infinity,
+                    height: 56,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.red.shade400,
+                          Colors.red.shade600,
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.red.withValues(alpha: 0.3),
+                          blurRadius: 15,
+                          offset: const Offset(0, 8),
+                        ),
+                      ],
+                    ),
+                    child: ElevatedButton(
+                      onPressed: _logout,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.transparent,
+                        shadowColor: Colors.transparent,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.logout_rounded, color: Colors.white),
+                          const SizedBox(width: 12),
+                          Text(
+                            "Logout",
+                            style: GoogleFonts.poppins(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 40),
+                ],
+              ),
             ),
-            const SizedBox(height: 8),
-            Text(email),
-            Text(phone),
-            const Spacer(),
-            ElevatedButton(
-              onPressed: () => Navigator.popUntil(context, (r) => r.isFirst),
-              style: ElevatedButton.styleFrom(minimumSize: const Size.fromHeight(48)),
-              child: const Text("Logout"),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ActionButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _ActionButton({
+    required this.icon,
+    required this.label,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [color, color.withValues(alpha: 0.8)],
+          ),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: color.withValues(alpha: 0.3),
+              blurRadius: 10,
+              offset: const Offset(0, 5),
             ),
           ],
         ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: Colors.white, size: 32),
+            const SizedBox(height: 8),
+            Text(
+              label,
+              style: GoogleFonts.poppins(
+                color: Colors.white,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _EmergencyButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String number;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _EmergencyButton({
+    required this.icon,
+    required this.label,
+    required this.number,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: color.withValues(alpha: 0.3), width: 2),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ListTile(
+        leading: Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Icon(icon, color: color, size: 24),
+        ),
+        title: Text(
+          label,
+          style: GoogleFonts.poppins(
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+            color: Colors.grey.shade900,
+          ),
+        ),
+        subtitle: Text(
+          number,
+          style: GoogleFonts.poppins(
+            fontSize: 14,
+            color: color,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        trailing: IconButton(
+          icon: Icon(Icons.call_rounded, color: color),
+          onPressed: onTap,
+        ),
+        onTap: onTap,
+      ),
+    );
+  }
+}
+
+class _ServiceButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String subtitle;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _ServiceButton({
+    required this.icon,
+    required this.label,
+    required this.subtitle,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ListTile(
+        leading: Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [color, color.withValues(alpha: 0.8)],
+            ),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Icon(icon, color: Colors.white, size: 24),
+        ),
+        title: Text(
+          label,
+          style: GoogleFonts.poppins(
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+            color: Colors.grey.shade900,
+          ),
+        ),
+        subtitle: Text(
+          subtitle,
+          style: GoogleFonts.poppins(
+            fontSize: 12,
+            color: Colors.grey.shade600,
+          ),
+        ),
+        trailing: Icon(Icons.chevron_right_rounded, color: color),
+        onTap: onTap,
       ),
     );
   }

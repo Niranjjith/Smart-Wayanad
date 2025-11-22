@@ -6,7 +6,9 @@ import Locations from "./pages/Locations.jsx";
 import BusRoutes from "./pages/BusRoutes.jsx";
 import Climate from "./pages/Climate.jsx";
 import Chatbot from "./pages/Chatbot.jsx";
-import SendAlert from "./pages/SendAlert.jsx"; // 🆕 added
+import SendAlert from "./pages/SendAlert.jsx";
+import Analytics from "./pages/Analytics.jsx";
+import AIMLFeatures from "./pages/AIMLFeatures.jsx";
 import ProtectedRoute from "./routes/ProtectedRoute.jsx";
 import { AuthProvider } from "./context/AuthContext.jsx";
 import { ToastContainer } from "react-toastify";
@@ -81,6 +83,24 @@ function App() {
             element={
               <ProtectedRoute>
                 <Chatbot />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/analytics"
+            element={
+              <ProtectedRoute>
+                <Analytics />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/ai-ml"
+            element={
+              <ProtectedRoute>
+                <AIMLFeatures />
               </ProtectedRoute>
             }
           />
