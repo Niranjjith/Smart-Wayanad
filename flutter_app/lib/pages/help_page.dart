@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../services/api_service.dart';
 import '../services/location_service.dart';
 import 'dart:math' as math;
+import 'dart:async';
 
 class HelpPage extends StatefulWidget {
   final Map user;
@@ -16,8 +17,10 @@ class _HelpPageState extends State<HelpPage> with TickerProviderStateMixin {
   final _messageController = TextEditingController();
   bool _loading = false;
   bool _gettingLocation = false;
+  bool _sharingLiveLocation = false;
   double? _lat;
   double? _lng;
+  Timer? _locationUpdateTimer;
   late AnimationController _pulseController;
   late AnimationController _shakeController;
   late Animation<double> _pulseAnimation;
@@ -42,6 +45,7 @@ class _HelpPageState extends State<HelpPage> with TickerProviderStateMixin {
 
   @override
   void dispose() {
+    _locationUpdateTimer?.cancel();
     _messageController.dispose();
     _pulseController.dispose();
     _shakeController.dispose();
@@ -125,9 +129,12 @@ class _HelpPageState extends State<HelpPage> with TickerProviderStateMixin {
       );
 
       if (success && mounted) {
+        // Start live location sharing
+        _startLiveLocationSharing();
+        
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text("✅ Emergency alert sent! Help is on the way."),
+            content: const Text("✅ Emergency alert sent! Live location sharing active."),
             backgroundColor: Colors.green,
             behavior: SnackBarBehavior.floating,
             duration: const Duration(seconds: 3),
@@ -159,6 +166,38 @@ class _HelpPageState extends State<HelpPage> with TickerProviderStateMixin {
         setState(() => _loading = false);
       }
     }
+  }
+
+  /// 📍 Start live location sharing (updates every 30 seconds)
+  void _startLiveLocationSharing() {
+    setState(() => _sharingLiveLocation = true);
+    
+    _locationUpdateTimer = Timer.periodic(const Duration(seconds: 30), (timer) async {
+      try {
+        final pos = await LocationService.currentPosition();
+        if (pos != null && mounted) {
+          setState(() {
+            _lat = pos.latitude;
+            _lng = pos.longitude;
+          });
+          
+          // Send location update to backend
+          await ApiService.updateLiveLocation(
+            lat: _lat!,
+            lng: _lng!,
+            alertId: null, // TODO: Get alert ID from response
+          );
+        }
+      } catch (e) {
+        print('Live location update error: $e');
+      }
+    });
+  }
+
+  /// 🛑 Stop live location sharing
+  void _stopLiveLocationSharing() {
+    _locationUpdateTimer?.cancel();
+    setState(() => _sharingLiveLocation = false);
   }
 
   @override

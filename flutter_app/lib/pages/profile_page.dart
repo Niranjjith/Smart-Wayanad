@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'dart:io';
 import '../services/api_service.dart';
 import 'splash_page.dart';
 import 'help_page.dart';
@@ -11,6 +13,11 @@ import 'hospital_page.dart';
 import 'clinic_page.dart';
 import 'helpline_page.dart';
 import 'taxi_page.dart';
+import 'edit_profile_page.dart';
+import 'settings_page.dart';
+import 'ar_navigation_page.dart';
+import 'voice_report_page.dart';
+import 'incident_heatmap_page.dart';
 
 class ProfilePage extends StatefulWidget {
   final Map user;
@@ -49,16 +56,29 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+  String _getProfilePhotoUrl() {
+    final profilePhoto = widget.user['profilePhoto'];
+    if (profilePhoto != null && profilePhoto.toString().isNotEmpty) {
+      final baseUrl = (Platform.isWindows || Platform.isMacOS) 
+          ? "http://localhost:5000" 
+          : "http://192.168.1.2:5000";
+      return "$baseUrl$profilePhoto";
+    }
+    return '';
+  }
+
   @override
   Widget build(BuildContext context) {
     final name = widget.user['name'] ?? 'User';
     final email = widget.user['email'] ?? '—';
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final profilePhotoUrl = _getProfilePhotoUrl();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
+      backgroundColor: isDark ? const Color(0xFF0A0E27) : const Color(0xFFF5F7FA),
       body: CustomScrollView(
         slivers: [
-          // Premium App Bar
+          // Premium App Bar with Profile Photo
           SliverAppBar(
             expandedHeight: 220,
             floating: false,
@@ -71,11 +91,17 @@ class _ProfilePageState extends State<ProfilePage> {
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [
-                      const Color(0xFF667EEA),
-                      const Color(0xFF764BA2),
-                      const Color(0xFFF093FB),
-                    ],
+                    colors: isDark
+                        ? [
+                            const Color(0xFF0A0E27),
+                            const Color(0xFF1A1F3A),
+                            const Color(0xFF2196F3).withValues(alpha: 0.3),
+                          ]
+                        : [
+                            const Color(0xFF667EEA),
+                            const Color(0xFF764BA2),
+                            const Color(0xFFF093FB),
+                          ],
                   ),
                 ),
                 child: SafeArea(
@@ -84,16 +110,66 @@ class _ProfilePageState extends State<ProfilePage> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        CircleAvatar(
-                          radius: 50,
-                          backgroundColor: Colors.white.withValues(alpha: 0.2),
-                          child: Text(
-                            name[0].toUpperCase(),
-                            style: GoogleFonts.poppins(
-                              color: Colors.white,
-                              fontSize: 36,
-                              fontWeight: FontWeight.w800,
+                        Container(
+                          width: 100,
+                          height: 100,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.5),
+                              width: 3,
                             ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.2),
+                                blurRadius: 15,
+                                spreadRadius: 2,
+                              ),
+                            ],
+                          ),
+                          child: ClipOval(
+                            child: profilePhotoUrl.isNotEmpty
+                                ? CachedNetworkImage(
+                                    imageUrl: profilePhotoUrl,
+                                    fit: BoxFit.cover,
+                                    placeholder: (context, url) => Container(
+                                      color: Colors.white.withValues(alpha: 0.2),
+                                      child: Center(
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          valueColor: AlwaysStoppedAnimation<Color>(
+                                            Colors.white.withValues(alpha: 0.5),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    errorWidget: (context, url, error) => Container(
+                                      color: Colors.white.withValues(alpha: 0.2),
+                                      child: Center(
+                                        child: Text(
+                                          name[0].toUpperCase(),
+                                          style: GoogleFonts.poppins(
+                                            color: Colors.white,
+                                            fontSize: 36,
+                                            fontWeight: FontWeight.w800,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                : Container(
+                                    color: Colors.white.withValues(alpha: 0.2),
+                                    child: Center(
+                                      child: Text(
+                                        name[0].toUpperCase(),
+                                        style: GoogleFonts.poppins(
+                                          color: Colors.white,
+                                          fontSize: 36,
+                                          fontWeight: FontWeight.w800,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
                           ),
                         ),
                         const SizedBox(height: 16),
@@ -260,6 +336,102 @@ class _ProfilePageState extends State<ProfilePage> {
                     number: "1098",
                     color: const Color(0xFF4FACFE),
                     onTap: () => _callNumber("1098"),
+                  ),
+                  const SizedBox(height: 32),
+
+                  // Profile Actions
+                  Text(
+                    "Profile & Settings",
+                    style: GoogleFonts.poppins(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.grey.shade900,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  _ServiceButton(
+                    icon: Icons.edit_rounded,
+                    label: "Edit Profile",
+                    subtitle: "Update your profile information",
+                    color: const Color(0xFF667EEA),
+                    onTap: () async {
+                      final result = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => EditProfilePage(user: widget.user),
+                        ),
+                      );
+                      if (result != null && mounted) {
+                        // Refresh profile if needed
+                        Navigator.pop(context);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => ProfilePage(user: {...widget.user, ...result}),
+                          ),
+                        );
+                      }
+                    },
+                  ),
+                  _ServiceButton(
+                    icon: Icons.settings_rounded,
+                    label: "Settings",
+                    subtitle: "Dark mode, notifications & more",
+                    color: const Color(0xFF764BA2),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => SettingsPage(user: widget.user),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+
+                  // Advanced Features
+                  Text(
+                    "Advanced Features",
+                    style: GoogleFonts.poppins(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.grey.shade900,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  _ServiceButton(
+                    icon: Icons.camera_alt_rounded,
+                    label: "AR Navigation",
+                    subtitle: "Find services with AR",
+                    color: const Color(0xFF4FACFE),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const ARNavigationPage(),
+                      ),
+                    ),
+                  ),
+                  _ServiceButton(
+                    icon: Icons.mic_rounded,
+                    label: "Voice Report",
+                    subtitle: "Report incidents with voice",
+                    color: const Color(0xFFF5576C),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => VoiceReportPage(user: widget.user),
+                      ),
+                    ),
+                  ),
+                  _ServiceButton(
+                    icon: Icons.map_rounded,
+                    label: "Incident Heatmap",
+                    subtitle: "View incident hotspots",
+                    color: const Color(0xFF43E97B),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const IncidentHeatmapPage(),
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 32),
 

@@ -16,18 +16,18 @@ export const chatbotReply = async (req, res) => {
     let intent = "general";
     let confidence = 0.8;
 
-    // 🧠 NLP-based Intent Recognition
+    // 🧠 NLP-based Intent Recognition (English + Malayalam)
     const intents = {
-      greeting: ["hi", "hello", "hey", "namaste", "good morning", "good evening"],
-      emergency: ["help", "emergency", "sos", "urgent", "danger", "accident"],
-      hospital: ["hospital", "doctor", "medical", "clinic", "ambulance", "health"],
-      police: ["police", "station", "crime", "theft", "complaint"],
-      bus: ["bus", "route", "transport", "travel", "schedule", "timing"],
-      weather: ["weather", "rain", "temperature", "climate", "forecast"],
-      location: ["location", "where", "address", "place", "nearby"],
-      taxi: ["taxi", "cab", "auto", "rickshaw", "transport"],
-      helpline: ["helpline", "contact", "phone", "number", "call"],
-      thanks: ["thanks", "thank you", "appreciate"],
+      greeting: ["hi", "hello", "hey", "namaste", "good morning", "good evening", "നമസ്കാരം", "വണക്കം", "ഹലോ"],
+      emergency: ["help", "emergency", "sos", "urgent", "danger", "accident", "സഹായം", "അടിയന്തരം", "ആപത്ത്"],
+      hospital: ["hospital", "doctor", "medical", "clinic", "ambulance", "health", "ആശുപത്രി", "ഡോക്ടർ", "വൈദ്യം"],
+      police: ["police", "station", "crime", "theft", "complaint", "പോലീസ്", "തുറസ്സാക്കൽ", "പരാതി"],
+      bus: ["bus", "route", "transport", "travel", "schedule", "timing", "ബസ്", "വഴി", "സമയം"],
+      weather: ["weather", "rain", "temperature", "climate", "forecast", "കാലാവസ്ഥ", "മഴ", "താപനില"],
+      location: ["location", "where", "address", "place", "nearby", "സ്ഥലം", "വിലാസം", "എവിടെ"],
+      taxi: ["taxi", "cab", "auto", "rickshaw", "transport", "ടാക്സി", "ഓട്ടോ"],
+      helpline: ["helpline", "contact", "phone", "number", "call", "ഹെൽപ്പ്‌ലൈൻ", "ഫോൺ", "കോൾ"],
+      thanks: ["thanks", "thank you", "appreciate", "നന്ദി", "വളരെ നന്ദി"],
     };
 
     // Detect intent
@@ -42,7 +42,11 @@ export const chatbotReply = async (req, res) => {
     // 🎯 Context-Aware Responses
     switch (intent) {
       case "greeting":
-        reply = "Hello! 👋 I'm your Smart Wayanad AI Assistant. How can I help you today? I can assist with emergencies, bus routes, hospitals, weather, and more!";
+        // Detect language preference
+        const isMalayalam = userMessage.includes("നമസ്കാരം") || userMessage.includes("വണക്കം");
+        reply = isMalayalam
+          ? "നമസ്കാരം! 👋 ഞാൻ നിങ്ങളുടെ സ്മാർട്ട് വയനാട് AI അസിസ്റ്റന്റ് ആണ്. എങ്ങനെ സഹായിക്കാം? അടിയന്തര സേവനങ്ങൾ, ബസ് റൂട്ടുകൾ, ആശുപത്രികൾ, കാലാവസ്ഥ തുടങ്ങിയവയിൽ എനിക്ക് സഹായിക്കാം!"
+          : "Hello! 👋 I'm your Smart Wayanad AI Assistant. How can I help you today? I can assist with emergencies, bus routes, hospitals, weather, and more!";
         break;
 
       case "emergency":

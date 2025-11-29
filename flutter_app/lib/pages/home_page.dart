@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'dart:math' as math;
+import 'dart:io';
 
 // Import pages
 import 'help_page.dart';
@@ -16,6 +18,9 @@ import 'clinic_page.dart';
 import 'notifications_page.dart';
 import 'smart_route_page.dart';
 import 'ai_ml_page.dart';
+import 'ar_navigation_page.dart';
+import 'voice_report_page.dart';
+import 'incident_heatmap_page.dart';
 import '../services/api_service.dart';
 
 class HomePage extends StatefulWidget {
@@ -86,93 +91,148 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     setState(() => _selectedIndex = 0);
   }
 
+  String _getProfilePhotoUrl() {
+    final profilePhoto = widget.user['profilePhoto'];
+    if (profilePhoto != null && profilePhoto.toString().isNotEmpty) {
+      final baseUrl = (Platform.isWindows || Platform.isMacOS) 
+          ? "http://localhost:5000" 
+          : "http://192.168.1.2:5000";
+      return "$baseUrl$profilePhoto";
+    }
+    return '';
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = widget.user;
     final size = MediaQuery.of(context).size;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final profilePhotoUrl = _getProfilePhotoUrl();
 
-    // Premium feature cards with gradients
+    // Premium feature cards - smaller and more compact
     final List<Map<String, dynamic>> features = [
       {
-        "title": "SOS Emergency",
+        "title": "SOS",
         "icon": Icons.sos_rounded,
-        "gradient": [const Color(0xFFE53935), const Color(0xFFC62828)],
+        "gradient": isDark 
+            ? [const Color(0xFFE53935), const Color(0xFFC62828)]
+            : [const Color(0xFFE53935), const Color(0xFFC62828)],
         "page": HelpPage(user: user),
         "badge": "24/7",
       },
       {
         "title": "Bus Routes",
         "icon": Icons.directions_bus_rounded,
-        "gradient": [const Color(0xFF667EEA), const Color(0xFF764BA2)],
+        "gradient": isDark
+            ? [const Color(0xFF2196F3), const Color(0xFF1976D2)]
+            : [const Color(0xFF667EEA), const Color(0xFF764BA2)],
         "page": const BusRoutesPage(),
-        "badge": null,
       },
       {
         "title": "Smart Route",
         "icon": Icons.route_rounded,
-        "gradient": [const Color(0xFF43E97B), const Color(0xFF38F9D7)],
+        "gradient": isDark
+            ? [const Color(0xFF4CAF50), const Color(0xFF388E3C)]
+            : [const Color(0xFF43E97B), const Color(0xFF38F9D7)],
         "page": const SmartRoutePage(),
         "badge": "AI",
       },
       {
-        "title": "AI/ML Features",
+        "title": "AI/ML",
         "icon": Icons.psychology_rounded,
-        "gradient": [const Color(0xFF667EEA), const Color(0xFF764BA2)],
+        "gradient": isDark
+            ? [const Color(0xFF2196F3), const Color(0xFF1976D2)]
+            : [const Color(0xFF667EEA), const Color(0xFF764BA2)],
         "page": const AIMLPage(),
         "badge": "NEW",
       },
       {
+        "title": "AR Nav",
+        "icon": Icons.camera_alt_rounded,
+        "gradient": isDark
+            ? [const Color(0xFF00BCD4), const Color(0xFF0097A7)]
+            : [const Color(0xFF4FACFE), const Color(0xFF00F2FE)],
+        "page": const ARNavigationPage(),
+        "badge": "NEW",
+      },
+      {
+        "title": "Voice",
+        "icon": Icons.mic_rounded,
+        "gradient": isDark
+            ? [const Color(0xFFE91E63), const Color(0xFFC2185B)]
+            : [const Color(0xFFF5576C), const Color(0xFFFA709A)],
+        "page": HelpPage(user: user), // Redirect to SOS for voice reporting
+        "badge": null,
+      },
+      {
+        "title": "Heatmap",
+        "icon": Icons.map_rounded,
+        "gradient": isDark
+            ? [const Color(0xFF4CAF50), const Color(0xFF388E3C)]
+            : [const Color(0xFF43E97B), const Color(0xFF38F9D7)],
+        "page": const IncidentHeatmapPage(),
+        "badge": "Live",
+      },
+      {
         "title": "Weather",
         "icon": Icons.wb_sunny_rounded,
-        "gradient": [const Color(0xFFF093FB), const Color(0xFFF5576C)],
+        "gradient": isDark
+            ? [const Color(0xFFFF9800), const Color(0xFFF57C00)]
+            : [const Color(0xFFF093FB), const Color(0xFFF5576C)],
         "page": const ClimatePage(),
         "badge": "Live",
       },
       {
-        "title": "AI Chatbot",
+        "title": "Chatbot",
         "icon": Icons.smart_toy_rounded,
-        "gradient": [const Color(0xFF4FACFE), const Color(0xFF00F2FE)],
+        "gradient": isDark
+            ? [const Color(0xFF2196F3), const Color(0xFF1976D2)]
+            : [const Color(0xFF4FACFE), const Color(0xFF00F2FE)],
         "page": const ChatbotPage(),
         "badge": "AI",
       },
       {
         "title": "Helpline",
         "icon": Icons.phone_in_talk_rounded,
-        "gradient": [const Color(0xFF43E97B), const Color(0xFF38F9D7)],
+        "gradient": isDark
+            ? [const Color(0xFF4CAF50), const Color(0xFF388E3C)]
+            : [const Color(0xFF43E97B), const Color(0xFF38F9D7)],
         "page": const HelplinePage(),
-        "badge": null,
       },
       {
         "title": "Hospitals",
         "icon": Icons.local_hospital_rounded,
-        "gradient": [const Color(0xFFFA709A), const Color(0xFFFEE140)],
+        "gradient": isDark
+            ? [const Color(0xFFE91E63), const Color(0xFFC2185B)]
+            : [const Color(0xFFFA709A), const Color(0xFFFEE140)],
         "page": const HospitalPage(),
-        "badge": null,
       },
       {
         "title": "Clinics",
         "icon": Icons.healing_rounded,
-        "gradient": [const Color(0xFF30CFD0), const Color(0xFF330867)],
+        "gradient": isDark
+            ? [const Color(0xFF00BCD4), const Color(0xFF0097A7)]
+            : [const Color(0xFF30CFD0), const Color(0xFF330867)],
         "page": const ClinicPage(),
-        "badge": null,
       },
       {
-        "title": "Taxi Stands",
+        "title": "Taxi",
         "icon": Icons.local_taxi_rounded,
-        "gradient": [const Color(0xFFA8EDEA), const Color(0xFFFED6E3)],
+        "gradient": isDark
+            ? [const Color(0xFFFF9800), const Color(0xFFF57C00)]
+            : [const Color(0xFFA8EDEA), const Color(0xFFFED6E3)],
         "page": const TaxiPage(),
-        "badge": null,
       },
     ];
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
+      backgroundColor: isDark ? const Color(0xFF0A0E27) : const Color(0xFFF5F7FA),
       extendBodyBehindAppBar: true,
       body: CustomScrollView(
         slivers: [
-          // Premium App Bar with Gradient
+          // Premium App Bar with Profile Photo
           SliverAppBar(
-            expandedHeight: 280,
+            expandedHeight: 240,
             floating: false,
             pinned: true,
             elevation: 0,
@@ -183,11 +243,17 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [
-                      const Color(0xFF667EEA),
-                      const Color(0xFF764BA2),
-                      const Color(0xFFF093FB),
-                    ],
+                    colors: isDark
+                        ? [
+                            const Color(0xFF0A0E27),
+                            const Color(0xFF1A1F3A),
+                            const Color(0xFF2196F3).withValues(alpha: 0.3),
+                          ]
+                        : [
+                            const Color(0xFF667EEA),
+                            const Color(0xFF764BA2),
+                            const Color(0xFFF093FB),
+                          ],
                   ),
                 ),
                 child: SafeArea(
@@ -202,18 +268,16 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           children: [
                             Container(
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 6,
+                                horizontal: 10,
+                                vertical: 5,
                               ),
                               decoration: BoxDecoration(
                                 color: _isServerOnline
-                                    ? Colors.green.withValues(alpha: 0.2)
-                                    : Colors.red.withValues(alpha: 0.2),
-                                borderRadius: BorderRadius.circular(20),
+                                    ? Colors.green.withValues(alpha: isDark ? 0.2 : 0.2)
+                                    : Colors.red.withValues(alpha: isDark ? 0.2 : 0.2),
+                                borderRadius: BorderRadius.circular(16),
                                 border: Border.all(
-                                  color: _isServerOnline
-                                      ? Colors.green
-                                      : Colors.red,
+                                  color: _isServerOnline ? Colors.green : Colors.red,
                                   width: 1.5,
                                 ),
                               ),
@@ -221,12 +285,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Container(
-                                    width: 8,
-                                    height: 8,
+                                    width: 6,
+                                    height: 6,
                                     decoration: BoxDecoration(
-                                      color: _isServerOnline
-                                          ? Colors.green
-                                          : Colors.red,
+                                      color: _isServerOnline ? Colors.green : Colors.red,
                                       shape: BoxShape.circle,
                                     ),
                                   ),
@@ -235,7 +297,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                     _isServerOnline ? 'Online' : 'Offline',
                                     style: GoogleFonts.poppins(
                                       color: Colors.white,
-                                      fontSize: 12,
+                                      fontSize: 11,
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
@@ -244,63 +306,96 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             ),
                             const Spacer(),
                             IconButton(
-                              icon: const Icon(Icons.logout_rounded,
-                                  color: Colors.white),
+                              icon: const Icon(Icons.logout_rounded, color: Colors.white, size: 22),
                               onPressed: () {
                                 Navigator.pushAndRemoveUntil(
                                   context,
-                                  MaterialPageRoute(
-                                      builder: (_) => const SplashPage()),
+                                  MaterialPageRoute(builder: (_) => const SplashPage()),
                                   (route) => false,
                                 );
                               },
                             ),
                           ],
                         ),
-                        const SizedBox(height: 20),
-                        // Welcome section
+                        const SizedBox(height: 16),
+                        // Welcome section with profile photo
                         Row(
                           children: [
                             ScaleTransition(
                               scale: _pulseAnimation,
                               child: Container(
-                                width: 70,
-                                height: 70,
+                                width: 60,
+                                height: 60,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  gradient: LinearGradient(
-                                    colors: [
-                                      Colors.white.withValues(alpha: 0.3),
-                                      Colors.white.withValues(alpha: 0.1),
-                                    ],
-                                  ),
                                   border: Border.all(
                                     color: Colors.white.withValues(alpha: 0.5),
-                                    width: 2,
+                                    width: 2.5,
                                   ),
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    (user["name"]?[0] ?? "U").toUpperCase(),
-                                    style: GoogleFonts.poppins(
-                                      color: Colors.white,
-                                      fontSize: 28,
-                                      fontWeight: FontWeight.w800,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withValues(alpha: 0.2),
+                                      blurRadius: 10,
+                                      spreadRadius: 2,
                                     ),
-                                  ),
+                                  ],
+                                ),
+                                child: ClipOval(
+                                  child: profilePhotoUrl.isNotEmpty
+                                      ? CachedNetworkImage(
+                                          imageUrl: profilePhotoUrl,
+                                          fit: BoxFit.cover,
+                                          placeholder: (context, url) => Container(
+                                            color: Colors.white.withValues(alpha: 0.2),
+                                            child: Center(
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 2,
+                                                valueColor: AlwaysStoppedAnimation<Color>(
+                                                  Colors.white.withValues(alpha: 0.5),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          errorWidget: (context, url, error) => Container(
+                                            color: Colors.white.withValues(alpha: 0.2),
+                                            child: Center(
+                                              child: Text(
+                                                (user["name"]?[0] ?? "U").toUpperCase(),
+                                                style: GoogleFonts.poppins(
+                                                  color: Colors.white,
+                                                  fontSize: 24,
+                                                  fontWeight: FontWeight.w800,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        )
+                                      : Container(
+                                          color: Colors.white.withValues(alpha: 0.2),
+                                          child: Center(
+                                            child: Text(
+                                              (user["name"]?[0] ?? "U").toUpperCase(),
+                                              style: GoogleFonts.poppins(
+                                                color: Colors.white,
+                                                fontSize: 24,
+                                                fontWeight: FontWeight.w800,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 16),
+                            const SizedBox(width: 14),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    "Hello, ${user["name"] ?? "Citizen"} 👋",
+                                    "Hello, ${user["name"]?.split(" ")[0] ?? "Citizen"} 👋",
                                     style: GoogleFonts.poppins(
                                       color: Colors.white,
-                                      fontSize: 24,
+                                      fontSize: 22,
                                       fontWeight: FontWeight.w800,
                                       letterSpacing: -0.5,
                                     ),
@@ -310,7 +405,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                     "Welcome to Smart Wayanad",
                                     style: GoogleFonts.poppins(
                                       color: Colors.white.withValues(alpha: 0.9),
-                                      fontSize: 14,
+                                      fontSize: 13,
                                       fontWeight: FontWeight.w500,
                                     ),
                                   ),
@@ -327,38 +422,41 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             ),
           ),
 
-          // Quick Stats Section
+          // Quick Stats Section - Compact
           SliverToBoxAdapter(
             child: SlideTransition(
               position: _slideAnimation,
               child: Padding(
-                padding: const EdgeInsets.all(20.0),
+                padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12),
                 child: Row(
                   children: [
                     Expanded(
                       child: _StatCard(
                         icon: Icons.directions_bus_rounded,
                         value: "50+",
-                        label: "Bus Routes",
-                        color: const Color(0xFF667EEA),
+                        label: "Routes",
+                        color: isDark ? const Color(0xFF2196F3) : const Color(0xFF667EEA),
+                        isDark: isDark,
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 10),
                     Expanded(
                       child: _StatCard(
                         icon: Icons.local_hospital_rounded,
                         value: "20+",
                         label: "Hospitals",
-                        color: const Color(0xFFF5576C),
+                        color: isDark ? const Color(0xFFE91E63) : const Color(0xFFF5576C),
+                        isDark: isDark,
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 10),
                     Expanded(
                       child: _StatCard(
                         icon: Icons.wb_sunny_rounded,
                         value: "24°C",
                         label: "Weather",
-                        color: const Color(0xFF4FACFE),
+                        color: isDark ? const Color(0xFF00BCD4) : const Color(0xFF4FACFE),
+                        isDark: isDark,
                       ),
                     ),
                   ],
@@ -367,29 +465,30 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             ),
           ),
 
-          // Services Section
+          // Services Section Header
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8),
               child: Row(
                 children: [
                   Text(
                     "Services",
                     style: GoogleFonts.poppins(
-                      fontSize: 22,
+                      fontSize: 20,
                       fontWeight: FontWeight.w800,
-                      color: Colors.grey.shade900,
+                      color: isDark ? Colors.white : Colors.grey.shade900,
                     ),
                   ),
                   const Spacer(),
                   TextButton.icon(
                     onPressed: _checkServerStatus,
-                    icon: const Icon(Icons.refresh_rounded, size: 18),
+                    icon: Icon(Icons.refresh_rounded, size: 16, color: isDark ? Colors.white70 : Colors.grey.shade700),
                     label: Text(
                       "Refresh",
                       style: GoogleFonts.poppins(
-                        fontSize: 14,
+                        fontSize: 12,
                         fontWeight: FontWeight.w600,
+                        color: isDark ? Colors.white70 : Colors.grey.shade700,
                       ),
                     ),
                   ),
@@ -398,15 +497,15 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             ),
           ),
 
-          // Features Grid
+          // Features Grid - Smaller, more compact
           SliverPadding(
-            padding: const EdgeInsets.all(20.0),
+            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8),
             sliver: SliverGrid(
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                childAspectRatio: 1.1,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
+                crossAxisCount: 3,
+                childAspectRatio: 0.95,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
               ),
               delegate: SliverChildBuilderDelegate(
                 (context, index) {
@@ -416,6 +515,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     icon: feature["icon"],
                     gradient: feature["gradient"],
                     badge: feature["badge"],
+                    isDark: isDark,
                     onTap: () {
                       Navigator.push(
                         context,
@@ -434,20 +534,20 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           // District Guidelines
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     "District Guidelines",
                     style: GoogleFonts.poppins(
-                      fontSize: 22,
+                      fontSize: 20,
                       fontWeight: FontWeight.w800,
-                      color: Colors.grey.shade900,
+                      color: isDark ? Colors.white : Colors.grey.shade900,
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  _GuidelinesCard(),
+                  const SizedBox(height: 12),
+                  _GuidelinesCard(isDark: isDark),
                   const SizedBox(height: 100),
                 ],
               ),
@@ -460,10 +560,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [
-              const Color(0xFF667EEA),
-              const Color(0xFF764BA2),
-            ],
+            colors: isDark
+                ? [const Color(0xFF0A0E27), const Color(0xFF1A1F3A)]
+                : [
+                    const Color(0xFF667EEA),
+                    const Color(0xFF764BA2),
+                  ],
           ),
           boxShadow: [
             BoxShadow(
@@ -481,45 +583,45 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           currentIndex: _selectedIndex,
           onTap: _onItemTapped,
           type: BottomNavigationBarType.fixed,
-          selectedFontSize: 12,
-          unselectedFontSize: 12,
+          selectedFontSize: 11,
+          unselectedFontSize: 11,
           items: [
             BottomNavigationBarItem(
               icon: Container(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
                   color: _selectedIndex == 0
                       ? Colors.white.withValues(alpha: 0.2)
                       : Colors.transparent,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Icon(Icons.home_rounded, size: 24),
+                child: const Icon(Icons.home_rounded, size: 22),
               ),
               label: "Home",
             ),
             BottomNavigationBarItem(
               icon: Container(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
                   color: _selectedIndex == 1
                       ? Colors.white.withValues(alpha: 0.2)
                       : Colors.transparent,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Icon(Icons.notifications_rounded, size: 24),
+                child: const Icon(Icons.notifications_rounded, size: 22),
               ),
               label: "Alerts",
             ),
             BottomNavigationBarItem(
               icon: Container(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
                   color: _selectedIndex == 2
                       ? Colors.white.withValues(alpha: 0.2)
                       : Colors.transparent,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Icon(Icons.person_rounded, size: 24),
+                child: const Icon(Icons.person_rounded, size: 22),
               ),
               label: "Profile",
             ),
@@ -530,12 +632,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 }
 
-// Premium Feature Card Widget
+// Premium Feature Card Widget - Smaller and more compact
 class _PremiumFeatureCard extends StatefulWidget {
   final String title;
   final IconData icon;
   final List<Color> gradient;
   final String? badge;
+  final bool isDark;
   final VoidCallback onTap;
 
   const _PremiumFeatureCard({
@@ -543,6 +646,7 @@ class _PremiumFeatureCard extends StatefulWidget {
     required this.icon,
     required this.gradient,
     this.badge,
+    required this.isDark,
     required this.onTap,
   });
 
@@ -597,12 +701,12 @@ class _PremiumFeatureCardState extends State<_PremiumFeatureCard>
               end: Alignment.bottomRight,
               colors: widget.gradient,
             ),
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(18),
             boxShadow: [
               BoxShadow(
                 color: widget.gradient[0].withValues(alpha: 0.4),
-                blurRadius: 20,
-                offset: const Offset(0, 10),
+                blurRadius: 12,
+                offset: const Offset(0, 6),
               ),
             ],
           ),
@@ -610,32 +714,20 @@ class _PremiumFeatureCardState extends State<_PremiumFeatureCard>
             children: [
               // Decorative circles
               Positioned(
-                top: -20,
-                right: -20,
+                top: -15,
+                right: -15,
                 child: Container(
-                  width: 80,
-                  height: 80,
+                  width: 50,
+                  height: 50,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: Colors.white.withValues(alpha: 0.1),
                   ),
                 ),
               ),
-              Positioned(
-                bottom: -30,
-                left: -30,
-                child: Container(
-                  width: 100,
-                  height: 100,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.white.withValues(alpha: 0.05),
-                  ),
-                ),
-              ),
               // Content
               Padding(
-                padding: const EdgeInsets.all(20.0),
+                padding: const EdgeInsets.all(14.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -644,32 +736,32 @@ class _PremiumFeatureCardState extends State<_PremiumFeatureCard>
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Container(
-                          padding: const EdgeInsets.all(12),
+                          padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
                             color: Colors.white.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(12),
                           ),
                           child: Icon(
                             widget.icon,
                             color: Colors.white,
-                            size: 28,
+                            size: 22,
                           ),
                         ),
                         if (widget.badge != null)
                           Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
+                              horizontal: 6,
+                              vertical: 3,
                             ),
                             decoration: BoxDecoration(
                               color: Colors.white.withValues(alpha: 0.3),
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
                               widget.badge!,
                               style: GoogleFonts.poppins(
                                 color: Colors.white,
-                                fontSize: 10,
+                                fontSize: 8,
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
@@ -680,10 +772,12 @@ class _PremiumFeatureCardState extends State<_PremiumFeatureCard>
                       widget.title,
                       style: GoogleFonts.poppins(
                         color: Colors.white,
-                        fontSize: 16,
+                        fontSize: 13,
                         fontWeight: FontWeight.w700,
                         letterSpacing: -0.3,
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
@@ -696,32 +790,34 @@ class _PremiumFeatureCardState extends State<_PremiumFeatureCard>
   }
 }
 
-// Stat Card Widget
+// Stat Card Widget - Compact
 class _StatCard extends StatelessWidget {
   final IconData icon;
   final String value;
   final String label;
   final Color color;
+  final bool isDark;
 
   const _StatCard({
     required this.icon,
     required this.value,
     required this.label,
     required this.color,
+    required this.isDark,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        color: isDark ? const Color(0xFF1A1F3A) : Colors.white,
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
           ),
         ],
       ),
@@ -729,28 +825,28 @@ class _StatCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(icon, color: color, size: 24),
+            child: Icon(icon, color: color, size: 20),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
           Text(
             value,
             style: GoogleFonts.poppins(
-              fontSize: 20,
+              fontSize: 18,
               fontWeight: FontWeight.w800,
-              color: Colors.grey.shade900,
+              color: isDark ? Colors.white : Colors.grey.shade900,
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 2),
           Text(
             label,
             style: GoogleFonts.poppins(
-              fontSize: 12,
-              color: Colors.grey.shade600,
+              fontSize: 11,
+              color: isDark ? Colors.white70 : Colors.grey.shade600,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -762,7 +858,8 @@ class _StatCard extends StatelessWidget {
 
 // Guidelines Card Widget
 class _GuidelinesCard extends StatelessWidget {
-  final List<String> rules = [
+  final bool isDark;
+  static const List<String> rules = [
     "Respect natural habitats & wildlife",
     "Avoid littering in eco-sensitive zones",
     "Drive safely & follow traffic rules",
@@ -771,50 +868,59 @@ class _GuidelinesCard extends StatelessWidget {
     "Stay updated about weather alerts",
   ];
 
+  const _GuidelinesCard({required this.isDark});
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            const Color(0xFF43E97B).withValues(alpha: 0.1),
-            const Color(0xFF38F9D7).withValues(alpha: 0.1),
-          ],
+          colors: isDark
+              ? [
+                  const Color(0xFF4CAF50).withValues(alpha: 0.15),
+                  const Color(0xFF388E3C).withValues(alpha: 0.15),
+                ]
+              : [
+                  const Color(0xFF43E97B).withValues(alpha: 0.1),
+                  const Color(0xFF38F9D7).withValues(alpha: 0.1),
+                ],
         ),
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: const Color(0xFF43E97B).withValues(alpha: 0.3),
+          color: isDark
+              ? const Color(0xFF4CAF50).withValues(alpha: 0.4)
+              : const Color(0xFF43E97B).withValues(alpha: 0.3),
           width: 1.5,
         ),
       ),
       child: Column(
         children: rules
             .map((rule) => Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
+                  padding: const EdgeInsets.only(bottom: 10),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Container(
                         margin: const EdgeInsets.only(top: 6),
-                        width: 6,
-                        height: 6,
+                        width: 5,
+                        height: 5,
                         decoration: BoxDecoration(
-                          color: const Color(0xFF43E97B),
+                          color: isDark ? const Color(0xFF4CAF50) : const Color(0xFF43E97B),
                           shape: BoxShape.circle,
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: 10),
                       Expanded(
                         child: Text(
                           rule,
                           style: GoogleFonts.poppins(
-                            fontSize: 14,
-                            color: Colors.grey.shade800,
+                            fontSize: 13,
+                            color: isDark ? Colors.white70 : Colors.grey.shade800,
                             fontWeight: FontWeight.w500,
-                            height: 1.5,
+                            height: 1.4,
                           ),
                         ),
                       ),

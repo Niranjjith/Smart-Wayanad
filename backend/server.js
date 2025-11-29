@@ -14,6 +14,8 @@ import busRoutes from "./src/routes/busRoutes.js";
 import locationRoutes from "./src/routes/locationRoutes.js";
 import chatRoutes from "./src/routes/chatRoutes.js";
 import climateRoutes from "./src/routes/climateRoutes.js";
+import chatbotRoutes from "./src/routes/chatbotRoutes.js";
+import analyticsRoutes from "./src/routes/analyticsRoutes.js";
 
 // 🟢 ADD THIS — Help Alerts Route
 import alertRoutes from "./src/routes/alertRoutes.js";
@@ -24,6 +26,14 @@ dotenv.config();
 
 const app = express();
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Serve static files (uploaded profile photos)
+import { fileURLToPath } from "url";
+import { dirname, join } from "path";
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+app.use("/uploads", express.static(join(__dirname, "uploads")));
 
 // CORS
 app.use(
@@ -77,6 +87,8 @@ app.use("/api/bus", busRoutes);
 app.use("/api/location", locationRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/climate", climateRoutes);
+app.use("/api/chatbot", chatbotRoutes);
+app.use("/api/analytics", analyticsRoutes);
 
 // 🟢 FIX — Register Help Alerts Route
 app.use("/api/help", alertRoutes);

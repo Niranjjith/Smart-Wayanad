@@ -158,3 +158,54 @@ export async function deleteAlert(req, res) {
     res.status(500).json({ message: err.message });
   }
 }
+
+// ----------------------------------------
+// UPDATE LIVE LOCATION (Real-time tracking)
+// ----------------------------------------
+export async function updateLiveLocation(req, res) {
+  try {
+    const { lat, lng, alertId } = req.body;
+
+    if (lat == null || lng == null) {
+      return res.status(400).json({
+        message: "Latitude and longitude are required",
+      });
+    }
+
+    // If alertId is provided, update that specific alert
+    if (alertId) {
+      const alert = await Alert.findByIdAndUpdate(
+        alertId,
+        {
+          $set: {
+            location: {
+              type: "Point",
+              coordinates: [lng, lat],
+            },
+          },
+        },
+        { new: true }
+      );
+
+      if (!alert) {
+        return res.status(404).json({ message: "Alert not found" });
+      }
+
+      // Emit real-time location update
+      const io = req.app.get("io");
+      if (io) io.emit("alert:location-update", { alertId, lat, lng });
+
+      return res.json({ success: true, alert });
+    }
+
+    // Otherwise, just acknowledge the location update
+    // (for tracking purposes without a specific alert)
+    const io = req.app.get("io");
+    if (io) io.emit("location:update", { lat, lng });
+
+    res.json({ success: true, message: "Location updated" });
+  } catch (err) {
+    console.error("❌ updateLiveLocation error:", err);
+    res.status(500).json({ message: err.message });
+  }
+}

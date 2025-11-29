@@ -244,3 +244,6 @@ See `readme.md` for detailed installation instructions.
 
 **Built with ❤️ for Smart Wayanad**
 
+
+
+

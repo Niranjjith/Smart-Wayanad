@@ -4,7 +4,8 @@ import 'login_page.dart';
 import 'dart:math' as math;
 
 class SplashPage extends StatefulWidget {
-  const SplashPage({super.key});
+  final Function(bool)? toggleTheme;
+  const SplashPage({super.key, this.toggleTheme});
 
   @override
   State<SplashPage> createState() => _SplashPageState();

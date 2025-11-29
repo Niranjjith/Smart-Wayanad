@@ -118,6 +118,24 @@ class ApiService {
     return data is List ? data : [];
   }
 
+  static Future<bool> updateLiveLocation({
+    required double lat,
+    required double lng,
+    String? alertId,
+  }) async {
+    try {
+      final res = await _post("help/live-location", {
+        "lat": lat,
+        "lng": lng,
+        "alertId": alertId,
+      });
+      return res != null;
+    } catch (e) {
+      print("Error updating live location: $e");
+      return false;
+    }
+  }
+
   // ---------------------------------------------------------------------------
   // 🚌 BUS ROUTES
   // ---------------------------------------------------------------------------

@@ -33,6 +33,28 @@ dependencies:
   # 🎡 Loading animations / spinners
   flutter_spinkit: ^5.2.0
 
+  # 🗺️ Maps and location
+  google_maps_flutter: ^2.5.0
+  flutter_map: ^6.1.0
+  latlong2: ^0.9.1
+  mapbox_gl: ^0.15.0
+
+  # 📸 Image picker
+  image_picker: ^1.0.7
+
+  # 🎤 Voice recording (optional - not available on Windows/Linux)
+  # record: ^5.0.4  # Commented out due to Windows compatibility issues
+  permission_handler: ^11.3.0
+
+  # 🌙 Dark mode
+  shared_preferences: ^2.2.2
+
+  # 📱 AR (camera-based navigation)
+  camera: ^0.10.5+5
+
+  # 🎨 UI enhancements
+  cached_network_image: ^3.3.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
