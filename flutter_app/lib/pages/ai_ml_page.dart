@@ -148,6 +148,10 @@ class _AIMLPageState extends State<AIMLPage> with TickerProviderStateMixin {
             pinned: true,
             elevation: 0,
             backgroundColor: Colors.transparent,
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.white),
+              onPressed: () => Navigator.pop(context),
+            ),
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
                 decoration: BoxDecoration(

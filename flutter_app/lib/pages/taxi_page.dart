@@ -60,7 +60,13 @@ class TaxiPage extends StatelessWidget {
     final isTablet = width > 600;
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Taxi Stands")),
+      appBar: AppBar(
+        title: const Text("Taxi Stands"),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: GridView.count(

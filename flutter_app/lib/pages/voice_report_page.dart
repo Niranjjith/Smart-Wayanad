@@ -145,6 +145,10 @@ class _VoiceReportPageState extends State<VoiceReportPage> {
         elevation: 0,
         backgroundColor: const Color(0xFF667EEA),
         foregroundColor: Colors.white,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
       body: Column(
         children: [

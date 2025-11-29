@@ -56,7 +56,7 @@ export async function createAdminAlert(req, res) {
     }
 
     // Create the admin alert entry (without location)
-    // First create the alert
+    // Don't include location field at all for admin alerts
     const alert = await Alert.create({
       name: "Admin",
       phone: "",
@@ -65,23 +65,21 @@ export async function createAdminAlert(req, res) {
       alertType: alertType || "other",
       source: "admin",
       priority: priority || "high",
+      // Explicitly don't set location - pre-save hook will handle it
     });
     
-    // Immediately remove location field from database using $unset
-    await Alert.findByIdAndUpdate(
-      alert._id,
-      { $unset: { location: "" } },
-      { new: true }
-    );
-    
-    // Reload the alert to get the clean version without location
+    // Ensure location is removed (pre-save hook should handle this, but double-check)
     const cleanAlert = await Alert.findById(alert._id).lean();
     if (cleanAlert && cleanAlert.location) {
       delete cleanAlert.location;
     }
     
     // Use the clean alert for response
-    const finalAlert = cleanAlert || alert;
+    const finalAlert = cleanAlert || alert.toObject();
+    // Remove location if it somehow still exists
+    if (finalAlert.location) {
+      delete finalAlert.location;
+    }
 
     // Emit real-time event to all users
     const io = req.app.get("io");

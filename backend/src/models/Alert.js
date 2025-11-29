@@ -53,15 +53,21 @@ const alertSchema = new mongoose.Schema(
 alertSchema.pre('save', function(next) {
   // If source is admin, ensure location is completely removed
   if (this.source === 'admin') {
+    // Remove location field completely
+    if (this.location !== undefined && this.location !== null) {
+      delete this._doc.location;
+    }
+    // Set to undefined to ensure it's not saved
     this.set('location', undefined, { strict: false });
-    this.unset('location');
   }
-  // If location exists but has no coordinates, remove it entirely
-  else if (this.location && (!this.location.coordinates || 
-           this.location.coordinates.length === 0 || 
-           !Array.isArray(this.location.coordinates))) {
+  // If location exists but has no valid coordinates, remove it entirely
+  else if (this.location && 
+           (!this.location.coordinates || 
+            this.location.coordinates.length === 0 || 
+            !Array.isArray(this.location.coordinates))) {
+    // Remove invalid location
+    delete this._doc.location;
     this.set('location', undefined, { strict: false });
-    this.unset('location');
   }
   next();
 });
@@ -69,10 +75,22 @@ alertSchema.pre('save', function(next) {
 // Pre-update hook for findOneAndUpdate, updateOne, etc.
 alertSchema.pre(['findOneAndUpdate', 'updateOne', 'updateMany'], function(next) {
   const update = this.getUpdate();
-  // If source is admin or location has no coordinates, remove location
+  // If source is admin or location has no coordinates, remove location using $unset
   if (update && (update.source === 'admin' || 
       (update.location && (!update.location.coordinates || update.location.coordinates.length === 0)))) {
-    this.set({ location: undefined });
+    // Use $unset to remove the location field
+    if (!update.$unset) {
+      update.$unset = {};
+    }
+    update.$unset.location = "";
+    // Also remove location from $set if it exists
+    if (update.$set && update.$set.location !== undefined) {
+      delete update.$set.location;
+    }
+    // Remove location from top-level update if it exists
+    if (update.location !== undefined) {
+      delete update.location;
+    }
   }
   next();
 });

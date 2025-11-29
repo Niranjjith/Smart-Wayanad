@@ -552,7 +552,7 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 - 📧 Email: niranjjithbathery@gmail.com
 - 🌐 Website: [arjith.vercel.app](https://arjith.vercel.app)
-- 💼 LinkedIn: [Your LinkedIn](www.linkedin.com/in/niranjan-a-r-674799281)
+- 💼 LinkedIn: [www.linkedin.com/in/niranjan-a-r-674799281](www.linkedin.com/in/niranjan-a-r-674799281)
 
 ---
 

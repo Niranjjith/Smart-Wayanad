@@ -28,6 +28,12 @@ export const chatbotReply = async (req, res) => {
       taxi: ["taxi", "cab", "auto", "rickshaw", "transport", "ടാക്സി", "ഓട്ടോ"],
       helpline: ["helpline", "contact", "phone", "number", "call", "ഹെൽപ്പ്‌ലൈൻ", "ഫോൺ", "കോൾ"],
       thanks: ["thanks", "thank you", "appreciate", "നന്ദി", "വളരെ നന്ദി"],
+      about: ["about", "tell me", "information", "details", "wayanad", "district", "പറ്റി", "വിവരം", "വയനാട്"],
+      tourist: ["tourist", "places", "visit", "attractions", "sightseeing", "പ്രധാന", "സന്ദർശന", "സ്ഥലങ്ങൾ"],
+      besttime: ["best time", "when to visit", "season", "monsoon", "ഏത് സമയം", "മഴക്കാലം", "സീസൺ"],
+      howtoreach: ["how to reach", "how to come", "transport", "way", "എങ്ങനെ", "വഴി", "എത്താം"],
+      culture: ["culture", "tribes", "traditions", "festivals", "സംസ്കാരം", "ഗോത്രങ്ങൾ", "ഉത്സവങ്ങൾ"],
+      food: ["food", "cuisine", "dishes", "restaurants", "ഭക്ഷണം", "പാചകം", "റെസ്റ്റോറന്റ്"],
     };
 
     // Detect intent
@@ -137,15 +143,394 @@ export const chatbotReply = async (req, res) => {
         reply = "You're welcome! 😊 If you need anything else, just ask. Stay safe!";
         break;
 
+      case "about":
+        reply = `🌿 **About Wayanad District:**
+
+**Location & Geography:**
+• Located in the Western Ghats, Kerala, India
+• Area: 2,131 sq km
+• Headquarters: Kalpetta
+• Altitude: 700-2100 meters above sea level
+• Known as the "Green Paradise" of Kerala
+
+**Key Facts:**
+• Formed in 1980 (youngest district in Kerala)
+• Borders: Karnataka (North & East), Kozhikode & Malappuram (South & West)
+• Population: ~8.17 lakhs (2011 census)
+• Literacy Rate: 89.32%
+• Official Language: Malayalam
+
+**Natural Features:**
+• Dense forests covering 80% of the area
+• Rich biodiversity with many endangered species
+• Several wildlife sanctuaries and national parks
+• Numerous waterfalls and rivers
+• Coffee, tea, and spice plantations
+
+**Economy:**
+• Agriculture: Coffee, tea, pepper, cardamom, rubber
+• Tourism: Major source of income
+• Handicrafts: Bamboo products, tribal artifacts
+
+**Administrative Divisions:**
+• 3 Taluks: Mananthavady, Sulthan Bathery, Vythiri
+• 4 Municipalities: Kalpetta, Mananthavady, Sulthan Bathery, Panamaram
+• 49 Grama Panchayats
+
+Would you like to know more about specific aspects like tourist places, culture, or how to reach?`;
+        break;
+
+      case "tourist":
+        reply = `🏞️ **Famous Tourist Places in Wayanad:**
+
+**Nature & Wildlife:**
+1. **Edakkal Caves** - Ancient rock carvings, 6000+ years old
+2. **Chembra Peak** - Highest peak (2100m), heart-shaped lake
+3. **Banasura Sagar Dam** - Largest earth dam in India
+4. **Soochipara Falls** - Beautiful 3-tier waterfall
+5. **Kuruva Island** - River island with rich biodiversity
+6. **Pookode Lake** - Freshwater lake surrounded by forests
+7. **Meenmutty Falls** - Three-tier waterfall, 300m high
+
+**Wildlife Sanctuaries:**
+8. **Wayanad Wildlife Sanctuary** - Home to elephants, tigers, leopards
+9. **Tholpetty Wildlife Sanctuary** - Elephant sightings
+10. **Muthanga Wildlife Sanctuary** - Part of Nilgiri Biosphere
+
+**Historical & Cultural:**
+11. **Edakkal Caves** - Prehistoric cave paintings
+12. **Pazhassi Raja Museum** - History of Wayanad
+13. **Thirunelli Temple** - Ancient temple in Brahmagiri hills
+14. **Jain Temple, Sulthan Bathery** - 13th-century temple
+
+**Plantations & Spice Gardens:**
+15. **Spice Plantations** - Guided tours
+16. **Coffee Estates** - Experience coffee cultivation
+17. **Tea Gardens** - Scenic tea plantations
+
+**Adventure Activities:**
+• Trekking (Chembra Peak, Neelimala)
+• Bamboo rafting (Kuruva Island)
+• Rock climbing
+• Camping
+
+**Best Time to Visit:** October to May (avoid monsoon: June-September)`;
+        break;
+
+      case "besttime":
+        reply = `📅 **Best Time to Visit Wayanad:**
+
+**Peak Season (October - May):**
+• **October - February:** 
+  - Pleasant weather, 15-25°C
+  - Perfect for sightseeing and trekking
+  - Clear skies, minimal rainfall
+  - Best time for wildlife spotting
+
+• **March - May:**
+  - Summer season, 20-30°C
+  - Good for outdoor activities
+  - Slightly warmer but still comfortable
+  - Waterfalls may have less water
+
+**Monsoon Season (June - September):**
+• Heavy rainfall (3000-4000mm annually)
+• Lush green landscapes
+• Waterfalls at their best
+• Some areas may be inaccessible
+• Not ideal for trekking or outdoor activities
+
+**Climate:**
+• Tropical climate with high humidity
+• Average temperature: 18-28°C
+• Annual rainfall: ~3000mm
+• Cool evenings throughout the year
+
+**Recommendation:**
+🎯 **Best months:** November to February (winter)
+🌿 **For greenery:** July-August (monsoon)
+☀️ **For activities:** October-May (dry season)
+
+**What to Pack:**
+• Light woolens (Nov-Feb)
+• Rain gear (Jun-Sep)
+• Comfortable trekking shoes
+• Insect repellent
+• Camera for scenic views!`;
+        break;
+
+      case "howtoreach":
+        reply = `🚗 **How to Reach Wayanad:**
+
+**By Air:**
+• **Nearest Airport:** Calicut International Airport (Kozhikode)
+  - Distance: ~100 km from Kalpetta
+  - Flight time: 2.5-3 hours from major cities
+  - From airport: Taxi/bus to Wayanad (2-3 hours)
+
+**By Train:**
+• **Nearest Railway Station:** Kozhikode Railway Station
+  - Distance: ~110 km from Kalpetta
+  - Well-connected to major cities
+  - From station: Bus/taxi to Wayanad (2.5-3 hours)
+
+**By Road:**
+• **From Bangalore:** ~280 km (6-7 hours)
+  - Route: Bangalore → Mysore → Gundlupet → Wayanad
+  - Good road conditions, scenic drive
+
+• **From Kochi:** ~280 km (6-7 hours)
+  - Route: Kochi → Thrissur → Palakkad → Wayanad
+
+• **From Kozhikode:** ~110 km (2.5-3 hours)
+  - Route: Kozhikode → Thamarassery → Kalpetta
+  - Most common route
+
+• **From Mysore:** ~120 km (3-4 hours)
+  - Route: Mysore → Gundlupet → Wayanad
+  - Scenic route through forests
+
+**Local Transport:**
+• **Buses:** KSRTC and private buses connect all major towns
+• **Taxis:** Available from airports/railway stations
+• **Auto-rickshaws:** For local travel
+• **Car Rental:** Available in Kalpetta and major towns
+
+**Important Routes:**
+• NH 766 (Kozhikode - Kollegal)
+• State Highway 29 (connects major towns)
+• Ghat roads: Beautiful but winding, drive carefully
+
+**Tips:**
+• Book accommodation in advance (peak season)
+• Carry valid ID proof
+• Keep emergency contacts handy
+• Download offline maps (network can be weak in hills)`;
+        break;
+
+      case "culture":
+        reply = `🎭 **Culture & Traditions of Wayanad:**
+
+**Tribal Communities:**
+Wayanad is home to several indigenous tribes:
+• **Paniyas** - Largest tribal community
+• **Adiyas** - Traditional agricultural workers
+• **Kurichiyas** - Known for archery skills
+• **Kurumas** - Pottery and basket making
+• **Kattunayakans** - Forest dwellers, honey collectors
+
+**Festivals:**
+• **Onam** - Harvest festival (August-September)
+• **Vishu** - New Year (April)
+• **Puthari** - Tribal harvest festival
+• **Karivela** - Tribal festival
+• **Theyyam** - Ritualistic dance form
+
+**Traditional Arts:**
+• **Tribal Dances:** Folk dances with traditional music
+• **Handicrafts:** Bamboo products, cane furniture
+• **Traditional Medicine:** Herbal remedies
+• **Cuisine:** Tribal and local Kerala dishes
+
+**Languages:**
+• **Malayalam** - Official language
+• **Tribal Languages:** Various dialects
+• **English** - Widely understood in tourist areas
+
+**Religious Diversity:**
+• Hindus (majority)
+• Muslims
+• Christians
+• Tribal religions
+
+**Traditional Practices:**
+• Agriculture-based lifestyle
+• Forest conservation practices
+• Traditional healing methods
+• Community-based decision making
+
+**Cultural Sites:**
+• Tribal museums
+• Ancient temples
+• Heritage sites
+• Cultural centers`;
+        break;
+
+      case "food":
+        reply = `🍽️ **Food & Cuisine of Wayanad:**
+
+**Traditional Dishes:**
+• **Kerala Sadya** - Traditional vegetarian feast
+• **Appam & Stew** - Rice pancakes with vegetable stew
+• **Puttu & Kadala** - Steamed rice cake with chickpeas
+• **Kerala Parotta** - Layered flatbread
+• **Fish Curry** - Traditional spicy fish preparation
+• **Beef Fry** - Popular non-vegetarian dish
+• **Chicken Curry** - Spiced chicken preparation
+
+**Local Specialties:**
+• **Bamboo Rice** - Unique rice variety
+• **Tribal Cuisine** - Traditional tribal dishes
+• **Wild Honey** - Collected from forests
+• **Coffee** - Fresh Wayanad coffee
+• **Spices** - Fresh pepper, cardamom, cinnamon
+
+**Famous Snacks:**
+• **Banana Chips** - Crispy banana snacks
+• **Kozhukatta** - Sweet rice dumplings
+• **Unniyappam** - Sweet rice fritters
+• **Achappam** - Rose cookies
+
+**Beverages:**
+• **Fresh Coffee** - Wayanad is famous for coffee
+• **Tender Coconut** - Fresh coconut water
+• **Buttermilk** - Traditional drink
+• **Kashayam** - Herbal tea
+
+**Where to Eat:**
+• **Local Restaurants:** Traditional Kerala cuisine
+• **Resort Restaurants:** Multi-cuisine options
+• **Street Food:** Local snacks and fast food
+• **Plantation Cafes:** Coffee and snacks
+
+**Food Tips:**
+• Try local tribal cuisine if available
+• Fresh spices are great souvenirs
+• Coffee plantations offer fresh coffee
+• Ask for less spice if you can't handle heat
+• Try bamboo rice - unique to the region!`;
+        break;
+
       default:
         // 🧠 Smart fallback with suggestions
-        const suggestions = [];
-        if (userMessage.includes("how") || userMessage.includes("what")) {
-          reply = "I can help you with:\n• Emergency services (SOS)\n• Bus routes and schedules\n• Hospital and clinic locations\n• Weather information\n• Police stations\n• Taxi stands\n• Helpline numbers\n\nWhat would you like to know?";
+        if (userMessage.includes("wayanad") || userMessage.includes("district") || userMessage.includes("about")) {
+          reply = `🌿 **Wayanad District Information:**
+
+Wayanad is a beautiful hill district in Kerala, India, located in the Western Ghats. Here's what you should know:
+
+**Quick Facts:**
+• Area: 2,131 sq km
+• Headquarters: Kalpetta
+• Altitude: 700-2100m above sea level
+• Known as: "Green Paradise" of Kerala
+
+**Popular Attractions:**
+• Edakkal Caves (ancient rock carvings)
+• Chembra Peak (highest point)
+• Banasura Sagar Dam
+• Soochipara Falls
+• Wayanad Wildlife Sanctuary
+
+**Best Time to Visit:** October to May
+
+**How to Reach:**
+• Nearest Airport: Calicut (100 km)
+• Nearest Railway: Kozhikode (110 km)
+• Well-connected by road from major cities
+
+Ask me about:
+• Tourist places
+• Best time to visit
+• How to reach
+• Culture & traditions
+• Food & cuisine
+• Emergency services
+• Bus routes
+• Hospitals & more!`;
+        } else if (userMessage.includes("how") || userMessage.includes("what")) {
+          reply = `I can help you with comprehensive information about Wayanad! 🌿
+
+**District Information:**
+• About Wayanad district
+• Tourist places & attractions
+• Best time to visit
+• How to reach Wayanad
+• Culture & traditions
+• Food & cuisine
+
+**Services:**
+• 🚨 Emergency services (SOS)
+• 🚌 Bus routes and schedules
+• 🏥 Hospital and clinic locations
+• 🌤️ Weather information
+• 🚔 Police stations
+• 🚕 Taxi stands
+• 📞 Helpline numbers
+
+What would you like to know?`;
         } else if (userMessage.includes("where")) {
-          reply = "I can help you find locations! Try asking about:\n• Hospitals near me\n• Police stations\n• Bus routes\n• Taxi stands\n\nOr use the Locations section in the app.";
+          reply = `I can help you find locations in Wayanad! 📍
+
+**Tourist Places:**
+• Edakkal Caves
+• Chembra Peak
+• Banasura Sagar Dam
+• Soochipara Falls
+• Wildlife Sanctuaries
+
+**Services:**
+• Hospitals near me
+• Police stations
+• Bus routes
+• Taxi stands
+• Clinics
+
+**Useful Commands:**
+• "Tell me about Wayanad"
+• "Tourist places"
+• "How to reach"
+• "Best time to visit"
+• "Emergency help"
+
+Or use the Locations section in the app for detailed maps!`;
+        } else if (userMessage.includes("tourist") || userMessage.includes("visit") || userMessage.includes("places")) {
+          reply = `🏞️ **Top Tourist Places in Wayanad:**
+
+1. **Edakkal Caves** - Ancient rock carvings (6000+ years)
+2. **Chembra Peak** - Highest peak with heart-shaped lake
+3. **Banasura Sagar Dam** - Largest earth dam in India
+4. **Soochipara Falls** - Beautiful 3-tier waterfall
+5. **Kuruva Island** - River island with rich biodiversity
+6. **Pookode Lake** - Scenic freshwater lake
+7. **Wayanad Wildlife Sanctuary** - See elephants, tigers
+8. **Meenmutty Falls** - 300m high waterfall
+
+**Adventure Activities:**
+• Trekking
+• Bamboo rafting
+• Rock climbing
+• Camping
+
+Ask "Tell me about tourist places" for detailed information!`;
         } else {
-          reply = "I'm here to help! 🤖 Try asking about:\n• Emergency services\n• Bus routes\n• Hospitals\n• Weather\n• Police stations\n• Or use the SOS button for immediate help!";
+          reply = `I'm your Smart Wayanad AI Assistant! 🤖 I can help you with:
+
+**🌿 District Information:**
+• About Wayanad district
+• Tourist places & attractions
+• Best time to visit
+• How to reach
+• Culture & traditions
+• Food & cuisine
+
+**🚨 Services:**
+• Emergency services (SOS)
+• Bus routes
+• Hospitals & clinics
+• Weather information
+• Police stations
+• Taxi stands
+• Helpline numbers
+
+**Quick Questions:**
+Try asking:
+• "Tell me about Wayanad"
+• "Tourist places"
+• "Best time to visit"
+• "How to reach Wayanad"
+• "Emergency help"
+
+Or use the SOS button for immediate emergency assistance!`;
         }
     }
 

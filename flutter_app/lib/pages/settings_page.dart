@@ -80,6 +80,10 @@ class _SettingsPageState extends State<SettingsPage> {
         elevation: 0,
         backgroundColor: isDark ? const Color(0xFF0A0E27) : const Color(0xFF667EEA),
         foregroundColor: Colors.white,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
       body: ListView(
         padding: const EdgeInsets.all(20),

@@ -109,6 +109,10 @@ class _IncidentHeatmapPageState extends State<IncidentHeatmapPage> {
         elevation: 0,
         backgroundColor: const Color(0xFF667EEA),
         foregroundColor: Colors.white,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh_rounded),

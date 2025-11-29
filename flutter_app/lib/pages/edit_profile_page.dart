@@ -161,6 +161,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
         elevation: 0,
         backgroundColor: const Color(0xFF667EEA),
         foregroundColor: Colors.white,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),

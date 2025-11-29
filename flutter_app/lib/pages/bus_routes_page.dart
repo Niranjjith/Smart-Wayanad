@@ -97,6 +97,10 @@ class _BusRoutesPageState extends State<BusRoutesPage> {
             pinned: true,
             elevation: 0,
             backgroundColor: Colors.transparent,
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.white),
+              onPressed: () => Navigator.pop(context),
+            ),
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
                 decoration: BoxDecoration(
