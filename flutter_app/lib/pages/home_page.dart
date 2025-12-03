@@ -106,7 +106,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     final user = widget.user;
     final size = MediaQuery.of(context).size;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    // Always use light theme
+    const isDark = false;
     final profilePhotoUrl = _getProfilePhotoUrl();
 
     // Premium feature cards - smaller and more compact
@@ -114,119 +115,93 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       {
         "title": "SOS",
         "icon": Icons.sos_rounded,
-        "gradient": isDark 
-            ? [const Color(0xFFE53935), const Color(0xFFC62828)]
-            : [const Color(0xFFE53935), const Color(0xFFC62828)],
+        "gradient": [const Color(0xFFE53935), const Color(0xFFC62828)],
         "page": HelpPage(user: user),
         "badge": "24/7",
       },
       {
         "title": "Bus Routes",
         "icon": Icons.directions_bus_rounded,
-        "gradient": isDark
-            ? [const Color(0xFF2196F3), const Color(0xFF1976D2)]
-            : [const Color(0xFF667EEA), const Color(0xFF764BA2)],
+        "gradient": [const Color(0xFF667EEA), const Color(0xFF764BA2)],
         "page": const BusRoutesPage(),
       },
       {
         "title": "Smart Route",
         "icon": Icons.route_rounded,
-        "gradient": isDark
-            ? [const Color(0xFF4CAF50), const Color(0xFF388E3C)]
-            : [const Color(0xFF43E97B), const Color(0xFF38F9D7)],
+        "gradient": [const Color(0xFF43E97B), const Color(0xFF38F9D7)],
         "page": const SmartRoutePage(),
         "badge": "AI",
       },
       {
         "title": "AI/ML",
         "icon": Icons.psychology_rounded,
-        "gradient": isDark
-            ? [const Color(0xFF2196F3), const Color(0xFF1976D2)]
-            : [const Color(0xFF667EEA), const Color(0xFF764BA2)],
+        "gradient": [const Color(0xFF667EEA), const Color(0xFF764BA2)],
         "page": const AIMLPage(),
         "badge": "NEW",
       },
       {
         "title": "AR Nav",
         "icon": Icons.camera_alt_rounded,
-        "gradient": isDark
-            ? [const Color(0xFF00BCD4), const Color(0xFF0097A7)]
-            : [const Color(0xFF4FACFE), const Color(0xFF00F2FE)],
+        "gradient": [const Color(0xFF4FACFE), const Color(0xFF00F2FE)],
         "page": const ARNavigationPage(),
         "badge": "NEW",
       },
       {
         "title": "Voice",
         "icon": Icons.mic_rounded,
-        "gradient": isDark
-            ? [const Color(0xFFE91E63), const Color(0xFFC2185B)]
-            : [const Color(0xFFF5576C), const Color(0xFFFA709A)],
+        "gradient": [const Color(0xFFF5576C), const Color(0xFFFA709A)],
         "page": HelpPage(user: user), // Redirect to SOS for voice reporting
         "badge": null,
       },
       {
         "title": "Heatmap",
         "icon": Icons.map_rounded,
-        "gradient": isDark
-            ? [const Color(0xFF4CAF50), const Color(0xFF388E3C)]
-            : [const Color(0xFF43E97B), const Color(0xFF38F9D7)],
+        "gradient": [const Color(0xFF43E97B), const Color(0xFF38F9D7)],
         "page": const IncidentHeatmapPage(),
         "badge": "Live",
       },
       {
         "title": "Weather",
         "icon": Icons.wb_sunny_rounded,
-        "gradient": isDark
-            ? [const Color(0xFFFF9800), const Color(0xFFF57C00)]
-            : [const Color(0xFFF093FB), const Color(0xFFF5576C)],
+        "gradient": [const Color(0xFFF093FB), const Color(0xFFF5576C)],
         "page": const ClimatePage(),
         "badge": "Live",
       },
       {
         "title": "Chatbot",
         "icon": Icons.smart_toy_rounded,
-        "gradient": isDark
-            ? [const Color(0xFF2196F3), const Color(0xFF1976D2)]
-            : [const Color(0xFF4FACFE), const Color(0xFF00F2FE)],
+        "gradient": [const Color(0xFF4FACFE), const Color(0xFF00F2FE)],
         "page": const ChatbotPage(),
         "badge": "AI",
       },
       {
         "title": "Helpline",
         "icon": Icons.phone_in_talk_rounded,
-        "gradient": isDark
-            ? [const Color(0xFF4CAF50), const Color(0xFF388E3C)]
-            : [const Color(0xFF43E97B), const Color(0xFF38F9D7)],
+        "gradient": [const Color(0xFF43E97B), const Color(0xFF38F9D7)],
         "page": const HelplinePage(),
       },
       {
         "title": "Hospitals",
         "icon": Icons.local_hospital_rounded,
-        "gradient": isDark
-            ? [const Color(0xFFE91E63), const Color(0xFFC2185B)]
-            : [const Color(0xFFFA709A), const Color(0xFFFEE140)],
+        "gradient": [const Color(0xFFFA709A), const Color(0xFFFEE140)],
         "page": const HospitalPage(),
       },
       {
         "title": "Clinics",
         "icon": Icons.healing_rounded,
-        "gradient": isDark
-            ? [const Color(0xFF00BCD4), const Color(0xFF0097A7)]
-            : [const Color(0xFF30CFD0), const Color(0xFF330867)],
+        "gradient": [const Color(0xFF30CFD0), const Color(0xFF330867)],
         "page": const ClinicPage(),
       },
       {
         "title": "Taxi",
         "icon": Icons.local_taxi_rounded,
-        "gradient": isDark
-            ? [const Color(0xFFFF9800), const Color(0xFFF57C00)]
-            : [const Color(0xFFA8EDEA), const Color(0xFFFED6E3)],
+        "gradient": [const Color(0xFFA8EDEA), const Color(0xFFFED6E3)],
         "page": const TaxiPage(),
       },
     ];
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0A0E27) : const Color(0xFFF5F7FA),
+      backgroundColor: const Color(0xFFF5F7FA),
       extendBodyBehindAppBar: true,
       body: CustomScrollView(
         slivers: [
@@ -243,17 +218,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: isDark
-                        ? [
-                            const Color(0xFF0A0E27),
-                            const Color(0xFF1A1F3A),
-                            const Color(0xFF2196F3).withValues(alpha: 0.3),
-                          ]
-                        : [
-                            const Color(0xFF667EEA),
-                            const Color(0xFF764BA2),
-                            const Color(0xFFF093FB),
-                          ],
+                    colors: [
+                      const Color(0xFF667EEA),
+                      const Color(0xFF764BA2),
+                      const Color(0xFFF093FB),
+                    ],
                   ),
                 ),
                 child: SafeArea(
@@ -273,8 +242,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                               ),
                               decoration: BoxDecoration(
                                 color: _isServerOnline
-                                    ? Colors.green.withValues(alpha: isDark ? 0.2 : 0.2)
-                                    : Colors.red.withValues(alpha: isDark ? 0.2 : 0.2),
+                                    ? Colors.green.withValues(alpha: 0.2)
+                                    : Colors.red.withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(16),
                                 border: Border.all(
                                   color: _isServerOnline ? Colors.green : Colors.red,
@@ -435,8 +404,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         icon: Icons.directions_bus_rounded,
                         value: "50+",
                         label: "Routes",
-                        color: isDark ? const Color(0xFF2196F3) : const Color(0xFF667EEA),
-                        isDark: isDark,
+                        color: const Color(0xFF667EEA),
+                        isDark: false,
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -445,8 +414,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         icon: Icons.local_hospital_rounded,
                         value: "20+",
                         label: "Hospitals",
-                        color: isDark ? const Color(0xFFE91E63) : const Color(0xFFF5576C),
-                        isDark: isDark,
+                        color: const Color(0xFFF5576C),
+                        isDark: false,
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -455,8 +424,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         icon: Icons.wb_sunny_rounded,
                         value: "24°C",
                         label: "Weather",
-                        color: isDark ? const Color(0xFF00BCD4) : const Color(0xFF4FACFE),
-                        isDark: isDark,
+                        color: const Color(0xFF4FACFE),
+                        isDark: false,
                       ),
                     ),
                   ],
@@ -476,19 +445,19 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     style: GoogleFonts.poppins(
                       fontSize: 20,
                       fontWeight: FontWeight.w800,
-                      color: isDark ? Colors.white : Colors.grey.shade900,
+                      color: Colors.grey.shade900,
                     ),
                   ),
                   const Spacer(),
                   TextButton.icon(
                     onPressed: _checkServerStatus,
-                    icon: Icon(Icons.refresh_rounded, size: 16, color: isDark ? Colors.white70 : Colors.grey.shade700),
+                    icon: Icon(Icons.refresh_rounded, size: 16, color: Colors.grey.shade700),
                     label: Text(
                       "Refresh",
                       style: GoogleFonts.poppins(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
-                        color: isDark ? Colors.white70 : Colors.grey.shade700,
+                        color: Colors.grey.shade700,
                       ),
                     ),
                   ),
@@ -515,7 +484,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     icon: feature["icon"],
                     gradient: feature["gradient"],
                     badge: feature["badge"],
-                    isDark: isDark,
+                    isDark: false,
                     onTap: () {
                       Navigator.push(
                         context,
@@ -543,11 +512,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     style: GoogleFonts.poppins(
                       fontSize: 20,
                       fontWeight: FontWeight.w800,
-                      color: isDark ? Colors.white : Colors.grey.shade900,
+                      color: Colors.grey.shade900,
                     ),
                   ),
                   const SizedBox(height: 12),
-                  _GuidelinesCard(isDark: isDark),
+                  const _GuidelinesCard(isDark: false),
                   const SizedBox(height: 100),
                 ],
               ),
@@ -560,12 +529,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: isDark
-                ? [const Color(0xFF0A0E27), const Color(0xFF1A1F3A)]
-                : [
-                    const Color(0xFF667EEA),
-                    const Color(0xFF764BA2),
-                  ],
+            colors: [
+              const Color(0xFF667EEA),
+              const Color(0xFF764BA2),
+            ],
           ),
           boxShadow: [
             BoxShadow(
@@ -811,11 +778,11 @@ class _StatCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1A1F3A) : Colors.white,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: const Offset(0, 3),
           ),
@@ -838,7 +805,7 @@ class _StatCard extends StatelessWidget {
             style: GoogleFonts.poppins(
               fontSize: 18,
               fontWeight: FontWeight.w800,
-              color: isDark ? Colors.white : Colors.grey.shade900,
+              color: Colors.grey.shade900,
             ),
           ),
           const SizedBox(height: 2),
@@ -846,7 +813,7 @@ class _StatCard extends StatelessWidget {
             label,
             style: GoogleFonts.poppins(
               fontSize: 11,
-              color: isDark ? Colors.white70 : Colors.grey.shade600,
+              color: Colors.grey.shade600,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -878,21 +845,14 @@ class _GuidelinesCard extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: isDark
-              ? [
-                  const Color(0xFF4CAF50).withValues(alpha: 0.15),
-                  const Color(0xFF388E3C).withValues(alpha: 0.15),
-                ]
-              : [
-                  const Color(0xFF43E97B).withValues(alpha: 0.1),
-                  const Color(0xFF38F9D7).withValues(alpha: 0.1),
-                ],
+          colors: [
+            const Color(0xFF43E97B).withValues(alpha: 0.1),
+            const Color(0xFF38F9D7).withValues(alpha: 0.1),
+          ],
         ),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: isDark
-              ? const Color(0xFF4CAF50).withValues(alpha: 0.4)
-              : const Color(0xFF43E97B).withValues(alpha: 0.3),
+          color: const Color(0xFF43E97B).withValues(alpha: 0.3),
           width: 1.5,
         ),
       ),
@@ -908,7 +868,7 @@ class _GuidelinesCard extends StatelessWidget {
                         width: 5,
                         height: 5,
                         decoration: BoxDecoration(
-                          color: isDark ? const Color(0xFF4CAF50) : const Color(0xFF43E97B),
+                          color: const Color(0xFF43E97B),
                           shape: BoxShape.circle,
                         ),
                       ),
@@ -918,7 +878,7 @@ class _GuidelinesCard extends StatelessWidget {
                           rule,
                           style: GoogleFonts.poppins(
                             fontSize: 13,
-                            color: isDark ? Colors.white70 : Colors.grey.shade800,
+                            color: Colors.grey.shade800,
                             fontWeight: FontWeight.w500,
                             height: 1.4,
                           ),

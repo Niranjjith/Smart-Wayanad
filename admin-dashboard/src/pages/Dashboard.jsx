@@ -31,6 +31,7 @@ import {
 import Sidebar from "../layout/Sidebar.jsx";
 import Topbar from "../layout/Topbar.jsx";
 import StatCard from "../components/StatCard.jsx";
+import LoadingAnimation from "../components/LoadingAnimation.jsx";
 import API from "../services/api.js";
 import {
   LineChart,
@@ -301,6 +302,26 @@ export default function Dashboard() {
     reader.readAsDataURL(file);
   };
 
+  // Show loading animation while initial data is loading
+  if (loading && stats.users === 0 && stats.alerts === 0) {
+    return (
+      <Box sx={{ display: "flex", bgcolor: "#f5f7fa", minHeight: "100vh" }}>
+        <Sidebar />
+        <Topbar title="Dashboard" />
+        <Box
+          component="main"
+          sx={{
+            flexGrow: 1,
+            ml: "260px",
+            minHeight: "100vh",
+          }}
+        >
+          <LoadingAnimation message="Loading Dashboard..." />
+        </Box>
+      </Box>
+    );
+  }
+
   return (
     <Box sx={{ display: "flex", bgcolor: "#f5f7fa", minHeight: "100vh" }}>
       <Sidebar />
@@ -315,6 +336,7 @@ export default function Dashboard() {
           pt: 3,
           px: 3,
           minHeight: "100vh",
+          background: "linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%)",
         }}
       >
         <Toolbar />
@@ -394,7 +416,7 @@ export default function Dashboard() {
                 </Button>
               </Stack>
             </Stack>
-            <Box sx={{ mt: 2 }}>
+            <Box sx={{ mt: 2, display: "flex", alignItems: "center", gap: 1 }}>
               <Chip
                 label={`Last updated: ${lastUpdate.toLocaleTimeString()}`}
                 size="small"
@@ -404,6 +426,14 @@ export default function Dashboard() {
                   fontWeight: 600,
                 }}
               />
+              {loading && (
+                <CircularProgress
+                  size={16}
+                  sx={{
+                    color: "white",
+                  }}
+                />
+              )}
             </Box>
           </Paper>
         </motion.div>

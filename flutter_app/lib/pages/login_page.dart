@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../services/api_service.dart';
+import '../utils/app_theme.dart';
+import '../widgets/animated_page.dart';
 import 'home_page.dart';
 import 'signup_page.dart';
 
@@ -11,47 +12,17 @@ class LoginPage extends StatefulWidget {
   State<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage>
-    with SingleTickerProviderStateMixin {
+class _LoginPageState extends State<LoginPage> {
   final _email = TextEditingController();
   final _password = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _loading = false;
   bool _showPassword = false;
-  late AnimationController _animationController;
-  late Animation<double> _fadeAnimation;
-  late Animation<Offset> _slideAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 800),
-    );
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: Curves.easeIn,
-      ),
-    );
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.3),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: Curves.easeOutCubic,
-      ),
-    );
-    _animationController.forward();
-  }
 
   @override
   void dispose() {
     _email.dispose();
     _password.dispose();
-    _animationController.dispose();
     super.dispose();
   }
 
@@ -114,234 +85,168 @@ class _LoginPageState extends State<LoginPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              const Color(0xFF667EEA),
-              const Color(0xFF764BA2),
-              const Color(0xFFF093FB),
-            ],
-          ),
-        ),
-        child: SafeArea(
+      backgroundColor: AppTheme.backgroundColor,
+      body: SafeArea(
+        child: AnimatedPage(
           child: Center(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(24.0),
-              child: FadeTransition(
-                opacity: _fadeAnimation,
-                child: SlideTransition(
-                  position: _slideAnimation,
-                  child: Container(
-                    constraints: const BoxConstraints(maxWidth: 400),
-                    child: Card(
-                      elevation: 20,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(32.0),
-                        child: Form(
-                          key: _formKey,
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
+              padding: const EdgeInsets.all(AppTheme.paddingLarge),
+              child: Container(
+                constraints: const BoxConstraints(maxWidth: 400),
+                child: Card(
+                  elevation: 2,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppTheme.radiusXLarge),
+                  ),
+                  color: AppTheme.cardColor,
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppTheme.paddingXLarge),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          // Logo and Title
+                          Column(
                             children: [
-                              // Logo and Title
-                              Column(
-                                children: [
-                                  Container(
-                                    width: 80,
-                                    height: 80,
-                                    decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                        colors: [
-                                          const Color(0xFF667EEA),
-                                          const Color(0xFF764BA2),
-                                        ],
-                                      ),
-                                      shape: BoxShape.circle,
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: const Color(0xFF667EEA)
-                                              .withValues(alpha: 0.4),
-                                          blurRadius: 20,
-                                          offset: const Offset(0, 10),
-                                        ),
-                                      ],
-                                    ),
-                                    child: const Icon(
-                                      Icons.public_rounded,
-                                      color: Colors.white,
-                                      size: 40,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 24),
-                                  Text(
-                                    'Smart Wayanad',
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 32,
-                                      fontWeight: FontWeight.w800,
-                                      color: Colors.grey.shade900,
-                                      letterSpacing: -0.5,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    'Welcome Back 👋',
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 16,
-                                      color: Colors.grey.shade600,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 40),
-
-                              // Email Field
-                              TextFormField(
-                                controller: _email,
-                                keyboardType: TextInputType.emailAddress,
-                                decoration: InputDecoration(
-                                  labelText: "Email",
-                                  prefixIcon: const Icon(Icons.email_outlined),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-                                  filled: true,
-                                  fillColor: Colors.grey.shade50,
+                              Container(
+                                width: 70,
+                                height: 70,
+                                decoration: BoxDecoration(
+                                  color: AppTheme.primaryColor.withOpacity(0.1),
+                                  shape: BoxShape.circle,
                                 ),
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Please enter your email';
-                                  }
-                                  if (!value.contains('@')) {
-                                    return 'Please enter a valid email';
-                                  }
-                                  return null;
-                                },
-                              ),
-                              const SizedBox(height: 20),
-
-                              // Password Field
-                              TextFormField(
-                                controller: _password,
-                                obscureText: !_showPassword,
-                                decoration: InputDecoration(
-                                  labelText: "Password",
-                                  prefixIcon: const Icon(Icons.lock_outline),
-                                  suffixIcon: IconButton(
-                                    icon: Icon(
-                                      _showPassword
-                                          ? Icons.visibility_off
-                                          : Icons.visibility,
-                                    ),
-                                    onPressed: () => setState(
-                                      () => _showPassword = !_showPassword,
-                                    ),
-                                  ),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-                                  filled: true,
-                                  fillColor: Colors.grey.shade50,
+                                child: Icon(
+                                  Icons.public_rounded,
+                                  color: AppTheme.primaryColor,
+                                  size: 36,
                                 ),
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Please enter your password';
-                                  }
-                                  if (value.length < 6) {
-                                    return 'Password must be at least 6 characters';
-                                  }
-                                  return null;
-                                },
                               ),
-                              const SizedBox(height: 32),
-
-                              // Login Button
-                              _loading
-                                  ? const Center(
-                                      child: CircularProgressIndicator(
-                                        color: Color(0xFF667EEA),
-                                      ),
-                                    )
-                                  : Container(
-                                      height: 56,
-                                      decoration: BoxDecoration(
-                                        gradient: LinearGradient(
-                                          colors: [
-                                            const Color(0xFF667EEA),
-                                            const Color(0xFF764BA2),
-                                          ],
-                                        ),
-                                        borderRadius: BorderRadius.circular(16),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: const Color(0xFF667EEA)
-                                                .withValues(alpha: 0.4),
-                                            blurRadius: 15,
-                                            offset: const Offset(0, 8),
-                                          ),
-                                        ],
-                                      ),
-                                      child: ElevatedButton(
-                                        onPressed: _login,
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: Colors.transparent,
-                                          shadowColor: Colors.transparent,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(16),
-                                          ),
-                                        ),
-                                        child: Text(
-                                          "Login",
-                                          style: GoogleFonts.poppins(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w700,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-
-                              const SizedBox(height: 24),
-
-                              // Signup Link
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    "Don't have an account? ",
-                                    style: GoogleFonts.poppins(
-                                      color: Colors.grey.shade600,
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                  TextButton(
-                                    onPressed: () => Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) => const SignupPage(),
-                                      ),
-                                    ),
-                                    child: Text(
-                                      "Register",
-                                      style: GoogleFonts.poppins(
-                                        color: const Color(0xFF667EEA),
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                              const SizedBox(height: AppTheme.paddingLarge),
+                              Text(
+                                'Smart Wayanad',
+                                style: AppTheme.headingLarge.copyWith(
+                                  color: AppTheme.textPrimary,
+                                ),
+                              ),
+                              const SizedBox(height: AppTheme.paddingSmall),
+                              Text(
+                                'Welcome Back 👋',
+                                style: AppTheme.bodyMedium.copyWith(
+                                  color: AppTheme.textSecondary,
+                                ),
                               ),
                             ],
                           ),
-                        ),
+                          const SizedBox(height: AppTheme.paddingXLarge),
+
+                          // Email Field
+                          TextFormField(
+                            controller: _email,
+                            keyboardType: TextInputType.emailAddress,
+                            style: AppTheme.bodyLarge.copyWith(
+                              color: AppTheme.textPrimary,
+                            ),
+                            decoration: AppTheme.inputDecoration(
+                              context: context,
+                              label: "Email",
+                              prefixIcon: Icons.email_outlined,
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter your email';
+                              }
+                              if (!value.contains('@')) {
+                                return 'Please enter a valid email';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: AppTheme.paddingMedium),
+
+                          // Password Field
+                          TextFormField(
+                            controller: _password,
+                            obscureText: !_showPassword,
+                            style: AppTheme.bodyLarge.copyWith(
+                              color: AppTheme.textPrimary,
+                            ),
+                            decoration: AppTheme.inputDecoration(
+                              context: context,
+                              label: "Password",
+                              prefixIcon: Icons.lock_outline,
+                            ).copyWith(
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  _showPassword ? Icons.visibility_off : Icons.visibility,
+                                  color: AppTheme.textSecondary,
+                                ),
+                                onPressed: () => setState(() => _showPassword = !_showPassword),
+                              ),
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter your password';
+                              }
+                              if (value.length < 6) {
+                                return 'Password must be at least 6 characters';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: AppTheme.paddingXLarge),
+
+                          // Login Button
+                          _loading
+                              ? Center(
+                                  child: CircularProgressIndicator(
+                                    color: AppTheme.primaryColor,
+                                  ),
+                                )
+                              : ElevatedButton(
+                                  onPressed: _login,
+                                  style: AppTheme.primaryButtonStyle(context),
+                                  child: Text(
+                                    "Login",
+                                    style: AppTheme.bodyLarge.copyWith(
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+
+                          const SizedBox(height: AppTheme.paddingLarge),
+
+                          // Signup Link
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "Don't have an account? ",
+                                style: AppTheme.bodyMedium.copyWith(
+                                  color: AppTheme.textSecondary,
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () => Navigator.pushReplacement(
+                                  context,
+                                  AppPageRoute(page: const SignupPage()),
+                                ),
+                                style: TextButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                                ),
+                                child: Text(
+                                  "Register",
+                                  style: AppTheme.bodyMedium.copyWith(
+                                    color: AppTheme.primaryColor,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                     ),
                   ),

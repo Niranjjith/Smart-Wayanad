@@ -15,7 +15,6 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  bool _darkMode = false;
   bool _notifications = true;
   String _language = "en";
 
@@ -28,7 +27,6 @@ class _SettingsPageState extends State<SettingsPage> {
   Future<void> _loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      _darkMode = prefs.getBool('darkMode') ?? false;
       _notifications = prefs.getBool('notifications') ?? true;
       _language = prefs.getString('language') ?? 'en';
     });
@@ -36,20 +34,20 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Future<void> _saveSettings() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('darkMode', _darkMode);
     await prefs.setBool('notifications', _notifications);
     await prefs.setString('language', _language);
     
-    // Notify app to update theme
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Settings saved! ${_darkMode ? "Restart app to apply dark mode." : ""}'),
+        const SnackBar(
+          content: Text('Settings saved!'),
           backgroundColor: Colors.green,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10)),
+          ),
         ),
       );
-      // Reload the app theme
-      Navigator.pop(context);
     }
   }
 
@@ -66,19 +64,19 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    const isDark = false;
     final profilePhotoUrl = _getProfilePhotoUrl();
     final name = widget.user['name'] ?? 'User';
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0A0E27) : const Color(0xFFF5F7FA),
+      backgroundColor: const Color(0xFFF5F7FA),
       appBar: AppBar(
         title: Text(
           'Settings',
           style: GoogleFonts.poppins(fontWeight: FontWeight.w700),
         ),
         elevation: 0,
-        backgroundColor: isDark ? const Color(0xFF0A0E27) : const Color(0xFF667EEA),
+        backgroundColor: const Color(0xFF667EEA),
         foregroundColor: Colors.white,
       ),
       body: ListView(
@@ -94,7 +92,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: isDark ? const Color(0xFF2196F3) : const Color(0xFF667EEA),
+                      color: const Color(0xFF667EEA),
                       width: 3,
                     ),
                     boxShadow: [
@@ -111,7 +109,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             imageUrl: profilePhotoUrl,
                             fit: BoxFit.cover,
                             placeholder: (context, url) => Container(
-                              color: isDark ? const Color(0xFF1A1F3A) : Colors.grey.shade200,
+                              color: Colors.grey.shade200,
                               child: Center(
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
@@ -122,12 +120,12 @@ class _SettingsPageState extends State<SettingsPage> {
                               ),
                             ),
                             errorWidget: (context, url, error) => Container(
-                              color: isDark ? const Color(0xFF1A1F3A) : Colors.grey.shade200,
+                              color: Colors.grey.shade200,
                               child: Center(
                                 child: Text(
                                   name[0].toUpperCase(),
                                   style: GoogleFonts.poppins(
-                                    color: isDark ? Colors.white : Colors.grey.shade700,
+                                    color: Colors.grey.shade700,
                                     fontSize: 36,
                                     fontWeight: FontWeight.w800,
                                   ),
@@ -136,7 +134,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             ),
                           )
                         : Container(
-                            color: isDark ? const Color(0xFF1A1F3A) : Colors.grey.shade200,
+                            color: Colors.grey.shade200,
                             child: Center(
                               child: Text(
                                 name[0].toUpperCase(),
@@ -156,7 +154,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   style: GoogleFonts.poppins(
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
-                    color: isDark ? Colors.white : Colors.grey.shade900,
+                    color: Colors.grey.shade900,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -164,7 +162,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   widget.user['email'] ?? '',
                   style: GoogleFonts.poppins(
                     fontSize: 14,
-                    color: isDark ? Colors.white70 : Colors.grey.shade600,
+                    color: Colors.grey.shade600,
                   ),
                 ),
               ],
@@ -172,54 +170,38 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           const SizedBox(height: 32),
 
-          // Appearance Section
-          _SectionHeader(title: 'Appearance', isDark: isDark),
-          _SettingCard(
-            title: 'Dark Mode',
-            subtitle: 'Switch to blue/black/white theme',
-            leading: Icon(
-              Icons.dark_mode_rounded,
-              color: isDark ? const Color(0xFF2196F3) : const Color(0xFF667EEA),
-            ),
-            trailing: Switch(
-              value: _darkMode,
-              onChanged: (val) => setState(() => _darkMode = val),
-              activeColor: isDark ? const Color(0xFF2196F3) : const Color(0xFF667EEA),
-            ),
-            isDark: isDark,
-          ),
-          const SizedBox(height: 16),
+          // Appearance Section - Removed dark mode toggle
 
           // Notifications Section
-          _SectionHeader(title: 'Notifications', isDark: isDark),
+          _SectionHeader(title: 'Notifications', isDark: false),
           _SettingCard(
             title: 'Push Notifications',
             subtitle: 'Receive alerts and updates',
             leading: Icon(
               Icons.notifications_rounded,
-              color: isDark ? const Color(0xFF2196F3) : const Color(0xFF667EEA),
+              color: const Color(0xFF667EEA),
             ),
             trailing: Switch(
               value: _notifications,
               onChanged: (val) => setState(() => _notifications = val),
-              activeColor: isDark ? const Color(0xFF2196F3) : const Color(0xFF667EEA),
+              activeColor: const Color(0xFF667EEA),
             ),
-            isDark: isDark,
+            isDark: false,
           ),
           const SizedBox(height: 16),
 
           // Language Section
-          _SectionHeader(title: 'Language', isDark: isDark),
+          _SectionHeader(title: 'Language', isDark: false),
           _SettingCard(
             title: 'App Language',
             subtitle: 'Choose your preferred language',
             leading: Icon(
               Icons.language_rounded,
-              color: isDark ? const Color(0xFF2196F3) : const Color(0xFF667EEA),
+              color: const Color(0xFF667EEA),
             ),
             trailing: DropdownButton<String>(
               value: _language,
-              dropdownColor: isDark ? const Color(0xFF1A1F3A) : Colors.white,
+              dropdownColor: Colors.white,
               style: GoogleFonts.poppins(
                 color: isDark ? Colors.white : Colors.grey.shade900,
               ),
@@ -235,7 +217,7 @@ class _SettingsPageState extends State<SettingsPage> {
               ],
               onChanged: (val) => setState(() => _language = val ?? 'en'),
             ),
-            isDark: isDark,
+            isDark: false,
           ),
           const SizedBox(height: 32),
 
@@ -243,7 +225,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ElevatedButton(
             onPressed: _saveSettings,
             style: ElevatedButton.styleFrom(
-              backgroundColor: isDark ? const Color(0xFF2196F3) : const Color(0xFF667EEA),
+              backgroundColor: const Color(0xFF667EEA),
               padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -306,11 +288,11 @@ class _SettingCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1A1F3A) : Colors.white,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -329,7 +311,7 @@ class _SettingCard extends StatelessWidget {
                   style: GoogleFonts.poppins(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
-                    color: isDark ? Colors.white : Colors.grey.shade900,
+                    color: Colors.grey.shade900,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -337,7 +319,7 @@ class _SettingCard extends StatelessWidget {
                   subtitle,
                   style: GoogleFonts.poppins(
                     fontSize: 12,
-                    color: isDark ? Colors.white70 : Colors.grey.shade600,
+                    color: Colors.grey.shade600,
                   ),
                 ),
               ],

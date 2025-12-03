@@ -71,11 +71,11 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     final name = widget.user['name'] ?? 'User';
     final email = widget.user['email'] ?? '—';
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    const isDark = false;
     final profilePhotoUrl = _getProfilePhotoUrl();
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0A0E27) : const Color(0xFFF5F7FA),
+      backgroundColor: const Color(0xFFF5F7FA),
       body: CustomScrollView(
         slivers: [
           // Premium App Bar with Profile Photo
@@ -91,17 +91,11 @@ class _ProfilePageState extends State<ProfilePage> {
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: isDark
-                        ? [
-                            const Color(0xFF0A0E27),
-                            const Color(0xFF1A1F3A),
-                            const Color(0xFF2196F3).withValues(alpha: 0.3),
-                          ]
-                        : [
-                            const Color(0xFF667EEA),
-                            const Color(0xFF764BA2),
-                            const Color(0xFFF093FB),
-                          ],
+                    colors: [
+                      const Color(0xFF667EEA),
+                      const Color(0xFF764BA2),
+                      const Color(0xFFF093FB),
+                    ],
                   ),
                 ),
                 child: SafeArea(
