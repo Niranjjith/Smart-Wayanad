@@ -59,13 +59,7 @@ class HospitalPage extends StatelessWidget {
     final isTablet = width > 600;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Hospitals"),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
+      appBar: AppBar(title: const Text("Hospitals")),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: LayoutBuilder(

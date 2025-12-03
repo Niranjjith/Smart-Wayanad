@@ -46,13 +46,7 @@ class HelplinePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Helpline Numbers"),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
+      appBar: AppBar(title: const Text("Helpline Numbers")),
       body: ListView.builder(
         padding: const EdgeInsets.all(16),
         itemCount: helplines.length,

@@ -98,20 +98,6 @@ class _ARNavigationPageState extends State<ARNavigationPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'AR Navigation',
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w700),
-        ),
-        elevation: 0,
-        backgroundColor: Colors.black.withValues(alpha: 0.5),
-        foregroundColor: Colors.white,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      extendBodyBehindAppBar: true,
       body: Stack(
         children: [
           // Camera Preview

@@ -33,13 +33,7 @@ class _ClimatePageState extends State<ClimatePage> {
     final city = data?['city'] ?? "Wayanad";
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Climate Info"),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
+      appBar: AppBar(title: const Text("Climate Info")),
       body: Center(
         child: loading
             ? const CircularProgressIndicator()

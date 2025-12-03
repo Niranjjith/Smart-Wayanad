@@ -2,7 +2,6 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import HelpAlerts from "./pages/HelpAlerts.jsx";
-import Locations from "./pages/Locations.jsx";
 import BusRoutes from "./pages/BusRoutes.jsx";
 import Climate from "./pages/Climate.jsx";
 import Chatbot from "./pages/Chatbot.jsx";
@@ -47,15 +46,6 @@ function App() {
             element={
               <ProtectedRoute>
                 <SendAlert />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/locations"
-            element={
-              <ProtectedRoute>
-                <Locations />
               </ProtectedRoute>
             }
           />

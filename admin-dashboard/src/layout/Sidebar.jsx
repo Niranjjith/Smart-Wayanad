@@ -12,7 +12,6 @@ import {
 import {
   Dashboard,
   Sos,
-  Map,
   DirectionsBus,
   Cloud,
   Chat,
@@ -26,7 +25,6 @@ import { motion } from "framer-motion";
 const items = [
   { to: "/", text: "Dashboard", icon: <Dashboard /> },
   { to: "/alerts", text: "Help Alerts", icon: <Sos /> },
-  { to: "/locations", text: "Locations", icon: <Map /> },
   { to: "/bus", text: "Bus Routes", icon: <DirectionsBus /> },
   { to: "/climate", text: "Climate", icon: <Cloud /> },
   { to: "/chatbot", text: "Chatbot", icon: <Chat /> },
