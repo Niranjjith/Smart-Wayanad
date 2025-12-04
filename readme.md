@@ -10,7 +10,9 @@
 [![MongoDB](https://img.shields.io/badge/MongoDB-8.4-47A248?logo=mongodb)](https://www.mongodb.com)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-*Empowering Citizens, Digitally.*
+*Empowering citizens of Wayanad with a unified digital platform for safety, transport, and essential services.*
+
+</div>
 
 ---
 
@@ -31,7 +33,7 @@
 - [Future Enhancements](#-future-enhancements)
 - [Contributing](#-contributing)
 - [License](#-license)
-- [Contact](#-contact)
+- [Contact & Support](#-contact--support)
 
 ---
 
@@ -39,7 +41,7 @@
 
 <div align="center">
 
-**Smart Wayanad** is a comprehensive digital platform designed for citizens of Wayanad District, Kerala. It provides emergency assistance, transport information, district resources, climate updates, and AI-powered chatbot support through a unified mobile and web interface.
+**Smart Wayanad** is a comprehensive digital platform for citizens of Wayanad District, Kerala. It provides emergency assistance, transport information, district resources, climate updates, and AI-powered chatbot support through a unified mobile and web interface.
 
 </div>
 
@@ -51,7 +53,7 @@
 |---------|-------------|
 | 🚨 **Emergency SOS** | Real-time emergency alerts with GPS location tracking |
 | 🚌 **Bus Routes** | Complete bus route management with expandable sub-routes |
-| 🏥 **Healthcare** | Comprehensive hospitals, clinics, and medical facilities directory |
+| 🏥 **Healthcare** | Comprehensive directory of hospitals, clinics, and medical facilities |
 | 🌤️ **Climate Info** | Real-time weather updates and climate forecasts |
 | 🤖 **AI Chatbot** | Intelligent assistance for citizen queries and support |
 | 📍 **Location Services** | Taxi stands, helplines, and essential services directory |
