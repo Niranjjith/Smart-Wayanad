@@ -8,7 +8,7 @@ const subRouteSchema = new mongoose.Schema(
     firstBus: { type: String, default: "" },
     lastBus: { type: String, default: "" },
     frequencyMin: { type: String, default: "" },
-    via: { type: String, default: "" }, // Intermediate stops
+    via: { type: String, default: "" }, 
   },
   { timestamps: true }
 );
@@ -22,7 +22,7 @@ const busRouteSchema = new mongoose.Schema(
     lastBus: { type: String, default: "" },
     frequencyMin: { type: String, default: "" },
     description: { type: String, default: "" },
-    subRoutes: [subRouteSchema], // Array of sub-routes
+    subRoutes: [subRouteSchema], 
     isActive: { type: Boolean, default: true },
   },
   { timestamps: true }
