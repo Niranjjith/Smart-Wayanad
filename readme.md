@@ -14,16 +14,6 @@
 
 ---
 
-### 🎯 Quick Navigation
-
-[Features](#-features) • [Installation](#-installation--setup) • [Screenshots](#-screenshots) • [API Documentation](#-api-documentation) • [Contributing](#-contributing)
-
----
-
-</div>
-
----
-
 ## 📋 Table of Contents
 
 - [Overview](#-overview)
@@ -547,28 +537,6 @@ smart-wayanad/
 ![Admin Dashboard Screenshot](backend/Screenshots/Screenshot%202025-12-03%20112431.png)
 
 *Comprehensive Dashboard Overview with Statistics, Charts, and System Features*
-
-</div>
-
----
-
-### 🏗️ Project Architecture & Database Design
-
-<div align="center">
-
-#### Data Flow Diagram (DFD)
-
-![Data Flow Diagram](backend/Screenshots/Dfd%20diagram.png)
-
-*Complete Data Flow Diagram showing system interactions, data flow, and process relationships*
-
----
-
-#### Entity Relationship Diagram (ERD)
-
-![Entity Relationship Diagram](backend/Screenshots/ER%20diagram.png)
-
-*Database Schema Design - Entity Relationships and Data Structure*
 
 </div>
 
