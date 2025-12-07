@@ -12,7 +12,7 @@
 
 *Empowering Citizens, Digitally.*
 
-[Features](#-features) • [Installation](#-installation--setup) • [Documentation](#-api-documentation) • [Contributing](#-contributing)
+[Features](#-features) • [Installation](#-installation--setup) • [Screenshots](#-screenshots) • [Documentation](#-api-documentation)
 
 </div>
 
@@ -22,6 +22,7 @@
 
 - [Overview](#-overview)
 - [Features](#-features)
+- [Screenshots](#-screenshots)
 - [Project Architecture](#-project-architecture)
 - [Tech Stack](#-tech-stack)
 - [Installation & Setup](#-installation--setup)
@@ -29,10 +30,9 @@
 - [Running the Project](#-running-the-project)
 - [API Documentation](#-api-documentation)
 - [Project Structure](#-project-structure)
-- [Screenshots](#-screenshots)
+- [Database Schema](#-database-schema)
 - [Security](#-security)
 - [Deployment](#-deployment)
-- [Future Enhancements](#-future-enhancements)
 - [Contributing](#-contributing)
 - [License](#-license)
 - [Contact](#-contact)
@@ -45,13 +45,15 @@
 
 ### Key Highlights
 
-- 🚨 **Emergency SOS** - Real-time emergency alerts with GPS location
+- 🚨 **Emergency SOS** - Real-time emergency alerts with GPS location tracking
 - 🚌 **Bus Routes** - Complete bus route management with sub-routes
 - 🏥 **Healthcare** - Hospitals, clinics, and medical facilities directory
-- 🌤️ **Climate Info** - Real-time weather and climate data
-- 🤖 **AI Chatbot** - Intelligent assistance for citizen queries
+- 🌤️ **Climate Info** - Real-time weather and climate data with forecasts
+- 🤖 **AI Chatbot** - Intelligent assistance with regional language support
 - 📍 **Location Services** - Taxi stands, helplines, and essential services
 - 🎨 **Premium UI** - Modern, responsive design with smooth animations
+- 📊 **Admin Dashboard** - Comprehensive management interface
+- 🔄 **Real-Time Updates** - Socket.IO for live data synchronization
 
 ---
 
@@ -59,26 +61,43 @@
 
 ### 📱 Citizen Mobile App (Flutter)
 
-- ✅ **Emergency SOS** - Send help alerts with live GPS location
+#### Core Features
+- ✅ **Emergency SOS** - Send help alerts with live GPS location sharing
 - ✅ **Bus Routes** - Search and view bus routes with expandable sub-routes
 - ✅ **Healthcare Directory** - Find hospitals, clinics, and medical facilities
-- ✅ **Climate Information** - Real-time weather updates and forecasts
-- ✅ **AI Chatbot** - Get instant answers to your queries
+- ✅ **Climate Information** - Real-time weather updates and 7-day forecasts
+- ✅ **AI Chatbot** - Get instant answers with Malayalam language support
 - ✅ **Location Services** - Access taxi stands, helplines, and emergency contacts
-- ✅ **Ecotourism Guidelines** - District rules and guidelines
-- ✅ **Profile Management** - User profile and settings
-- ✅ **Premium UI** - Beautiful gradient design with smooth animations
+- ✅ **Profile Management** - Update profile, photo, and settings
+- ✅ **Real-Time Notifications** - Get alerts and updates instantly
+
+#### Advanced Features
+- ✅ **AR Navigation** - Camera-based AR overlay for finding nearby services
+- ✅ **Voice Reporting** - Report incidents using voice commands
+- ✅ **Incident Heatmap** - Interactive map with incident clustering
+- ✅ **Smart Route Finder** - AI-powered route recommendations
+- ✅ **Dark Mode** - Beautiful dark theme support
+- ✅ **Multi-language** - English and Malayalam support
 
 ### 🖥️ Admin Dashboard (React)
 
-- ✅ **Real-Time Alerts** - Monitor SOS alerts with Socket.IO live updates
+#### Dashboard Features
+- ✅ **Real-Time Dashboard** - Live statistics and analytics
+- ✅ **Help Alerts Management** - Monitor and respond to SOS alerts
 - ✅ **Bus Route Management** - Full CRUD operations for routes and sub-routes
 - ✅ **Location Management** - Manage hospitals, clinics, taxi stands, and helplines
 - ✅ **User Management** - View and manage user accounts
-- ✅ **Chat Logs** - Monitor chatbot conversations
-- ✅ **Climate Dashboard** - Weather data visualization
-- ✅ **Send Alerts** - Broadcast alerts to all users
-- ✅ **Premium Design** - Modern Material UI with gradient themes
+- ✅ **Chatbot Logs** - Monitor and manage chatbot conversations
+- ✅ **Climate Dashboard** - Weather data visualization with forecasts
+- ✅ **Send Alerts** - Broadcast emergency alerts to all users
+- ✅ **Profile Settings** - Update admin profile, username, password, and photo
+
+#### Advanced Features
+- ✅ **AI Analytics** - Predictive analytics and anomaly detection
+- ✅ **Real-Time Updates** - Socket.IO for live data synchronization
+- ✅ **Data Export** - Export data in JSON format
+- ✅ **System Status** - Monitor API, database, and WebSocket status
+- ✅ **Modern UI** - Material-UI with gradient themes and animations
 
 ### 🔧 Backend API (Node.js + Express)
 
@@ -86,8 +105,45 @@
 - ✅ **Real-Time Communication** - Socket.IO for live updates
 - ✅ **Authentication** - JWT-based secure authentication
 - ✅ **Database Management** - MongoDB with Mongoose ODM
-- ✅ **Sub-Routes Support** - Nested bus route management
+- ✅ **File Upload** - Profile photo upload with base64 encoding
 - ✅ **Error Handling** - Comprehensive error handling and validation
+- ✅ **Security** - Helmet.js, CORS, and input validation
+
+---
+
+## 📸 Screenshots
+
+### Admin Dashboard
+
+<div align="center">
+
+#### Admin Dashboard Overview
+![Admin Dashboard](backend/Screenshots/admin%20page.png)
+
+*Modern admin dashboard with real-time statistics, charts, and management tools*
+
+#### System Screenshot
+![System Screenshot](backend/Screenshots/Screenshot%202025-12-03%20112431.png)
+
+*Complete system interface showing all features and components*
+
+</div>
+
+### System Architecture
+
+<div align="center">
+
+#### Data Flow Diagram (DFD)
+![Data Flow Diagram](backend/Screenshots/Dfd%20diagram.png)
+
+*Complete data flow architecture showing system interactions*
+
+#### Entity Relationship Diagram (ERD)
+![ER Diagram](backend/Screenshots/ER%20diagram.png)
+
+*Database schema and entity relationships*
+
+</div>
 
 ---
 
@@ -104,6 +160,11 @@
 ┌──────────────┐      ┌──────────────┐      ┌──────────────┐
 │ Flutter App  │      │ Admin Panel  │      │   Backend    │
 │  (Citizens)  │      │   (React)    │      │ (Node.js)    │
+│              │      │              │      │              │
+│ • SOS        │      │ • Dashboard  │      │ • REST API   │
+│ • Bus Routes │      │ • Analytics  │      │ • Socket.IO  │
+│ • Chatbot    │      │ • Management │      │ • Auth       │
+│ • Profile    │      │ • Settings   │      │ • Database   │
 └──────────────┘      └──────────────┘      └──────────────┘
         │                     │                     │
         │  REST + Socket.IO   │  REST + Socket.IO   │
@@ -113,6 +174,13 @@
                     ┌─────────────────┐
                     │    MongoDB      │
                     │   Database      │
+                    │                 │
+                    │ • Users         │
+                    │ • Alerts        │
+                    │ • Routes        │
+                    │ • Locations     │
+                    │ • Climate       │
+                    │ • Chats         │
                     └─────────────────┘
 ```
 
@@ -137,6 +205,7 @@
 - **HTTP Client**: Axios 1.13
 - **Routing**: React Router DOM 7.9
 - **Real-Time**: Socket.IO Client 4.8
+- **Notifications**: React Toastify
 
 ### Mobile App (Flutter)
 - **Framework**: Flutter 3.0+
@@ -145,7 +214,9 @@
 - **HTTP Client**: HTTP 1.2
 - **Location**: Geolocator 13.0
 - **Fonts**: Google Fonts 6.2
-- **Real-Time**: Socket.IO Client 2.0
+- **Image Picker**: image_picker
+- **Caching**: cached_network_image
+- **Storage**: shared_preferences
 
 ### Backend
 - **Runtime**: Node.js 18+
@@ -271,6 +342,8 @@ docker start mongodb
 ```bash
 cd backend
 npm run dev
+# or
+node server.js
 ```
 
 Backend will run at: **http://localhost:5000**
@@ -283,6 +356,10 @@ npm run dev
 ```
 
 Admin Dashboard will open at: **http://localhost:5173**
+
+**Default Admin Credentials:**
+- Email: `admin@smartwayanad.com` (or as set in `.env`)
+- Password: (as set in `.env`)
 
 ### Run Flutter App
 
@@ -315,6 +392,7 @@ http://localhost:5000/api
 | POST | `/auth/register` | Register new user | No |
 | POST | `/auth/login` | User/Admin login | No |
 | GET | `/auth/profile` | Get user profile | Yes |
+| PUT | `/auth/profile` | Update user profile | Yes |
 
 ### Bus Routes Endpoints
 
@@ -334,7 +412,9 @@ http://localhost:5000/api
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
 | POST | `/help` | Send SOS alert | No |
+| POST | `/help/admin` | Broadcast admin alert | Yes (Admin) |
 | GET | `/help` | Get all alerts | Yes (Admin) |
+| POST | `/help/live-location` | Update live location | No |
 
 ### Location Endpoints
 
@@ -344,18 +424,32 @@ http://localhost:5000/api
 | GET | `/location/:type` | Get locations by type | No |
 | POST | `/location` | Add location | Yes (Admin) |
 
-### Chat Endpoints
-
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| POST | `/chat` | Send chat message | No |
-| GET | `/chat` | Get chat logs | Yes (Admin) |
-
 ### Climate Endpoints
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
 | GET | `/climate/current?city=Wayanad` | Get current weather | No |
+| GET | `/climate/forecast?city=Wayanad&days=7` | Get weather forecast | No |
+| GET | `/climate/history?city=Wayanad&days=7` | Get historical data | No |
+| GET | `/climate/alerts?city=Wayanad` | Get weather alerts | No |
+| GET | `/climate/stats?city=Wayanad&days=30` | Get weather statistics | No |
+
+### Chatbot Endpoints
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| POST | `/chatbot` | Send message to AI chatbot | No |
+| GET | `/chatbot/analytics` | Get chatbot analytics | Yes (Admin) |
+| GET | `/chat` | Get chat logs | Yes (Admin) |
+| POST | `/chat` | Send chat message | No |
+
+### Analytics Endpoints
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/analytics/alerts/predictions` | Get alert predictions | No |
+| GET | `/analytics/alerts/anomalies` | Detect anomalies | No |
+| GET | `/analytics/routes/recommendations` | Smart route recommendations | No |
 
 ### Example API Request
 
@@ -368,17 +462,15 @@ curl -X POST http://localhost:5000/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"user@example.com","password":"password123"}'
 
-# Create bus route (with auth token)
-curl -X POST http://localhost:5000/api/bus \
+# Update Profile (with auth token)
+curl -X PUT http://localhost:5000/api/auth/profile \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -d '{
-    "routeNo": "1",
-    "origin": "Kalpetta",
-    "destination": "Mananthavady",
-    "firstBus": "06:00",
-    "lastBus": "22:00",
-    "frequencyMin": "30"
+    "name": "John Doe",
+    "email": "john@example.com",
+    "phone": "+91 9876543210",
+    "profilePhoto": "data:image/jpeg;base64,..."
   }'
 ```
 
@@ -393,20 +485,47 @@ smart-wayanad/
 │   ├── src/
 │   │   ├── config/            # Database configuration
 │   │   ├── controllers/       # Route controllers
+│   │   │   ├── adminController.js
+│   │   │   ├── alertController.js
+│   │   │   ├── analyticsController.js
+│   │   │   ├── authController.js
+│   │   │   ├── busController.js
+│   │   │   ├── chatbotController.js
+│   │   │   ├── climateController.js
+│   │   │   ├── locationController.js
+│   │   │   └── userController.js
 │   │   ├── middleware/        # Auth middleware
 │   │   ├── models/            # Mongoose models
+│   │   │   ├── Admin.js
+│   │   │   ├── Alert.js
+│   │   │   ├── BusRoute.js
+│   │   │   ├── Chat.js
+│   │   │   ├── Climate.js
+│   │   │   ├── Location.js
+│   │   │   └── User.js
 │   │   ├── routes/            # API routes
 │   │   ├── services/          # Business logic
+│   │   │   └── realtimeService.js
 │   │   └── utils/             # Utility functions
+│   ├── Screenshots/           # Project screenshots
 │   ├── server.js              # Server entry point
 │   └── package.json
 │
 ├── admin-dashboard/            # React Admin Panel
 │   ├── src/
-│   │   ├── components/        # Reusable components
+│   │   ├── components/       # Reusable components
 │   │   ├── context/           # React context
 │   │   ├── layout/            # Layout components
+│   │   │   ├── Sidebar.jsx
+│   │   │   └── Topbar.jsx
 │   │   ├── pages/             # Page components
+│   │   │   ├── Dashboard.jsx
+│   │   │   ├── HelpAlerts.jsx
+│   │   │   ├── BusRoutes.jsx
+│   │   │   ├── Climate.jsx
+│   │   │   ├── Chatbot.jsx
+│   │   │   ├── Settings.jsx
+│   │   │   └── ...
 │   │   ├── routes/            # Route configuration
 │   │   ├── services/          # API services
 │   │   └── main.jsx           # Entry point
@@ -415,7 +534,13 @@ smart-wayanad/
 ├── flutter_app/                # Flutter Mobile App
 │   ├── lib/
 │   │   ├── pages/             # App screens
+│   │   │   ├── auth_page.dart
+│   │   │   ├── home_page.dart
+│   │   │   ├── profile_page.dart
+│   │   │   ├── edit_profile_page.dart
+│   │   │   └── ...
 │   │   ├── services/          # API services
+│   │   │   └── api_service.dart
 │   │   ├── widgets/           # Reusable widgets
 │   │   └── main.dart          # Entry point
 │   └── pubspec.yaml
@@ -425,13 +550,90 @@ smart-wayanad/
 
 ---
 
-## 📸 Screenshots
+## 🗄️ Database Schema
 
-### Mobile App
-- *Screenshots will be added here*
+### User Model
+```javascript
+{
+  name: String (required),
+  email: String (required, unique),
+  password: String (required, hashed),
+  phone: String,
+  profilePhoto: String (base64),
+  settings: {
+    darkMode: Boolean,
+    notifications: Boolean,
+    language: String
+  }
+}
+```
 
-### Admin Dashboard
+### Alert Model
+```javascript
+{
+  name: String,
+  phone: String,
+  message: String,
+  lat: Number,
+  lng: Number,
+  alertType: String,
+  status: String
+}
+```
 
+### BusRoute Model
+```javascript
+{
+  routeNo: String,
+  origin: String,
+  destination: String,
+  firstBus: String,
+  lastBus: String,
+  frequencyMin: Number,
+  subRoutes: [{
+    name: String,
+    stops: [String]
+  }]
+}
+```
+
+### Location Model
+```javascript
+{
+  name: String,
+  type: String (hospital, clinic, taxi, police, helpline),
+  contact: String,
+  address: String,
+  latitude: Number,
+  longitude: Number
+}
+```
+
+### Climate Model
+```javascript
+{
+  city: String,
+  temp: Number,
+  humidity: Number,
+  wind: Number,
+  description: String,
+  forecast: [Object],
+  alerts: [Object]
+}
+```
+
+### Chat Model
+```javascript
+{
+  user: String,
+  message: String,
+  response: String,
+  intent: String,
+  confidence: Number
+}
+```
+
+---
 
 ## 🔐 Security
 
@@ -443,6 +645,7 @@ smart-wayanad/
 - ✅ **CORS** - Cross-origin resource sharing configuration
 - ✅ **Input Validation** - Request validation and sanitization
 - ✅ **Error Handling** - Secure error messages
+- ✅ **Token Storage** - Secure token management
 
 ### Security Best Practices
 
@@ -503,7 +706,49 @@ flutter build web
 
 ---
 
-## 🌟 Future Enhancements
+## 🌟 Key Features in Detail
+
+### 🚨 Emergency SOS System
+- Real-time GPS location tracking
+- Live location updates every 30 seconds
+- Automatic alert broadcasting
+- Admin can respond and manage alerts
+- Priority-based alert system
+
+### 🚌 Bus Route Management
+- Complete route information with sub-routes
+- Expandable sub-route details
+- Search and filter functionality
+- Real-time route updates
+- Admin can add/edit/delete routes
+
+### 🤖 AI Chatbot
+- Natural Language Processing (NLP)
+- Intent recognition (greeting, emergency, hospital, police, bus, weather, etc.)
+- Regional language support (English + Malayalam)
+- Context-aware responses
+- Confidence scoring
+- Real-time database integration
+
+### 🌤️ Climate Dashboard
+- Current weather conditions
+- 7-day weather forecast
+- Historical weather data
+- Weather alerts and warnings
+- Interactive charts and graphs
+- Multiple location support
+
+### 📊 Admin Dashboard
+- Real-time statistics
+- Interactive charts and visualizations
+- User-friendly interface
+- Profile management (username, password, photo)
+- System status monitoring
+- Data export functionality
+
+---
+
+## 🎯 Future Enhancements
 
 - [ ] **KSRTC Live Tracking** - Real-time bus location tracking
 - [ ] **Push Notifications** - Firebase Cloud Messaging integration
@@ -511,8 +756,8 @@ flutter build web
 - [ ] **Advanced AI Chatbot** - LLM integration (GPT/Claude)
 - [ ] **GIS Map Integration** - Interactive maps with route visualization
 - [ ] **Offline Mode** - Offline data caching for mobile app
-- [ ] **Multi-language Support** - Malayalam and English
-- [ ] **Analytics Dashboard** - Usage statistics and insights
+- [ ] **Multi-language Support** - Full Malayalam translation
+- [ ] **Analytics Dashboard** - Advanced usage statistics and insights
 - [ ] **Payment Integration** - For premium features
 - [ ] **Social Features** - Community forums and discussions
 
