@@ -67,19 +67,99 @@ export const getAlertPredictions = async (req, res) => {
   }
 };
 
-// 🧠 Smart Route Recommendations
+// 🧠 Advanced Smart Route Search & Recommendations
 export const getSmartRouteRecommendations = async (req, res) => {
   try {
-    const { origin, destination, time } = req.query;
+    const { origin, destination, query, time } = req.query;
     
+    // If query is provided, search by query string (e.g., "routes to kalpetta")
+    if (query) {
+      const searchQuery = query.toLowerCase();
+      const routes = await BusRoute.find({ isActive: true });
+      
+      // Advanced search: match in origin, destination, routeNo, description, alternativeNames
+      const matchedRoutes = routes
+        .map((route) => {
+          let matchScore = 0;
+          const searchTerms = searchQuery.split(' ');
+          
+          searchTerms.forEach((term) => {
+            // Check origin
+            if (route.origin.toLowerCase().includes(term)) matchScore += 3;
+            // Check destination
+            if (route.destination.toLowerCase().includes(term)) matchScore += 3;
+            // Check route number
+            if (route.routeNo.toLowerCase().includes(term)) matchScore += 2;
+            // Check description
+            if (route.description && route.description.toLowerCase().includes(term)) matchScore += 1;
+            // Check alternative names
+            if (route.alternativeNames && route.alternativeNames.length > 0) {
+              route.alternativeNames.forEach((altName) => {
+                if (altName.toLowerCase().includes(term)) matchScore += 2;
+              });
+            }
+            // Check sub-routes
+            if (route.subRoutes && route.subRoutes.length > 0) {
+              route.subRoutes.forEach((subRoute) => {
+                if (subRoute.origin.toLowerCase().includes(term) || 
+                    subRoute.destination.toLowerCase().includes(term)) {
+                  matchScore += 1;
+                }
+              });
+            }
+          });
+          
+          return { route, matchScore };
+        })
+        .filter((item) => item.matchScore > 0)
+        .sort((a, b) => b.matchScore - a.matchScore)
+        .map((item) => ({
+          routeNo: item.route.routeNo,
+          origin: item.route.origin,
+          destination: item.route.destination,
+          firstBus: item.route.firstBus,
+          lastBus: item.route.lastBus,
+          frequencyMin: item.route.frequencyMin,
+          roadStatus: item.route.roadStatus || 'normal',
+          roadStatusMessage: item.route.roadStatusMessage || '',
+          estimatedTime: item.route.estimatedTime || 0,
+          distance: item.route.distance || 0,
+          popularity: item.route.popularity || 0,
+          confidence: Math.min(item.matchScore / 10, 1.0),
+          subRoutes: item.route.subRoutes || [],
+        }));
+      
+      // Find best route (highest confidence, normal road status, highest popularity)
+      const bestRoute = matchedRoutes.length > 0 
+        ? matchedRoutes
+            .filter((r) => r.roadStatus === 'normal')
+            .sort((a, b) => {
+              // Sort by: normal road status first, then popularity, then confidence
+              if (a.roadStatus === 'normal' && b.roadStatus !== 'normal') return -1;
+              if (a.roadStatus !== 'normal' && b.roadStatus === 'normal') return 1;
+              if (a.popularity !== b.popularity) return b.popularity - a.popularity;
+              return b.confidence - a.confidence;
+            })[0] || matchedRoutes[0]
+        : null;
+      
+      return res.json({
+        recommendations: matchedRoutes,
+        bestRoute,
+        query: { search: query },
+        totalRoutes: matchedRoutes.length,
+        totalRoutesInSystem: routes.length,
+      });
+    }
+    
+    // Original origin-destination search
     if (!origin || !destination) {
-      return res.status(400).json({ message: "Origin and destination required" });
+      return res.status(400).json({ message: "Origin and destination or query required" });
     }
     
     // Get all routes
     const routes = await BusRoute.find({ isActive: true });
     
-    // Simple ML-based matching algorithm
+    // Advanced ML-based matching algorithm with road status consideration
     const recommendations = routes
       .map((route) => {
         let score = 0;
@@ -99,11 +179,21 @@ export const getSmartRouteRecommendations = async (req, res) => {
           });
         }
         
-        return { route, score };
+        // Road status penalty/bonus
+        let roadStatusMultiplier = 1.0;
+        if (route.roadStatus === 'normal') roadStatusMultiplier = 1.2;
+        else if (route.roadStatus === 'slow') roadStatusMultiplier = 0.9;
+        else if (route.roadStatus === 'maintenance') roadStatusMultiplier = 0.7;
+        else if (route.roadStatus === 'under_construction') roadStatusMultiplier = 0.5;
+        else if (route.roadStatus === 'blocked') roadStatusMultiplier = 0.3;
+        
+        // Popularity bonus
+        score += (route.popularity || 0) / 20;
+        
+        return { route, score: score * roadStatusMultiplier };
       })
       .filter((item) => item.score > 0)
       .sort((a, b) => b.score - a.score)
-      .slice(0, 5)
       .map((item) => ({
         routeNo: item.route.routeNo,
         origin: item.route.origin,
@@ -111,14 +201,31 @@ export const getSmartRouteRecommendations = async (req, res) => {
         firstBus: item.route.firstBus,
         lastBus: item.route.lastBus,
         frequencyMin: item.route.frequencyMin,
+        roadStatus: item.route.roadStatus || 'normal',
+        roadStatusMessage: item.route.roadStatusMessage || '',
+        estimatedTime: item.route.estimatedTime || 0,
+        distance: item.route.distance || 0,
+        popularity: item.route.popularity || 0,
         confidence: Math.min(item.score / 6, 1.0),
         subRoutes: item.route.subRoutes || [],
       }));
     
+    // Find best route
+    const bestRoute = recommendations.length > 0
+      ? recommendations
+          .filter((r) => r.roadStatus === 'normal')
+          .sort((a, b) => {
+            if (a.popularity !== b.popularity) return b.popularity - a.popularity;
+            return b.confidence - a.confidence;
+          })[0] || recommendations[0]
+      : null;
+    
     res.json({
       recommendations,
+      bestRoute,
       query: { origin, destination, time },
       totalMatches: recommendations.length,
+      totalRoutesInSystem: routes.length,
     });
   } catch (err) {
     console.error("Route recommendation error:", err);

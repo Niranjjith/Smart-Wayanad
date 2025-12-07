@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import '../widgets/profile_image_widget.dart';
 import 'dart:math' as math;
 import 'dart:io';
@@ -22,6 +21,7 @@ import 'ai_ml_page.dart';
 import 'ar_navigation_page.dart';
 import 'voice_report_page.dart';
 import 'incident_heatmap_page.dart';
+import 'app_guide_page.dart';
 import '../services/api_service.dart';
 
 class HomePage extends StatefulWidget {
@@ -35,9 +35,9 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   int _selectedIndex = 0;
   late AnimationController _pulseController;
-  late AnimationController _slideController;
+  late AnimationController _fadeController;
   late Animation<double> _pulseAnimation;
-  late Animation<Offset> _slideAnimation;
+  late Animation<double> _fadeAnimation;
   bool _isServerOnline = false;
   late Map _currentUser;
   
@@ -52,19 +52,18 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       duration: const Duration(seconds: 2),
     )..repeat(reverse: true);
     
-    _slideController = AnimationController(
+    _fadeController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 800),
+      duration: const Duration(milliseconds: 1000),
     )..forward();
     
-    _pulseAnimation = Tween<double>(begin: 0.95, end: 1.05).animate(
+    _pulseAnimation = Tween<double>(begin: 0.98, end: 1.02).animate(
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
     
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.3),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(parent: _slideController, curve: Curves.easeOut));
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _fadeController, curve: Curves.easeOut),
+    );
   }
   
   void updateUser(Map newUser) {
@@ -75,34 +74,32 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   Future<void> _checkServerStatus() async {
     final isOnline = await ApiService.pingServer();
-    setState(() => _isServerOnline = isOnline);
+    if (mounted) {
+      setState(() => _isServerOnline = isOnline);
+    }
   }
 
   @override
   void dispose() {
     _pulseController.dispose();
-    _slideController.dispose();
+    _fadeController.dispose();
     super.dispose();
   }
 
   void _onItemTapped(int index) {
     if (index == 0) {
-      // Home - do nothing, already on home
       setState(() => _selectedIndex = 0);
     } else if (index == 1) {
-      // SOS - Navigate to Help Page
       Navigator.push(
         context,
         MaterialPageRoute(builder: (_) => HelpPage(user: _currentUser)),
       );
     } else if (index == 2) {
-      // Profile - Get updated user data
       Navigator.push(
         context,
         MaterialPageRoute(builder: (_) => ProfilePage(user: _currentUser)),
       ).then((updatedUser) {
         if (updatedUser != null && mounted) {
-          // Update the user data in home page
           setState(() {
             _currentUser = Map<String, dynamic>.from(updatedUser is Map ? updatedUser : _currentUser);
           });
@@ -114,7 +111,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   String _getProfilePhotoUrl() {
     final profilePhoto = _currentUser['profilePhoto'];
     if (profilePhoto != null && profilePhoto.toString().isNotEmpty) {
-      // Check if it's already a full URL (base64 or http)
       if (profilePhoto.toString().startsWith('data:image') || 
           profilePhoto.toString().startsWith('http')) {
         return profilePhoto.toString();
@@ -131,141 +127,149 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     final user = _currentUser;
     final size = MediaQuery.of(context).size;
-    // Always use light theme
-    const isDark = false;
     final profilePhotoUrl = _getProfilePhotoUrl();
+    final firstName = user["name"]?.split(" ")[0] ?? "Citizen";
 
-    // Premium feature cards - smaller and more compact
-    final List<Map<String, dynamic>> features = [
+    // Organized feature categories
+    final quickAccess = [
       {
         "title": "Bus Routes",
         "icon": Icons.directions_bus_rounded,
-        "gradient": [const Color(0xFF667EEA), const Color(0xFF764BA2)],
+        "color": const Color(0xFF667EEA),
         "page": const BusRoutesPage(),
       },
       {
         "title": "Smart Route",
         "icon": Icons.route_rounded,
-        "gradient": [const Color(0xFF43E97B), const Color(0xFF38F9D7)],
+        "color": const Color(0xFF43E97B),
         "page": const SmartRoutePage(),
         "badge": "AI",
       },
       {
+        "title": "Chatbot",
+        "icon": Icons.smart_toy_rounded,
+        "color": const Color(0xFF4FACFE),
+        "page": const ChatbotPage(),
+        "badge": "AI",
+      },
+      {
+        "title": "Weather",
+        "icon": Icons.wb_sunny_rounded,
+        "color": const Color(0xFFFEE140),
+        "page": const ClimatePage(),
+        "badge": "Live",
+      },
+    ];
+
+    final services = [
+      {
+        "title": "Hospitals",
+        "icon": Icons.local_hospital_rounded,
+        "color": const Color(0xFFF5576C),
+        "page": const HospitalPage(),
+      },
+      {
+        "title": "Clinics",
+        "icon": Icons.healing_rounded,
+        "color": const Color(0xFF30CFD0),
+        "page": const ClinicPage(),
+      },
+      {
+        "title": "Helpline",
+        "icon": Icons.phone_in_talk_rounded,
+        "color": const Color(0xFF43E97B),
+        "page": const HelplinePage(),
+      },
+      {
+        "title": "Taxi",
+        "icon": Icons.local_taxi_rounded,
+        "color": const Color(0xFFFA709A),
+        "page": const TaxiPage(),
+      },
+    ];
+
+    final advanced = [
+      {
         "title": "AI/ML",
         "icon": Icons.psychology_rounded,
-        "gradient": [const Color(0xFF667EEA), const Color(0xFF764BA2)],
+        "color": const Color(0xFF764BA2),
         "page": const AIMLPage(),
         "badge": "NEW",
       },
       {
         "title": "AR Nav",
         "icon": Icons.camera_alt_rounded,
-        "gradient": [const Color(0xFF4FACFE), const Color(0xFF00F2FE)],
+        "color": const Color(0xFF4FACFE),
         "page": const ARNavigationPage(),
         "badge": "NEW",
       },
       {
-        "title": "Voice",
-        "icon": Icons.mic_rounded,
-        "gradient": [const Color(0xFFF5576C), const Color(0xFFFA709A)],
-        "page": HelpPage(user: user), // Redirect to SOS for voice reporting
-        "badge": null,
-      },
-      {
         "title": "Heatmap",
         "icon": Icons.map_rounded,
-        "gradient": [const Color(0xFF43E97B), const Color(0xFF38F9D7)],
+        "color": const Color(0xFF43E97B),
         "page": const IncidentHeatmapPage(),
         "badge": "Live",
       },
       {
-        "title": "Weather",
-        "icon": Icons.wb_sunny_rounded,
-        "gradient": [const Color(0xFFF093FB), const Color(0xFFF5576C)],
-        "page": const ClimatePage(),
-        "badge": "Live",
-      },
-      {
-        "title": "Chatbot",
-        "icon": Icons.smart_toy_rounded,
-        "gradient": [const Color(0xFF4FACFE), const Color(0xFF00F2FE)],
-        "page": const ChatbotPage(),
-        "badge": "AI",
-      },
-      {
-        "title": "Helpline",
-        "icon": Icons.phone_in_talk_rounded,
-        "gradient": [const Color(0xFF43E97B), const Color(0xFF38F9D7)],
-        "page": const HelplinePage(),
-      },
-      {
-        "title": "Hospitals",
-        "icon": Icons.local_hospital_rounded,
-        "gradient": [const Color(0xFFFA709A), const Color(0xFFFEE140)],
-        "page": const HospitalPage(),
-      },
-      {
-        "title": "Clinics",
-        "icon": Icons.healing_rounded,
-        "gradient": [const Color(0xFF30CFD0), const Color(0xFF330867)],
-        "page": const ClinicPage(),
-      },
-      {
-        "title": "Taxi",
-        "icon": Icons.local_taxi_rounded,
-        "gradient": [const Color(0xFFA8EDEA), const Color(0xFFFED6E3)],
-        "page": const TaxiPage(),
+        "title": "Voice",
+        "icon": Icons.mic_rounded,
+        "color": const Color(0xFFF5576C),
+        "page": HelpPage(user: user),
       },
     ];
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
-      extendBodyBehindAppBar: true,
-      body: CustomScrollView(
-        slivers: [
-          // Premium App Bar with Profile Photo
-          SliverAppBar(
-            expandedHeight: 240,
-            floating: false,
-            pinned: true,
-            elevation: 0,
-            backgroundColor: Colors.transparent,
-            flexibleSpace: FlexibleSpaceBar(
-              background: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      const Color(0xFF667EEA),
-                      const Color(0xFF764BA2),
-                      const Color(0xFFF093FB),
-                    ],
+      backgroundColor: const Color(0xFFF8F9FA),
+      body: FadeTransition(
+        opacity: _fadeAnimation,
+        child: CustomScrollView(
+          physics: const BouncingScrollPhysics(),
+          slivers: [
+            // Modern App Bar
+            SliverAppBar(
+              expandedHeight: 200,
+              floating: false,
+              pinned: true,
+              elevation: 0,
+              backgroundColor: Colors.transparent,
+              flexibleSpace: FlexibleSpaceBar(
+                background: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        const Color(0xFF667EEA),
+                        const Color(0xFF764BA2),
+                        const Color(0xFFF093FB),
+                      ],
+                    ),
                   ),
-                ),
-                child: SafeArea(
-                  child: Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        // Status indicator and top actions
-                        Row(
-                          children: [
-                            Flexible(
-                              child: Container(
+                  child: SafeArea(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          // Top Bar
+                          Row(
+                            children: [
+                              // Status Badge
+                              Container(
                                 padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 5,
+                                  horizontal: 12,
+                                  vertical: 6,
                                 ),
                                 decoration: BoxDecoration(
                                   color: _isServerOnline
-                                      ? Colors.green.withValues(alpha: 0.2)
-                                      : Colors.red.withValues(alpha: 0.2),
-                                  borderRadius: BorderRadius.circular(16),
+                                      ? Colors.green.withValues(alpha: 0.25)
+                                      : Colors.red.withValues(alpha: 0.25),
+                                  borderRadius: BorderRadius.circular(20),
                                   border: Border.all(
-                                    color: _isServerOnline ? Colors.green : Colors.red,
+                                    color: _isServerOnline 
+                                        ? Colors.green.shade300 
+                                        : Colors.red.shade300,
                                     width: 1.5,
                                   ),
                                 ),
@@ -273,377 +277,519 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Container(
-                                      width: 6,
-                                      height: 6,
+                                      width: 8,
+                                      height: 8,
                                       decoration: BoxDecoration(
-                                        color: _isServerOnline ? Colors.green : Colors.red,
+                                        color: _isServerOnline 
+                                            ? Colors.green 
+                                            : Colors.red,
                                         shape: BoxShape.circle,
                                       ),
                                     ),
                                     const SizedBox(width: 6),
-                                    Flexible(
-                                      child: Text(
-                                        _isServerOnline ? 'Online' : 'Offline',
-                                        style: GoogleFonts.poppins(
-                                          color: Colors.white,
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                        overflow: TextOverflow.ellipsis,
+                                    Text(
+                                      _isServerOnline ? 'Online' : 'Offline',
+                                      style: GoogleFonts.poppins(
+                                        color: Colors.white,
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w600,
                                       ),
                                     ),
                                   ],
                                 ),
                               ),
-                            ),
-                            const Spacer(),
-                            // Notifications Icon
-                            Container(
-                              margin: const EdgeInsets.only(right: 8),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.2),
-                                shape: BoxShape.circle,
-                              ),
-                              child: IconButton(
-                                icon: const Icon(Icons.notifications_rounded, color: Colors.white, size: 22),
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(builder: (_) => const NotificationsPage()),
-                                  );
-                                },
-                              ),
-                            ),
-                            // Logout Icon
-                            IconButton(
-                              icon: const Icon(Icons.logout_rounded, color: Colors.white, size: 22),
-                              onPressed: () {
-                                Navigator.pushAndRemoveUntil(
-                                  context,
-                                  MaterialPageRoute(builder: (_) => const SplashPage()),
-                                  (route) => false,
-                                );
-                              },
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
-                        // Welcome section with profile photo
-                        Row(
-                          children: [
-                            ScaleTransition(
-                              scale: _pulseAnimation,
-                              child: Container(
-                                width: 60,
-                                height: 60,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: Colors.white.withValues(alpha: 0.5),
-                                    width: 2.5,
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withValues(alpha: 0.2),
-                                      blurRadius: 10,
-                                      spreadRadius: 2,
+                              const Spacer(),
+                              // Notifications
+                              Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => const NotificationsPage(),
+                                      ),
+                                    );
+                                  },
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: Container(
+                                    padding: const EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withValues(alpha: 0.2),
+                                      borderRadius: BorderRadius.circular(12),
                                     ),
-                                  ],
+                                    child: const Icon(
+                                      Icons.notifications_outlined,
+                                      color: Colors.white,
+                                      size: 22,
+                                    ),
+                                  ),
                                 ),
-                                child: ClipOval(
-                                  child: profilePhotoUrl.isNotEmpty
-                                      ? ProfileImageWidget(
-                                          imageUrl: profilePhotoUrl,
-                                          fallbackText: user["name"] ?? "User",
-                                          size: 60,
-                                          fit: BoxFit.cover,
-                                        )
-                                      : Container(
-                                          color: Colors.white.withValues(alpha: 0.2),
-                                          child: Center(
-                                            child: Text(
-                                              (user["name"]?[0] ?? "U").toUpperCase(),
-                                              style: GoogleFonts.poppins(
-                                                color: Colors.white,
-                                                fontSize: 24,
-                                                fontWeight: FontWeight.w800,
+                              ),
+                              const SizedBox(width: 8),
+                              // Logout
+                              Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  onTap: () {
+                                    Navigator.pushAndRemoveUntil(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => const SplashPage(),
+                                      ),
+                                      (route) => false,
+                                    );
+                                  },
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: Container(
+                                    padding: const EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withValues(alpha: 0.2),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: const Icon(
+                                      Icons.logout_rounded,
+                                      color: Colors.white,
+                                      size: 22,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 20),
+                          // Welcome Section
+                          Row(
+                            children: [
+                              ScaleTransition(
+                                scale: _pulseAnimation,
+                                child: Container(
+                                  width: 64,
+                                  height: 64,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: Colors.white,
+                                      width: 3,
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withValues(alpha: 0.2),
+                                        blurRadius: 15,
+                                        spreadRadius: 2,
+                                      ),
+                                    ],
+                                  ),
+                                  child: ClipOval(
+                                    child: profilePhotoUrl.isNotEmpty
+                                        ? ProfileImageWidget(
+                                            imageUrl: profilePhotoUrl,
+                                            fallbackText: user["name"] ?? "User",
+                                            size: 64,
+                                            fit: BoxFit.cover,
+                                          )
+                                        : Container(
+                                            decoration: BoxDecoration(
+                                              gradient: LinearGradient(
+                                                colors: [
+                                                  Colors.white.withValues(alpha: 0.3),
+                                                  Colors.white.withValues(alpha: 0.1),
+                                                ],
+                                              ),
+                                            ),
+                                            child: Center(
+                                              child: Text(
+                                                (user["name"]?[0] ?? "U").toUpperCase(),
+                                                style: GoogleFonts.poppins(
+                                                  color: Colors.white,
+                                                  fontSize: 26,
+                                                  fontWeight: FontWeight.w800,
+                                                ),
                                               ),
                                             ),
                                           ),
-                                        ),
+                                  ),
                                 ),
                               ),
-                            ),
-                            const SizedBox(width: 14),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "Hello, ${user["name"]?.split(" ")[0] ?? "Citizen"} 👋",
-                                    style: GoogleFonts.poppins(
-                                      color: Colors.white,
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.w800,
-                                      letterSpacing: -0.5,
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Hello, $firstName! 👋",
+                                      style: GoogleFonts.poppins(
+                                        color: Colors.white,
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.w800,
+                                        letterSpacing: -0.5,
+                                      ),
                                     ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    "Welcome to Smart Wayanad",
-                                    style: GoogleFonts.poppins(
-                                      color: Colors.white.withValues(alpha: 0.9),
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w500,
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      "How can we help you today?",
+                                      style: GoogleFonts.poppins(
+                                        color: Colors.white.withValues(alpha: 0.9),
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ],
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
-          ),
 
-          // Quick Stats Section - Enhanced
-          SliverToBoxAdapter(
-            child: SlideTransition(
-              position: _slideAnimation,
+            // Quick Stats
+            SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
+                child: Row(
                   children: [
-                    Text(
-                      "Quick Stats",
-                      style: GoogleFonts.poppins(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.grey.shade800,
+                    Expanded(
+                      child: _ModernStatCard(
+                        icon: Icons.directions_bus_rounded,
+                        value: "50+",
+                        label: "Routes",
+                        gradient: [const Color(0xFF667EEA), const Color(0xFF764BA2)],
                       ),
                     ),
-                    const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _StatCard(
-                            icon: Icons.directions_bus_rounded,
-                            value: "50+",
-                            label: "Routes",
-                            color: const Color(0xFF667EEA),
-                            isDark: false,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: _StatCard(
-                            icon: Icons.local_hospital_rounded,
-                            value: "20+",
-                            label: "Hospitals",
-                            color: const Color(0xFFF5576C),
-                            isDark: false,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: _StatCard(
-                            icon: Icons.wb_sunny_rounded,
-                            value: "24°C",
-                            label: "Weather",
-                            color: const Color(0xFF4FACFE),
-                            isDark: false,
-                          ),
-                        ),
-                      ],
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _ModernStatCard(
+                        icon: Icons.local_hospital_rounded,
+                        value: "20+",
+                        label: "Hospitals",
+                        gradient: [const Color(0xFFF5576C), const Color(0xFFFA709A)],
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _ModernStatCard(
+                        icon: Icons.wb_sunny_rounded,
+                        value: "24°C",
+                        label: "Weather",
+                        gradient: [const Color(0xFF4FACFE), const Color(0xFF00F2FE)],
+                      ),
                     ),
                   ],
                 ),
               ),
             ),
-          ),
 
-          // Services Section Header
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16),
-              child: Row(
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Services",
-                        style: GoogleFonts.poppins(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.grey.shade900,
-                          letterSpacing: -0.5,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        "Explore all features",
-                        style: GoogleFonts.poppins(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.grey.shade600,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const Spacer(),
-                  IconButton(
-                    onPressed: _checkServerStatus,
-                    icon: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF667EEA).withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Icon(
-                        Icons.refresh_rounded,
-                        size: 20,
-                        color: const Color(0xFF667EEA),
+            // Quick Access Section
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
+                child: Row(
+                  children: [
+                    Text(
+                      "Quick Access",
+                      style: GoogleFonts.poppins(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.grey.shade900,
+                        letterSpacing: -0.5,
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          // Features Grid - Smaller, more compact
-          SliverPadding(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8),
-            sliver: SliverGrid(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-                childAspectRatio: 0.98,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
-              ),
-              delegate: SliverChildBuilderDelegate(
-                (context, index) {
-                  final feature = features[index];
-                  return _PremiumFeatureCard(
-                    title: feature["title"],
-                    icon: feature["icon"],
-                    gradient: feature["gradient"],
-                    badge: feature["badge"],
-                    isDark: false,
-                    onTap: () {
-                      final page = feature["page"] as Widget;
-                      // If page requires user, pass current user
-                      if (page is HelpPage) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => HelpPage(user: _currentUser),
+                    const Spacer(),
+                    Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const AppGuidePage(),
+                            ),
+                          );
+                        },
+                        borderRadius: BorderRadius.circular(8),
+                        child: Padding(
+                          padding: const EdgeInsets.all(4),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.help_outline_rounded,
+                                size: 16,
+                                color: Colors.grey.shade600,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                "Guide",
+                                style: GoogleFonts.poppins(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.grey.shade600,
+                                ),
+                              ),
+                            ],
                           ),
-                        );
-                      } else {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => page,
-                          ),
-                        );
-                      }
-                    },
-                  );
-                },
-                childCount: features.length,
-              ),
-            ),
-          ),
-
-          // District Guidelines
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: 4,
-                        height: 24,
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFF43E97B), Color(0xFF38F9D7)],
-                          ),
-                          borderRadius: BorderRadius.circular(2),
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      Text(
-                        "District Guidelines",
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // Quick Access Grid
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              sliver: SliverGrid(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 4,
+                  childAspectRatio: 0.85,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                ),
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) {
+                    final feature = quickAccess[index];
+                    return _ModernFeatureCard(
+                      title: feature["title"] as String,
+                      icon: feature["icon"] as IconData,
+                      color: feature["color"] as Color,
+                      badge: feature["badge"] as String?,
+                      onTap: () {
+                        final page = feature["page"] as Widget;
+                        if (page is HelpPage) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => HelpPage(user: _currentUser),
+                            ),
+                          );
+                        } else {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => page),
+                          );
+                        }
+                      },
+                    );
+                  },
+                  childCount: quickAccess.length,
+                ),
+              ),
+            ),
+
+            // Services Section
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 24, 20, 12),
+                child: Text(
+                  "Services",
+                  style: GoogleFonts.poppins(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.grey.shade900,
+                    letterSpacing: -0.5,
+                  ),
+                ),
+              ),
+            ),
+
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              sliver: SliverGrid(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 4,
+                  childAspectRatio: 0.85,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                ),
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) {
+                    final feature = services[index];
+                    return _ModernFeatureCard(
+                      title: feature["title"] as String,
+                      icon: feature["icon"] as IconData,
+                      color: feature["color"] as Color,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => feature["page"] as Widget),
+                        );
+                      },
+                    );
+                  },
+                  childCount: services.length,
+                ),
+              ),
+            ),
+
+            // Advanced Features
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 24, 20, 12),
+                child: Row(
+                  children: [
+                    Text(
+                      "Advanced",
+                      style: GoogleFonts.poppins(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.grey.shade900,
+                        letterSpacing: -0.5,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF43E97B), Color(0xFF38F9D7)],
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        "NEW",
                         style: GoogleFonts.poppins(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.grey.shade900,
-                          letterSpacing: -0.5,
+                          fontSize: 9,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
                         ),
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  const _GuidelinesCard(isDark: false),
-                  const SizedBox(height: 100),
-                ],
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              sliver: SliverGrid(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 4,
+                  childAspectRatio: 0.85,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                ),
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) {
+                    final feature = advanced[index];
+                    return _ModernFeatureCard(
+                      title: feature["title"] as String,
+                      icon: feature["icon"] as IconData,
+                      color: feature["color"] as Color,
+                      badge: feature["badge"] as String?,
+                      onTap: () {
+                        final page = feature["page"] as Widget;
+                        if (page is HelpPage) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => HelpPage(user: _currentUser),
+                            ),
+                          );
+                        } else {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => page),
+                          );
+                        }
+                      },
+                    );
+                  },
+                  childCount: advanced.length,
+                ),
+              ),
+            ),
+
+            // District Guidelines
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 24, 20, 12),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 4,
+                      height: 24,
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF43E97B), Color(0xFF38F9D7)],
+                        ),
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      "District Guidelines",
+                      style: GoogleFonts.poppins(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.grey.shade900,
+                        letterSpacing: -0.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
+                child: _ModernGuidelinesCard(),
+              ),
+            ),
+          ],
+        ),
       ),
 
-      // Premium Bottom Navigation with SOS
+      // Bottom Navigation
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: Colors.white,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.1),
+              color: Colors.black.withValues(alpha: 0.08),
               blurRadius: 20,
-              offset: const Offset(0, -5),
+              offset: const Offset(0, -4),
             ),
           ],
         ),
         child: SafeArea(
           child: Container(
-            height: 70,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            height: 72,
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 // Home
                 Expanded(
-                  child: _NavItem(
+                  child: _ModernNavItem(
                     icon: Icons.home_rounded,
                     label: "Home",
                     isSelected: _selectedIndex == 0,
-                    onTap: () {
-                      setState(() => _selectedIndex = 0);
-                    },
+                    onTap: () => setState(() => _selectedIndex = 0),
                   ),
                 ),
-                // SOS - Prominent center button
+                // SOS Button
                 GestureDetector(
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (_) => HelpPage(user: _currentUser)),
+                      MaterialPageRoute(
+                        builder: (_) => HelpPage(user: _currentUser),
+                      ),
                     );
                   },
                   child: Container(
-                    width: 56,
-                    height: 56,
+                    width: 64,
+                    height: 64,
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
                         colors: [Color(0xFFE53935), Color(0xFFC62828)],
@@ -651,22 +797,22 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFFE53935).withValues(alpha: 0.4),
-                          blurRadius: 15,
-                          offset: const Offset(0, 5),
+                          color: const Color(0xFFE53935).withValues(alpha: 0.5),
+                          blurRadius: 20,
+                          offset: const Offset(0, 8),
                         ),
                       ],
                     ),
                     child: const Icon(
                       Icons.sos_rounded,
                       color: Colors.white,
-                      size: 26,
+                      size: 28,
                     ),
                   ),
                 ),
                 // Profile
                 Expanded(
-                  child: _NavItem(
+                  child: _ModernNavItem(
                     icon: Icons.person_rounded,
                     label: "Profile",
                     isSelected: _selectedIndex == 2,
@@ -674,10 +820,16 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       setState(() => _selectedIndex = 2);
                       final updatedUser = await Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (_) => ProfilePage(user: _currentUser)),
+                        MaterialPageRoute(
+                          builder: (_) => ProfilePage(user: _currentUser),
+                        ),
                       );
                       if (updatedUser != null && mounted) {
-                        updateUser(updatedUser is Map ? updatedUser : _currentUser);
+                        setState(() {
+                          _currentUser = Map<String, dynamic>.from(
+                            updatedUser is Map ? updatedUser : _currentUser,
+                          );
+                        });
                       }
                     },
                   ),
@@ -691,29 +843,101 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 }
 
-// Premium Feature Card Widget - Smaller and more compact
-class _PremiumFeatureCard extends StatefulWidget {
+// Modern Stat Card
+class _ModernStatCard extends StatelessWidget {
+  final IconData icon;
+  final String value;
+  final String label;
+  final List<Color> gradient;
+
+  const _ModernStatCard({
+    required this.icon,
+    required this.value,
+    required this.label,
+    required this.gradient,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: gradient,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: gradient[0].withValues(alpha: 0.3),
+            blurRadius: 15,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.25),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, color: Colors.white, size: 24),
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                value,
+                style: GoogleFonts.poppins(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.white,
+                  letterSpacing: -0.5,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                label,
+                style: GoogleFonts.poppins(
+                  fontSize: 12,
+                  color: Colors.white.withValues(alpha: 0.9),
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// Modern Feature Card
+class _ModernFeatureCard extends StatefulWidget {
   final String title;
   final IconData icon;
-  final List<Color> gradient;
+  final Color color;
   final String? badge;
-  final bool isDark;
   final VoidCallback onTap;
 
-  const _PremiumFeatureCard({
+  const _ModernFeatureCard({
     required this.title,
     required this.icon,
-    required this.gradient,
+    required this.color,
     this.badge,
-    required this.isDark,
     required this.onTap,
   });
 
   @override
-  State<_PremiumFeatureCard> createState() => _PremiumFeatureCardState();
+  State<_ModernFeatureCard> createState() => _ModernFeatureCardState();
 }
 
-class _PremiumFeatureCardState extends State<_PremiumFeatureCard>
+class _ModernFeatureCardState extends State<_ModernFeatureCard>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   bool _isPressed = false;
@@ -755,38 +979,44 @@ class _PremiumFeatureCardState extends State<_PremiumFeatureCard>
         ),
         child: Container(
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: widget.gradient,
-            ),
-            borderRadius: BorderRadius.circular(18),
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: widget.gradient[0].withValues(alpha: 0.4),
-                blurRadius: 12,
+                color: widget.color.withValues(alpha: 0.15),
+                blurRadius: 15,
                 offset: const Offset(0, 6),
               ),
             ],
           ),
           child: Stack(
             children: [
-              // Decorative circles
+              // Background gradient accent
               Positioned(
-                top: -15,
-                right: -15,
+                top: 0,
+                left: 0,
+                right: 0,
+                height: 60,
                 child: Container(
-                  width: 50,
-                  height: 50,
                   decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.white.withValues(alpha: 0.1),
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        widget.color.withValues(alpha: 0.15),
+                        widget.color.withValues(alpha: 0.05),
+                      ],
+                    ),
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20),
+                    ),
                   ),
                 ),
               ),
               // Content
               Padding(
-                padding: const EdgeInsets.all(12.0),
+                padding: const EdgeInsets.all(14),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -795,52 +1025,50 @@ class _PremiumFeatureCardState extends State<_PremiumFeatureCard>
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Flexible(
-                          child: Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.2),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Icon(
-                              widget.icon,
-                              color: Colors.white,
-                              size: 20,
-                            ),
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: widget.color.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: Icon(
+                            widget.icon,
+                            color: widget.color,
+                            size: 24,
                           ),
                         ),
                         if (widget.badge != null)
-                          Flexible(
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 5,
-                                vertical: 2,
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 3,
+                            ),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  widget.color,
+                                  widget.color.withValues(alpha: 0.7),
+                                ],
                               ),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.3),
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: Text(
-                                widget.badge!,
-                                style: GoogleFonts.poppins(
-                                  color: Colors.white,
-                                  fontSize: 7,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              widget.badge!,
+                              style: GoogleFonts.poppins(
+                                color: Colors.white,
+                                fontSize: 8,
+                                fontWeight: FontWeight.w700,
                               ),
                             ),
                           ),
                       ],
                     ),
-                    const SizedBox(height: 4),
                     Flexible(
                       child: Text(
                         widget.title,
                         style: GoogleFonts.poppins(
-                          color: Colors.white,
-                          fontSize: 12,
+                          color: Colors.grey.shade900,
+                          fontSize: 13,
                           fontWeight: FontWeight.w700,
                           letterSpacing: -0.3,
                         ),
@@ -859,86 +1087,14 @@ class _PremiumFeatureCardState extends State<_PremiumFeatureCard>
   }
 }
 
-// Stat Card Widget - Enhanced
-class _StatCard extends StatelessWidget {
-  final IconData icon;
-  final String value;
-  final String label;
-  final Color color;
-  final bool isDark;
-
-  const _StatCard({
-    required this.icon,
-    required this.value,
-    required this.label,
-    required this.color,
-    required this.isDark,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  color.withValues(alpha: 0.15),
-                  color.withValues(alpha: 0.08),
-                ],
-              ),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(icon, color: color, size: 22),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            value,
-            style: GoogleFonts.poppins(
-              fontSize: 20,
-              fontWeight: FontWeight.w800,
-              color: Colors.grey.shade900,
-              letterSpacing: -0.5,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: GoogleFonts.poppins(
-              fontSize: 12,
-              color: Colors.grey.shade600,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// Navigation Item Widget
-class _NavItem extends StatelessWidget {
+// Modern Navigation Item
+class _ModernNavItem extends StatelessWidget {
   final IconData icon;
   final String label;
   final bool isSelected;
   final VoidCallback onTap;
 
-  const _NavItem({
+  const _ModernNavItem({
     required this.icon,
     required this.label,
     required this.isSelected,
@@ -947,114 +1103,182 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? const Color(0xFF667EEA).withValues(alpha: 0.1)
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              icon,
-              color: isSelected
-                  ? const Color(0xFF667EEA)
-                  : const Color(0xFF9CA3AF),
-              size: 24,
-            ),
-            const SizedBox(height: 4),
-            Flexible(
-              child: Text(
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          decoration: BoxDecoration(
+            color: isSelected
+                ? const Color(0xFF667EEA).withValues(alpha: 0.1)
+                : Colors.transparent,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                color: isSelected
+                    ? const Color(0xFF667EEA)
+                    : Colors.grey.shade400,
+                size: 26,
+              ),
+              const SizedBox(height: 4),
+              Text(
                 label,
                 style: GoogleFonts.poppins(
                   fontSize: 11,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                   color: isSelected
                       ? const Color(0xFF667EEA)
-                      : const Color(0xFF9CA3AF),
+                      : Colors.grey.shade500,
                 ),
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-// Guidelines Card Widget
-class _GuidelinesCard extends StatelessWidget {
-  final bool isDark;
-  static const List<String> rules = [
-    "Respect natural habitats & wildlife",
-    "Avoid littering in eco-sensitive zones",
-    "Drive safely & follow traffic rules",
-    "Support eco-tourism & local businesses",
-    "Use SOS for immediate emergency assistance",
-    "Stay updated about weather alerts",
+// Modern Guidelines Card
+class _ModernGuidelinesCard extends StatelessWidget {
+  static const List<Map<String, String>> guidelines = [
+    {
+      "icon": "🌿",
+      "title": "Respect Nature",
+      "description": "Protect natural habitats & wildlife",
+    },
+    {
+      "icon": "🚯",
+      "title": "Keep Clean",
+      "description": "Avoid littering in eco-sensitive zones",
+    },
+    {
+      "icon": "🚗",
+      "title": "Drive Safely",
+      "description": "Follow traffic rules & speed limits",
+    },
+    {
+      "icon": "🤝",
+      "title": "Support Local",
+      "description": "Promote eco-tourism & local businesses",
+    },
+    {
+      "icon": "🚨",
+      "title": "Emergency SOS",
+      "description": "Use SOS button for immediate help",
+    },
+    {
+      "icon": "🌤️",
+      "title": "Stay Updated",
+      "description": "Check weather alerts regularly",
+    },
   ];
-
-  const _GuidelinesCard({required this.isDark});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            const Color(0xFF43E97B).withValues(alpha: 0.1),
-            const Color(0xFF38F9D7).withValues(alpha: 0.1),
+            const Color(0xFF43E97B).withValues(alpha: 0.08),
+            const Color(0xFF38F9D7).withValues(alpha: 0.08),
           ],
         ),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: const Color(0xFF43E97B).withValues(alpha: 0.3),
+          color: const Color(0xFF43E97B).withValues(alpha: 0.2),
           width: 1.5,
         ),
       ),
       child: Column(
-        children: rules
-            .map((rule) => Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        margin: const EdgeInsets.only(top: 6),
-                        width: 5,
-                        height: 5,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF43E97B),
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Text(
-                          rule,
-                          style: GoogleFonts.poppins(
-                            fontSize: 13,
-                            color: Colors.grey.shade800,
-                            fontWeight: FontWeight.w500,
-                            height: 1.4,
-                          ),
-                        ),
-                      ),
-                    ],
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF43E97B), Color(0xFF38F9D7)],
                   ),
-                ))
-            .toList(),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.info_outline_rounded,
+                  color: Colors.white,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                "District Guidelines",
+                style: GoogleFonts.poppins(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.grey.shade900,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          ...guidelines.map((guideline) => Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF43E97B).withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Center(
+                        child: Text(
+                          guideline["icon"]!,
+                          style: const TextStyle(fontSize: 24),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            guideline["title"]!,
+                            style: GoogleFonts.poppins(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.grey.shade900,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            guideline["description"]!,
+                            style: GoogleFonts.poppins(
+                              fontSize: 13,
+                              color: Colors.grey.shade600,
+                              height: 1.4,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              )),
+        ],
       ),
     );
   }

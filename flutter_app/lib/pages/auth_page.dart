@@ -27,6 +27,7 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
   final _loginFormKey = GlobalKey<FormState>();
   bool _loginLoading = false;
   bool _showLoginPassword = false;
+  String? _loginError;
 
   // Signup Controllers
   final _signupName = TextEditingController();
@@ -37,6 +38,7 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
   bool _signupLoading = false;
   bool _showSignupPassword = false;
   bool _showSignupConfirmPassword = false;
+  String? _signupError;
 
   @override
   void initState() {
@@ -84,7 +86,10 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
   Future<void> _handleLogin() async {
     if (!_loginFormKey.currentState!.validate()) return;
 
-    setState(() => _loginLoading = true);
+    setState(() {
+      _loginLoading = true;
+      _loginError = null; // Clear previous errors
+    });
 
     try {
       final res = await ApiService.loginUser(
@@ -93,46 +98,70 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
       );
 
       if (res != null && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Welcome back ${res['name']}! 🎉"),
-            backgroundColor: Colors.green,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
+        // Check if response contains error
+        if (res['error'] == true) {
+          String errorMessage = res['message'] ?? 'Login failed';
+          
+          // Provide specific error messages
+          if (errorMessage.toLowerCase().contains('user not found') || 
+              errorMessage.toLowerCase().contains('email')) {
+            errorMessage = 'Email not found. Please check your email address.';
+          } else if (errorMessage.toLowerCase().contains('password') || 
+                     errorMessage.toLowerCase().contains('invalid credentials') ||
+                     errorMessage.toLowerCase().contains('incorrect')) {
+            errorMessage = 'Incorrect password. Please try again.';
+          } else if (errorMessage.toLowerCase().contains('connect') ||
+                     errorMessage.toLowerCase().contains('network')) {
+            errorMessage = 'Cannot connect to server. Please check your internet connection.';
+          }
+          
+          setState(() {
+            _loginError = errorMessage;
+            _loginLoading = false;
+          });
+          return;
+        }
+
+        // Success - user has token and data
+        if (res['token'] != null && mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("Welcome back ${res['name'] ?? 'User'}! 🎉"),
+              backgroundColor: Colors.green,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
             ),
-          ),
-        );
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (_) => HomePage(user: res)),
-          (r) => false,
-        );
-      } else if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text("Invalid email or password"),
-            backgroundColor: Colors.red,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-          ),
-        );
+          );
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (_) => HomePage(user: res)),
+            (r) => false,
+          );
+        } else {
+          setState(() {
+            _loginError = 'Login failed. Please try again.';
+            _loginLoading = false;
+          });
+        }
+      } else {
+        setState(() {
+          _loginError = 'Login failed. Please check your email and password.';
+          _loginLoading = false;
+        });
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Error: ${e.toString()}"),
-            backgroundColor: Colors.red,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _loginLoading = false);
+        String errorMessage = 'An error occurred. Please try again.';
+        if (e.toString().contains('SocketException') || 
+            e.toString().contains('Failed host lookup')) {
+          errorMessage = 'Cannot connect to server. Please check your internet connection.';
+        }
+        setState(() {
+          _loginError = errorMessage;
+          _loginLoading = false;
+        });
       }
     }
   }
@@ -140,7 +169,10 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
   Future<void> _handleSignup() async {
     if (!_signupFormKey.currentState!.validate()) return;
 
-    setState(() => _signupLoading = true);
+    setState(() {
+      _signupLoading = true;
+      _signupError = null; // Clear previous errors
+    });
 
     try {
       final res = await ApiService.registerUser(
@@ -150,43 +182,68 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
       );
 
       if (res != null && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Welcome ${_signupName.text}! 🎉"),
-            backgroundColor: Colors.green,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
+        // Check if response contains error
+        if (res['error'] == true) {
+          String errorMessage = res['message'] ?? 'Signup failed';
+          
+          // Provide specific error messages
+          if (errorMessage.toLowerCase().contains('already exists') || 
+              errorMessage.toLowerCase().contains('email')) {
+            errorMessage = 'This email is already registered. Please use a different email or try logging in.';
+          } else if (errorMessage.toLowerCase().contains('required')) {
+            errorMessage = 'Please fill in all required fields.';
+          } else if (errorMessage.toLowerCase().contains('connect') ||
+                     errorMessage.toLowerCase().contains('network')) {
+            errorMessage = 'Cannot connect to server. Please check your internet connection.';
+          }
+          
+          setState(() {
+            _signupError = errorMessage;
+            _signupLoading = false;
+          });
+          return;
+        }
+
+        // Success - user has token and data
+        if (res['token'] != null && mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("Welcome ${_signupName.text}! 🎉"),
+              backgroundColor: Colors.green,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
             ),
-          ),
-        );
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (_) => HomePage(user: res)),
-          (route) => false,
-        );
-      } else if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text("Signup failed. Please try again."),
-            backgroundColor: Colors.red,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+          );
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (_) => HomePage(user: res)),
+            (route) => false,
+          );
+        } else {
+          setState(() {
+            _signupError = 'Signup failed. Please try again.';
+            _signupLoading = false;
+          });
+        }
+      } else {
+        setState(() {
+          _signupError = 'Signup failed. Please try again.';
+          _signupLoading = false;
+        });
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Error: ${e.toString()}"),
-            backgroundColor: Colors.red,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _signupLoading = false);
+        String errorMessage = 'An error occurred. Please try again.';
+        if (e.toString().contains('SocketException') || 
+            e.toString().contains('Failed host lookup')) {
+          errorMessage = 'Cannot connect to server. Please check your internet connection.';
+        }
+        setState(() {
+          _signupError = errorMessage;
+          _signupLoading = false;
+        });
       }
     }
   }
@@ -379,10 +436,54 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
                   if (value.length < 6) {
                     return 'Password must be at least 6 characters';
                   }
+                  // Clear error when user starts typing
+                  if (_loginError != null) {
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      if (mounted) {
+                        setState(() => _loginError = null);
+                      }
+                    });
+                  }
                   return null;
                 },
+                onChanged: (value) {
+                  // Clear error when user starts typing
+                  if (_loginError != null) {
+                    setState(() => _loginError = null);
+                  }
+                },
               ),
-              const SizedBox(height: AppTheme.paddingXLarge),
+              const SizedBox(height: AppTheme.paddingMedium),
+
+              // Error Message Display
+              if (_loginError != null)
+                Container(
+                  margin: const EdgeInsets.only(bottom: AppTheme.paddingMedium),
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.red.shade50,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.red.shade200, width: 1),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.error_outline, color: Colors.red.shade700, size: 20),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          _loginError!,
+                          style: TextStyle(
+                            color: Colors.red.shade700,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+              const SizedBox(height: AppTheme.paddingMedium),
 
               // Login Button
               _loginLoading
@@ -559,6 +660,12 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
                   }
                   return null;
                 },
+                onChanged: (value) {
+                  // Clear error when user starts typing
+                  if (_signupError != null) {
+                    setState(() => _signupError = null);
+                  }
+                },
               ),
               const SizedBox(height: AppTheme.paddingMedium),
 
@@ -598,6 +705,12 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
                     return 'Please enter a valid email';
                   }
                   return null;
+                },
+                onChanged: (value) {
+                  // Clear error when user starts typing
+                  if (_signupError != null) {
+                    setState(() => _signupError = null);
+                  }
                 },
               ),
               const SizedBox(height: AppTheme.paddingMedium),
@@ -646,6 +759,12 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
                   }
                   return null;
                 },
+                onChanged: (value) {
+                  // Clear error when user starts typing
+                  if (_signupError != null) {
+                    setState(() => _signupError = null);
+                  }
+                },
               ),
               const SizedBox(height: AppTheme.paddingMedium),
 
@@ -693,8 +812,44 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
                   }
                   return null;
                 },
+                onChanged: (value) {
+                  // Clear error when user starts typing
+                  if (_signupError != null) {
+                    setState(() => _signupError = null);
+                  }
+                },
               ),
-              const SizedBox(height: AppTheme.paddingXLarge),
+              const SizedBox(height: AppTheme.paddingMedium),
+
+              // Error Message Display
+              if (_signupError != null)
+                Container(
+                  margin: const EdgeInsets.only(bottom: AppTheme.paddingMedium),
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.red.shade50,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.red.shade200, width: 1),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.error_outline, color: Colors.red.shade700, size: 20),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          _signupError!,
+                          style: TextStyle(
+                            color: Colors.red.shade700,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+              const SizedBox(height: AppTheme.paddingMedium),
 
               // Signup Button
               _signupLoading

@@ -149,17 +149,19 @@ export const chatbotReply = async (req, res) => {
         }
     }
 
-    // Save chat log
+    // Save chat log (ensure it's saved for admin dashboard)
     try {
-      await Chat.create({
+      const chatDoc = await Chat.create({
         user: userId || "Guest",
         message: message,
         response: reply,
         intent: intent,
         confidence: confidence,
       });
+      console.log("✅ Chat saved:", chatDoc._id);
     } catch (err) {
-      console.error("Error saving chat:", err);
+      console.error("❌ Error saving chat:", err);
+      // Don't fail the request if chat save fails
     }
 
     res.json({

@@ -35,15 +35,39 @@ class ApiService {
       try {
         final errorData = jsonDecode(res.body);
         if (errorData is Map<String, dynamic>) {
-          throw Exception(errorData['message'] ?? 'Request failed');
+          final errorMessage = errorData['message'] ?? 'Request failed';
+          // Return error information instead of throwing
+          return {
+            'error': true,
+            'message': errorMessage,
+            'statusCode': res.statusCode,
+          };
         }
       } catch (_) {
         // If parsing fails, use the raw body or default message
       }
-      throw Exception('Request failed with status ${res.statusCode}');
+      return {
+        'error': true,
+        'message': 'Request failed with status ${res.statusCode}',
+        'statusCode': res.statusCode,
+      };
     } catch (e) {
       print("⚠️ POST /$endpoint error: $e");
-      rethrow;
+      // Handle network errors
+      if (e.toString().contains('SocketException') || 
+          e.toString().contains('Failed host lookup') ||
+          e.toString().contains('Connection refused')) {
+        return {
+          'error': true,
+          'message': 'Cannot connect to server. Please check your internet connection.',
+          'statusCode': 0,
+        };
+      }
+      return {
+        'error': true,
+        'message': e.toString().replaceAll('Exception: ', ''),
+        'statusCode': 0,
+      };
     }
   }
 
@@ -68,7 +92,7 @@ class ApiService {
 
   static Future<Map<String, dynamic>?> registerUser(
       String name, String email, String password) async {
-    return await _post("users", {
+    return await _post("auth/register", {
       "name": name,
       "email": email,
       "password": password,
@@ -268,10 +292,28 @@ class ApiService {
   static Future<Map<String, dynamic>?> sendChatbotMessage(
       String message, String? userId) async {
     try {
-      return await _post("chatbot", {"message": message, "userId": userId});
+      final result = await _post("chatbot", {
+        "message": message,
+        "userId": userId ?? "Guest"
+      });
+      
+      // Check for errors
+      if (result != null && result['error'] == true) {
+        return {
+          'reply': result['message'] ?? 'Sorry, I could not process that.',
+          'intent': 'error',
+          'confidence': 0.0,
+        };
+      }
+      
+      return result;
     } catch (e) {
-      print("Chatbot error: $e");
-      return null;
+      print("⚠️ Chatbot error: $e");
+      return {
+        'reply': 'Sorry, I\'m having trouble connecting. Please try again.',
+        'intent': 'error',
+        'confidence': 0.0,
+      };
     }
   }
 
@@ -281,10 +323,20 @@ class ApiService {
     return data is Map<String, dynamic> ? data : null;
   }
 
-  static Future<Map<String, dynamic>?> getRouteRecommendations(
-      String origin, String destination) async {
-    final data = await _get(
-        "analytics/routes/recommendations?origin=$origin&destination=$destination");
+  static Future<Map<String, dynamic>?> getRouteRecommendations({
+    String? origin,
+    String? destination,
+    String? query,
+  }) async {
+    String url = "analytics/routes/recommendations?";
+    if (query != null && query.isNotEmpty) {
+      url += "query=${Uri.encodeComponent(query)}";
+    } else if (origin != null && destination != null) {
+      url += "origin=${Uri.encodeComponent(origin)}&destination=${Uri.encodeComponent(destination)}";
+    } else {
+      return null;
+    }
+    final data = await _get(url);
     return data is Map<String, dynamic> ? data : null;
   }
 
