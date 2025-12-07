@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import '../widgets/profile_image_widget.dart';
 import 'dart:math' as math;
 import 'dart:io';
 
@@ -29,11 +30,6 @@ class HomePage extends StatefulWidget {
 
   @override
   State<HomePage> createState() => _HomePageState();
-  
-  // Method to update user
-  static HomePageState? of(BuildContext context) {
-    return context.findAncestorStateOfType<HomePageState>();
-  }
 }
 
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
@@ -97,26 +93,19 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       // SOS - Navigate to Help Page
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (_) => HelpPage(user: widget.user)),
+        MaterialPageRoute(builder: (_) => HelpPage(user: _currentUser)),
       );
     } else if (index == 2) {
       // Profile - Get updated user data
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (_) => ProfilePage(user: widget.user)),
+        MaterialPageRoute(builder: (_) => ProfilePage(user: _currentUser)),
       ).then((updatedUser) {
         if (updatedUser != null && mounted) {
           // Update the user data in home page
           setState(() {
-            // Force rebuild with new user data
+            _currentUser = Map<String, dynamic>.from(updatedUser is Map ? updatedUser : _currentUser);
           });
-          // Navigate to new HomePage with updated user
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (_) => HomePage(user: updatedUser is Map ? updatedUser : widget.user),
-            ),
-          );
         }
       });
     }
@@ -363,33 +352,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                 ),
                                 child: ClipOval(
                                   child: profilePhotoUrl.isNotEmpty
-                                      ? CachedNetworkImage(
+                                      ? ProfileImageWidget(
                                           imageUrl: profilePhotoUrl,
+                                          fallbackText: user["name"] ?? "User",
+                                          size: 60,
                                           fit: BoxFit.cover,
-                                          placeholder: (context, url) => Container(
-                                            color: Colors.white.withValues(alpha: 0.2),
-                                            child: Center(
-                                              child: CircularProgressIndicator(
-                                                strokeWidth: 2,
-                                                valueColor: AlwaysStoppedAnimation<Color>(
-                                                  Colors.white.withValues(alpha: 0.5),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          errorWidget: (context, url, error) => Container(
-                                            color: Colors.white.withValues(alpha: 0.2),
-                                            child: Center(
-                                              child: Text(
-                                                (user["name"]?[0] ?? "U").toUpperCase(),
-                                                style: GoogleFonts.poppins(
-                                                  color: Colors.white,
-                                                  fontSize: 24,
-                                                  fontWeight: FontWeight.w800,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
                                         )
                                       : Container(
                                           color: Colors.white.withValues(alpha: 0.2),

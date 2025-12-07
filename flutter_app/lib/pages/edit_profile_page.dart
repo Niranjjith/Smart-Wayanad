@@ -168,7 +168,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       }
 
       // Update profile via API
-      final updatedUser = await ApiService.updateProfile(
+      final result = await ApiService.updateProfile(
         name: _nameController.text.trim(),
         email: _emailController.text.trim(),
         phone: _phoneController.text.trim().isEmpty ? null : _phoneController.text.trim(),
@@ -176,7 +176,17 @@ class _EditProfilePageState extends State<EditProfilePage> {
         profilePhoto: profilePhotoBase64,
       );
 
-      if (updatedUser != null && mounted) {
+      if (result != null && mounted) {
+        // Ensure we have a complete user object
+        final updatedUser = Map<String, dynamic>.from(result);
+        // Preserve existing fields if not updated
+        updatedUser['name'] = updatedUser['name'] ?? _nameController.text.trim();
+        updatedUser['email'] = updatedUser['email'] ?? _emailController.text.trim();
+        updatedUser['phone'] = updatedUser['phone'] ?? _phoneController.text.trim();
+        if (profilePhotoBase64 != null) {
+          updatedUser['profilePhoto'] = profilePhotoBase64;
+        }
+        
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('Profile updated successfully! 🎉'),

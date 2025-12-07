@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import '../widgets/profile_image_widget.dart';
 import 'dart:io';
 import '../services/api_service.dart';
 import 'splash_page.dart';
@@ -142,33 +143,11 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                           child: ClipOval(
                             child: profilePhotoUrl.isNotEmpty
-                                ? CachedNetworkImage(
+                                ? ProfileImageWidget(
                                     imageUrl: profilePhotoUrl,
+                                    fallbackText: name,
+                                    size: 100,
                                     fit: BoxFit.cover,
-                                    placeholder: (context, url) => Container(
-                                      color: Colors.white.withValues(alpha: 0.2),
-                                      child: Center(
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                          valueColor: AlwaysStoppedAnimation<Color>(
-                                            Colors.white.withValues(alpha: 0.5),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    errorWidget: (context, url, error) => Container(
-                                      color: Colors.white.withValues(alpha: 0.2),
-                                      child: Center(
-                                        child: Text(
-                                          name[0].toUpperCase(),
-                                          style: GoogleFonts.poppins(
-                                            color: Colors.white,
-                                            fontSize: 36,
-                                            fontWeight: FontWeight.w800,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
                                   )
                                 : Container(
                                     color: Colors.white.withValues(alpha: 0.2),

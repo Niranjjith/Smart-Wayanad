@@ -80,10 +80,16 @@ export const loginUser = async (req, res) => {
     // Generate JWT token
     const token = generateToken(user);
 
+    // Return user data without password
+    const userData = await User.findById(user._id).select("-password");
+    
     res.status(200).json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
+      _id: userData._id,
+      name: userData.name,
+      email: userData.email,
+      phone: userData.phone || "",
+      profilePhoto: userData.profilePhoto || "",
+      settings: userData.settings || {},
       token,
     });
   } catch (err) {
@@ -107,7 +113,7 @@ export const getProfile = async (req, res) => {
 // ✅ UPDATE PROFILE — PUT /api/auth/profile (Protected route)
 export const updateProfile = async (req, res) => {
   try {
-    const { name, email, password, profilePhoto } = req.body;
+    const { name, email, password, phone, profilePhoto } = req.body;
     const user = await User.findById(req.user.id);
 
     if (!user) {
@@ -115,10 +121,12 @@ export const updateProfile = async (req, res) => {
     }
 
     // Update name if provided
-    if (name) user.name = name;
+    if (name !== undefined && name !== null) {
+      user.name = name;
+    }
 
     // Update email if provided (check for duplicates)
-    if (email && email !== user.email) {
+    if (email !== undefined && email !== null && email !== user.email) {
       const existing = await User.findOne({ email });
       if (existing) {
         return res.status(400).json({ message: "Email already in use" });
@@ -126,15 +134,20 @@ export const updateProfile = async (req, res) => {
       user.email = email;
     }
 
+    // Update phone if provided
+    if (phone !== undefined) {
+      user.phone = phone || "";
+    }
+
     // Update password if provided
-    if (password) {
+    if (password !== undefined && password !== null && password !== "") {
       const hashedPassword = await bcrypt.hash(password, 10);
       user.password = hashedPassword;
     }
 
     // Update profile photo if provided
     if (profilePhoto !== undefined) {
-      user.profilePhoto = profilePhoto;
+      user.profilePhoto = profilePhoto || "";
     }
 
     await user.save();
