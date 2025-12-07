@@ -103,3 +103,49 @@ export const getProfile = async (req, res) => {
     res.status(500).json({ message: "Server error while fetching profile" });
   }
 };
+
+// ✅ UPDATE PROFILE — PUT /api/auth/profile (Protected route)
+export const updateProfile = async (req, res) => {
+  try {
+    const { name, email, password, profilePhoto } = req.body;
+    const user = await User.findById(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Update name if provided
+    if (name) user.name = name;
+
+    // Update email if provided (check for duplicates)
+    if (email && email !== user.email) {
+      const existing = await User.findOne({ email });
+      if (existing) {
+        return res.status(400).json({ message: "Email already in use" });
+      }
+      user.email = email;
+    }
+
+    // Update password if provided
+    if (password) {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      user.password = hashedPassword;
+    }
+
+    // Update profile photo if provided
+    if (profilePhoto !== undefined) {
+      user.profilePhoto = profilePhoto;
+    }
+
+    await user.save();
+
+    const updatedUser = await User.findById(user._id).select("-password");
+    res.status(200).json({
+      message: "Profile updated successfully",
+      user: updatedUser,
+    });
+  } catch (err) {
+    console.error("❌ Update profile error:", err);
+    res.status(500).json({ message: "Server error while updating profile" });
+  }
+};

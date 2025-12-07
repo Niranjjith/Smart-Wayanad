@@ -8,6 +8,7 @@ import Chatbot from "./pages/Chatbot.jsx";
 import SendAlert from "./pages/SendAlert.jsx";
 import Analytics from "./pages/Analytics.jsx";
 import AIMLFeatures from "./pages/AIMLFeatures.jsx";
+import Settings from "./pages/Settings.jsx";
 import ProtectedRoute from "./routes/ProtectedRoute.jsx";
 import { AuthProvider } from "./context/AuthContext.jsx";
 import { ToastContainer } from "react-toastify";
@@ -91,6 +92,15 @@ function App() {
             element={
               <ProtectedRoute>
                 <AIMLFeatures />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute>
+                <Settings />
               </ProtectedRoute>
             }
           />

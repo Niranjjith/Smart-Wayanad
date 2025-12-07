@@ -17,6 +17,7 @@ import {
   Chat,
   Analytics,
   Psychology,
+  Settings,
 } from "@mui/icons-material";
 import { Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -30,6 +31,7 @@ const items = [
   { to: "/chatbot", text: "Chatbot", icon: <Chat /> },
   { to: "/analytics", text: "AI Analytics", icon: <Analytics /> },
   { to: "/ai-ml", text: "AI/ML Features", icon: <Psychology /> },
+  { to: "/settings", text: "Settings", icon: <Settings /> },
 ];
 
 export default function Sidebar() {

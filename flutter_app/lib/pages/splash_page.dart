@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'login_page.dart';
+import 'auth_page.dart';
 import 'dart:math' as math;
 
 class SplashPage extends StatefulWidget {
@@ -82,7 +82,7 @@ class _SplashPageState extends State<SplashPage>
       context,
       PageRouteBuilder(
         transitionDuration: const Duration(milliseconds: 1000),
-        pageBuilder: (_, __, ___) => const LoginPage(),
+        pageBuilder: (_, __, ___) => const AuthPage(initialMode: AuthMode.login),
         transitionsBuilder: (_, anim, __, child) {
           return FadeTransition(
             opacity: anim,
