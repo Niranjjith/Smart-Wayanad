@@ -10,7 +10,9 @@
 [![MongoDB](https://img.shields.io/badge/MongoDB-8.4-47A248?logo=mongodb)](https://www.mongodb.com)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-*Empowering citizens of Wayanad with a unified digital platform for safety, transport, and essential services.*
+*Empowering Citizens, Digitally.*
+
+[Features](#-features) • [Installation](#-installation--setup) • [Documentation](#-api-documentation) • [Contributing](#-contributing)
 
 </div>
 
@@ -33,33 +35,23 @@
 - [Future Enhancements](#-future-enhancements)
 - [Contributing](#-contributing)
 - [License](#-license)
-- [Contact & Support](#-contact--support)
+- [Contact](#-contact)
 
 ---
 
 ## 🎯 Overview
 
-<div align="center">
+**Smart Wayanad** is a comprehensive digital platform designed for citizens of Wayanad District, Kerala. It provides emergency assistance, transport information, district resources, climate updates, and AI-powered chatbot support through a unified mobile and web interface.
 
-**Smart Wayanad** is a comprehensive digital platform for citizens of Wayanad District, Kerala. It provides emergency assistance, transport information, district resources, climate updates, and AI-powered chatbot support through a unified mobile and web interface.
+### Key Highlights
 
-</div>
-
-### ✨ Key Highlights
-
-<div align="center">
-
-| Feature | Description |
-|---------|-------------|
-| 🚨 **Emergency SOS** | Real-time emergency alerts with GPS location tracking |
-| 🚌 **Bus Routes** | Complete bus route management with expandable sub-routes |
-| 🏥 **Healthcare** | Comprehensive directory of hospitals, clinics, and medical facilities |
-| 🌤️ **Climate Info** | Real-time weather updates and climate forecasts |
-| 🤖 **AI Chatbot** | Intelligent assistance for citizen queries and support |
-| 📍 **Location Services** | Taxi stands, helplines, and essential services directory |
-| 🎨 **Premium UI** | Modern, responsive design with smooth animations |
-
-</div>
+- 🚨 **Emergency SOS** - Real-time emergency alerts with GPS location
+- 🚌 **Bus Routes** - Complete bus route management with sub-routes
+- 🏥 **Healthcare** - Hospitals, clinics, and medical facilities directory
+- 🌤️ **Climate Info** - Real-time weather and climate data
+- 🤖 **AI Chatbot** - Intelligent assistance for citizen queries
+- 📍 **Location Services** - Taxi stands, helplines, and essential services
+- 🎨 **Premium UI** - Modern, responsive design with smooth animations
 
 ---
 
@@ -67,62 +59,39 @@
 
 ### 📱 Citizen Mobile App (Flutter)
 
-<div align="center">
-
-| Feature | Status | Description |
-|---------|--------|-------------|
-| 🚨 Emergency SOS | ✅ | Send help alerts with live GPS location tracking |
-| 🚌 Bus Routes | ✅ | Search and view bus routes with expandable sub-routes |
-| 🏥 Healthcare Directory | ✅ | Find hospitals, clinics, and medical facilities |
-| 🌤️ Climate Information | ✅ | Real-time weather updates and forecasts |
-| 🤖 AI Chatbot | ✅ | Get instant answers to your queries |
-| 📍 Location Services | ✅ | Access taxi stands, helplines, and emergency contacts |
-| 🌿 Ecotourism Guidelines | ✅ | District rules and guidelines |
-| 👤 Profile Management | ✅ | User profile and settings management |
-| 🎨 Premium UI | ✅ | Beautiful gradient design with smooth animations |
-
-</div>
+- ✅ **Emergency SOS** - Send help alerts with live GPS location
+- ✅ **Bus Routes** - Search and view bus routes with expandable sub-routes
+- ✅ **Healthcare Directory** - Find hospitals, clinics, and medical facilities
+- ✅ **Climate Information** - Real-time weather updates and forecasts
+- ✅ **AI Chatbot** - Get instant answers to your queries
+- ✅ **Location Services** - Access taxi stands, helplines, and emergency contacts
+- ✅ **Ecotourism Guidelines** - District rules and guidelines
+- ✅ **Profile Management** - User profile and settings
+- ✅ **Premium UI** - Beautiful gradient design with smooth animations
 
 ### 🖥️ Admin Dashboard (React)
 
-<div align="center">
-
-| Feature | Status | Description |
-|---------|--------|-------------|
-| 🚨 Real-Time Alerts | ✅ | Monitor SOS alerts with Socket.IO live updates |
-| 🚌 Bus Route Management | ✅ | Full CRUD operations for routes and sub-routes |
-| 📍 Location Management | ✅ | Manage hospitals, clinics, taxi stands, and helplines |
-| 👥 User Management | ✅ | View and manage user accounts |
-| 💬 Chat Logs | ✅ | Monitor chatbot conversations |
-| 🌤️ Climate Dashboard | ✅ | Weather data visualization |
-| 📢 Send Alerts | ✅ | Broadcast alerts to all users |
-| 📊 Analytics Dashboard | ✅ | Real-time statistics and insights |
-| 🎨 Premium Design | ✅ | Modern Material UI with gradient themes |
-
-</div>
+- ✅ **Real-Time Alerts** - Monitor SOS alerts with Socket.IO live updates
+- ✅ **Bus Route Management** - Full CRUD operations for routes and sub-routes
+- ✅ **Location Management** - Manage hospitals, clinics, taxi stands, and helplines
+- ✅ **User Management** - View and manage user accounts
+- ✅ **Chat Logs** - Monitor chatbot conversations
+- ✅ **Climate Dashboard** - Weather data visualization
+- ✅ **Send Alerts** - Broadcast alerts to all users
+- ✅ **Premium Design** - Modern Material UI with gradient themes
 
 ### 🔧 Backend API (Node.js + Express)
 
-<div align="center">
-
-| Feature | Status | Description |
-|---------|--------|-------------|
-| 🌐 RESTful API | ✅ | Complete REST API for all services |
-| ⚡ Real-Time Communication | ✅ | Socket.IO for live updates |
-| 🔐 Authentication | ✅ | JWT-based secure authentication |
-| 💾 Database Management | ✅ | MongoDB with Mongoose ODM |
-| 🛣️ Sub-Routes Support | ✅ | Nested bus route management |
-| ⚠️ Error Handling | ✅ | Comprehensive error handling and validation |
-
-</div>
+- ✅ **RESTful API** - Complete REST API for all services
+- ✅ **Real-Time Communication** - Socket.IO for live updates
+- ✅ **Authentication** - JWT-based secure authentication
+- ✅ **Database Management** - MongoDB with Mongoose ODM
+- ✅ **Sub-Routes Support** - Nested bus route management
+- ✅ **Error Handling** - Comprehensive error handling and validation
 
 ---
 
 ## 🏗️ Project Architecture
-
-### System Architecture Overview
-
-<div align="center">
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -147,41 +116,13 @@
                     └─────────────────┘
 ```
 
-</div>
+### Data Flow
 
-### Data Flow Diagram
-
-<div align="center">
-
-![Data Flow Diagram](backend/Screenshots/Dfd%20diagram.png)
-
-*Complete Data Flow Diagram showing system interactions*
-
-</div>
-
-### Database Schema
-
-<div align="center">
-
-![ER Diagram](backend/Screenshots/ER%20diagram.png)
-
-*Entity Relationship Diagram - Database Structure*
-
-</div>
-
-### Data Flow Process
-
-<div align="center">
-
-| Step | Component | Action |
-|------|-----------|--------|
-| 1️⃣ | **Citizen App** | Sends requests via REST API and Socket.IO |
-| 2️⃣ | **Admin Dashboard** | Manages data via REST API |
-| 3️⃣ | **Backend** | Processes requests, manages database, broadcasts updates |
-| 4️⃣ | **MongoDB** | Stores all application data |
-| 5️⃣ | **Socket.IO** | Real-time bidirectional communication |
-
-</div>
+1. **Citizen App** → Sends requests via REST API and Socket.IO
+2. **Admin Dashboard** → Manages data via REST API
+3. **Backend** → Processes requests, manages database, broadcasts updates
+4. **MongoDB** → Stores all application data
+5. **Socket.IO** → Real-time bidirectional communication
 
 ---
 
@@ -220,20 +161,12 @@
 
 ## 📦 Installation & Setup
 
-### 📋 Prerequisites
+### Prerequisites
 
-<div align="center">
-
-| Requirement | Version | Purpose |
-|-------------|---------|---------|
-| **Node.js** | 18+ | Backend runtime environment |
-| **npm** | Latest | Package manager for Node.js |
-| **Flutter** | 3.0+ | Mobile app development framework |
-| **Dart SDK** | 3.0+ | Programming language for Flutter |
-| **MongoDB** | 6.0+ | Database (local or cloud instance) |
-| **Git** | Latest | Version control system |
-
-</div>
+- **Node.js** 18+ and npm
+- **Flutter** 3.0+ and Dart SDK
+- **MongoDB** 6.0+ (local or cloud instance)
+- **Git** for version control
 
 ### Step 1: Clone the Repository
 
@@ -323,85 +256,57 @@ Replace `YOUR_IP_ADDRESS` with your local network IP for mobile testing.
 
 ## 🚀 Running the Project
 
-### 🗄️ Step 1: Start MongoDB
+### Start MongoDB
 
-<div align="center">
-
-**Option A: Local MongoDB**
 ```bash
+# If using local MongoDB
 mongod
-```
 
-**Option B: Docker (Recommended)**
-```bash
+# Or using Docker
 docker start mongodb
 ```
 
-</div>
-
-### ⚙️ Step 2: Start Backend Server
-
-<div align="center">
+### Start Backend Server
 
 ```bash
 cd backend
 npm run dev
 ```
 
-🌐 **Backend URL**: [http://localhost:5000](http://localhost:5000)
+Backend will run at: **http://localhost:5000**
 
-</div>
-
-### 🖥️ Step 3: Start Admin Dashboard
-
-<div align="center">
+### Start Admin Dashboard
 
 ```bash
 cd admin-dashboard
 npm run dev
 ```
 
-🌐 **Admin Dashboard URL**: [http://localhost:5173](http://localhost:5173)
+Admin Dashboard will open at: **http://localhost:5173**
 
-**Default Login Credentials:**
-- Email: `admin@smartwayanad.com`
-- Password: (Set in `.env` file)
-
-</div>
-
-### 📱 Step 4: Run Flutter App
-
-<div align="center">
+### Run Flutter App
 
 ```bash
 cd flutter_app
 flutter run
 ```
 
-**Platform-Specific Commands:**
-
-| Platform | Command |
-|----------|---------|
-| 🪟 Windows | `flutter run -d windows` |
-| 🤖 Android | `flutter run -d android` |
-| 🍎 iOS (macOS only) | `flutter run -d ios` |
-| 🌐 Web | `flutter run -d chrome` |
-
-</div>
+**For specific platforms:**
+```bash
+flutter run -d windows    # Windows
+flutter run -d android    # Android
+flutter run -d ios        # iOS (macOS only)
+flutter run -d chrome     # Web
+```
 
 ---
 
 ## 📡 API Documentation
 
-### 🌐 Base URL
-
-<div align="center">
-
+### Base URL
 ```
 http://localhost:5000/api
 ```
-
-</div>
 
 ### Authentication Endpoints
 
@@ -522,58 +427,31 @@ smart-wayanad/
 
 ## 📸 Screenshots
 
-### 🖥️ Admin Dashboard
+### Mobile App
+- *Screenshots will be added here*
 
-<div align="center">
-
-#### Main Dashboard Interface
-
-![Admin Dashboard](backend/Screenshots/admin%20page.png)
-
-*Modern Admin Dashboard with Real-Time Monitoring, Statistics, and Quick Actions*
-
----
-
-#### Dashboard Analytics View
-
-![Admin Dashboard Screenshot](backend/Screenshots/Screenshot%202025-12-03%20112431.png)
-
-*Comprehensive Dashboard Overview with Statistics, Charts, and System Features*
-
-</div>
+### Admin Dashboard
 
 
 ## 🔐 Security
 
-### ✅ Implemented Security Features
+### Implemented Security Features
 
-<div align="center">
+- ✅ **JWT Authentication** - Secure token-based authentication
+- ✅ **Password Hashing** - bcryptjs for password encryption
+- ✅ **Helmet.js** - Security headers protection
+- ✅ **CORS** - Cross-origin resource sharing configuration
+- ✅ **Input Validation** - Request validation and sanitization
+- ✅ **Error Handling** - Secure error messages
 
-| Feature | Status | Description |
-|---------|--------|-------------|
-| 🔑 JWT Authentication | ✅ | Secure token-based authentication |
-| 🔒 Password Hashing | ✅ | bcryptjs for password encryption |
-| 🛡️ Helmet.js | ✅ | Security headers protection |
-| 🌐 CORS | ✅ | Cross-origin resource sharing configuration |
-| ✅ Input Validation | ✅ | Request validation and sanitization |
-| ⚠️ Error Handling | ✅ | Secure error messages |
+### Security Best Practices
 
-</div>
-
-### 🔒 Security Best Practices
-
-<div align="center">
-
-| # | Practice | Description |
-|---|----------|-------------|
-| 1️⃣ | **Change Default Credentials** | Update admin email and password in production |
-| 2️⃣ | **Use Strong JWT Secret** | Generate a strong random string for `JWT_SECRET` |
-| 3️⃣ | **Enable HTTPS** | Use SSL/TLS certificates in production |
-| 4️⃣ | **Environment Variables** | Never commit `.env` files to version control |
-| 5️⃣ | **Rate Limiting** | Consider adding rate limiting for API endpoints |
-| 6️⃣ | **Database Security** | Use MongoDB authentication and network restrictions |
-
-</div>
+1. **Change Default Credentials**: Update admin email and password in production
+2. **Use Strong JWT Secret**: Generate a strong random string for `JWT_SECRET`
+3. **Enable HTTPS**: Use SSL/TLS certificates in production
+4. **Environment Variables**: Never commit `.env` files to version control
+5. **Rate Limiting**: Consider adding rate limiting for API endpoints
+6. **Database Security**: Use MongoDB authentication and network restrictions
 
 ---
 
@@ -627,22 +505,16 @@ flutter build web
 
 ## 🌟 Future Enhancements
 
-<div align="center">
-
-| Feature | Priority | Description |
-|---------|----------|-------------|
-| 🚌 KSRTC Live Tracking | High | Real-time bus location tracking |
-| 📱 Push Notifications | High | Firebase Cloud Messaging integration |
-| 👥 Multi-role Admin Panel | Medium | Role-based access control |
-| 🤖 Advanced AI Chatbot | Medium | LLM integration (GPT/Claude) |
-| 🗺️ GIS Map Integration | Medium | Interactive maps with route visualization |
-| 📴 Offline Mode | Medium | Offline data caching for mobile app |
-| 🌍 Multi-language Support | Low | Malayalam and English |
-| 📊 Analytics Dashboard | Low | Usage statistics and insights |
-| 💳 Payment Integration | Low | For premium features |
-| 👥 Social Features | Low | Community forums and discussions |
-
-</div>
+- [ ] **KSRTC Live Tracking** - Real-time bus location tracking
+- [ ] **Push Notifications** - Firebase Cloud Messaging integration
+- [ ] **Multi-role Admin Panel** - Role-based access control
+- [ ] **Advanced AI Chatbot** - LLM integration (GPT/Claude)
+- [ ] **GIS Map Integration** - Interactive maps with route visualization
+- [ ] **Offline Mode** - Offline data caching for mobile app
+- [ ] **Multi-language Support** - Malayalam and English
+- [ ] **Analytics Dashboard** - Usage statistics and insights
+- [ ] **Payment Integration** - For premium features
+- [ ] **Social Features** - Community forums and discussions
 
 ---
 
@@ -695,16 +567,9 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 ## 📞 Contact & Support
 
-<div align="center">
-
-| Support Channel | Link/Contact |
-|----------------|--------------|
-| 🐛 **GitHub Issues** | [Report Issues](https://github.com/your-username/smart-wayanad/issues) |
-| 📧 **Email Support** | support@smartwayanad.com |
-| 📚 **Documentation** | [Full Documentation](https://docs.smartwayanad.com) |
-| 💬 **Discussions** | [GitHub Discussions](https://github.com/your-username/smart-wayanad/discussions) |
-
-</div>
+- **Issues**: [GitHub Issues](https://github.com/your-username/smart-wayanad/issues)
+- **Email**: support@smartwayanad.com
+- **Documentation**: [Full Documentation](https://docs.smartwayanad.com)
 
 ---
 
