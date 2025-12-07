@@ -29,6 +29,11 @@ class HomePage extends StatefulWidget {
 
   @override
   State<HomePage> createState() => _HomePageState();
+  
+  // Method to update user
+  static HomePageState? of(BuildContext context) {
+    return context.findAncestorStateOfType<HomePageState>();
+  }
 }
 
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
@@ -38,12 +43,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   late Animation<double> _pulseAnimation;
   late Animation<Offset> _slideAnimation;
   bool _isServerOnline = false;
-
+  late Map _currentUser;
+  
   @override
   void initState() {
     super.initState();
+    _currentUser = widget.user;
     _checkServerStatus();
-    
+
     _pulseController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
@@ -63,6 +70,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       end: Offset.zero,
     ).animate(CurvedAnimation(parent: _slideController, curve: Curves.easeOut));
   }
+  
+  void updateUser(Map newUser) {
+    setState(() {
+      _currentUser = newUser;
+    });
+  }
 
   Future<void> _checkServerStatus() async {
     final isOnline = await ApiService.pingServer();
@@ -77,23 +90,46 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   void _onItemTapped(int index) {
-    if (index == 1) {
+    if (index == 0) {
+      // Home - do nothing, already on home
+      setState(() => _selectedIndex = 0);
+    } else if (index == 1) {
+      // SOS - Navigate to Help Page
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (_) => const NotificationsPage()),
+        MaterialPageRoute(builder: (_) => HelpPage(user: widget.user)),
       );
     } else if (index == 2) {
+      // Profile - Get updated user data
       Navigator.push(
         context,
         MaterialPageRoute(builder: (_) => ProfilePage(user: widget.user)),
-      );
+      ).then((updatedUser) {
+        if (updatedUser != null && mounted) {
+          // Update the user data in home page
+          setState(() {
+            // Force rebuild with new user data
+          });
+          // Navigate to new HomePage with updated user
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (_) => HomePage(user: updatedUser is Map ? updatedUser : widget.user),
+            ),
+          );
+        }
+      });
     }
-    setState(() => _selectedIndex = 0);
   }
 
   String _getProfilePhotoUrl() {
-    final profilePhoto = widget.user['profilePhoto'];
+    final profilePhoto = _currentUser['profilePhoto'];
     if (profilePhoto != null && profilePhoto.toString().isNotEmpty) {
+      // Check if it's already a full URL (base64 or http)
+      if (profilePhoto.toString().startsWith('data:image') || 
+          profilePhoto.toString().startsWith('http')) {
+        return profilePhoto.toString();
+      }
       final baseUrl = (Platform.isWindows || Platform.isMacOS) 
           ? "http://localhost:5000" 
           : "http://192.168.1.2:5000";
@@ -104,7 +140,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final user = widget.user;
+    final user = _currentUser;
     final size = MediaQuery.of(context).size;
     // Always use light theme
     const isDark = false;
@@ -112,13 +148,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
     // Premium feature cards - smaller and more compact
     final List<Map<String, dynamic>> features = [
-      {
-        "title": "SOS",
-        "icon": Icons.sos_rounded,
-        "gradient": [const Color(0xFFE53935), const Color(0xFFC62828)],
-        "page": HelpPage(user: user),
-        "badge": "24/7",
-      },
       {
         "title": "Bus Routes",
         "icon": Icons.directions_bus_rounded,
@@ -232,48 +261,71 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        // Status indicator
+                        // Status indicator and top actions
                         Row(
                           children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 5,
-                              ),
-                              decoration: BoxDecoration(
-                                color: _isServerOnline
-                                    ? Colors.green.withValues(alpha: 0.2)
-                                    : Colors.red.withValues(alpha: 0.2),
-                                borderRadius: BorderRadius.circular(16),
-                                border: Border.all(
-                                  color: _isServerOnline ? Colors.green : Colors.red,
-                                  width: 1.5,
+                            Flexible(
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 5,
                                 ),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Container(
-                                    width: 6,
-                                    height: 6,
-                                    decoration: BoxDecoration(
-                                      color: _isServerOnline ? Colors.green : Colors.red,
-                                      shape: BoxShape.circle,
-                                    ),
+                                decoration: BoxDecoration(
+                                  color: _isServerOnline
+                                      ? Colors.green.withValues(alpha: 0.2)
+                                      : Colors.red.withValues(alpha: 0.2),
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(
+                                    color: _isServerOnline ? Colors.green : Colors.red,
+                                    width: 1.5,
                                   ),
-                                  const SizedBox(width: 6),
-                                  Text(
-                                    _isServerOnline ? 'Online' : 'Offline',
-                                    style: GoogleFonts.poppins(
-                                      color: Colors.white,
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w600,
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Container(
+                                      width: 6,
+                                      height: 6,
+                                      decoration: BoxDecoration(
+                                        color: _isServerOnline ? Colors.green : Colors.red,
+                                        shape: BoxShape.circle,
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                    const SizedBox(width: 6),
+                                    Flexible(
+                                      child: Text(
+                                        _isServerOnline ? 'Online' : 'Offline',
+                                        style: GoogleFonts.poppins(
+                                          color: Colors.white,
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                             const Spacer(),
+                            // Notifications Icon
+                            Container(
+                              margin: const EdgeInsets.only(right: 8),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.2),
+                                shape: BoxShape.circle,
+                              ),
+                              child: IconButton(
+                                icon: const Icon(Icons.notifications_rounded, color: Colors.white, size: 22),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (_) => const NotificationsPage()),
+                                  );
+                                },
+                              ),
+                            ),
+                            // Logout Icon
                             IconButton(
                               icon: const Icon(Icons.logout_rounded, color: Colors.white, size: 22),
                               onPressed: () {
@@ -391,42 +443,56 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             ),
           ),
 
-          // Quick Stats Section - Compact
+          // Quick Stats Section - Enhanced
           SliverToBoxAdapter(
             child: SlideTransition(
               position: _slideAnimation,
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12),
-                child: Row(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(
-                      child: _StatCard(
-                        icon: Icons.directions_bus_rounded,
-                        value: "50+",
-                        label: "Routes",
-                        color: const Color(0xFF667EEA),
-                        isDark: false,
+                    Text(
+                      "Quick Stats",
+                      style: GoogleFonts.poppins(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.grey.shade800,
                       ),
                     ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: _StatCard(
-                        icon: Icons.local_hospital_rounded,
-                        value: "20+",
-                        label: "Hospitals",
-                        color: const Color(0xFFF5576C),
-                        isDark: false,
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: _StatCard(
-                        icon: Icons.wb_sunny_rounded,
-                        value: "24°C",
-                        label: "Weather",
-                        color: const Color(0xFF4FACFE),
-                        isDark: false,
-                      ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _StatCard(
+                            icon: Icons.directions_bus_rounded,
+                            value: "50+",
+                            label: "Routes",
+                            color: const Color(0xFF667EEA),
+                            isDark: false,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _StatCard(
+                            icon: Icons.local_hospital_rounded,
+                            value: "20+",
+                            label: "Hospitals",
+                            color: const Color(0xFFF5576C),
+                            isDark: false,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _StatCard(
+                            icon: Icons.wb_sunny_rounded,
+                            value: "24°C",
+                            label: "Weather",
+                            color: const Color(0xFF4FACFE),
+                            isDark: false,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -437,27 +503,45 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           // Services Section Header
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16),
               child: Row(
                 children: [
-                  Text(
-                    "Services",
-                    style: GoogleFonts.poppins(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w800,
-                      color: Colors.grey.shade900,
-                    ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Services",
+                        style: GoogleFonts.poppins(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.grey.shade900,
+                          letterSpacing: -0.5,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        "Explore all features",
+                        style: GoogleFonts.poppins(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                    ],
                   ),
                   const Spacer(),
-                  TextButton.icon(
+                  IconButton(
                     onPressed: _checkServerStatus,
-                    icon: Icon(Icons.refresh_rounded, size: 16, color: Colors.grey.shade700),
-                    label: Text(
-                      "Refresh",
-                      style: GoogleFonts.poppins(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.grey.shade700,
+                    icon: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF667EEA).withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Icon(
+                        Icons.refresh_rounded,
+                        size: 20,
+                        color: const Color(0xFF667EEA),
                       ),
                     ),
                   ),
@@ -472,9 +556,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             sliver: SliverGrid(
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 3,
-                childAspectRatio: 0.95,
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
+                childAspectRatio: 0.98,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
               ),
               delegate: SliverChildBuilderDelegate(
                 (context, index) {
@@ -486,12 +570,23 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     badge: feature["badge"],
                     isDark: false,
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => feature["page"] as Widget,
-                        ),
-                      );
+                      final page = feature["page"] as Widget;
+                      // If page requires user, pass current user
+                      if (page is HelpPage) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => HelpPage(user: _currentUser),
+                          ),
+                        );
+                      } else {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => page,
+                          ),
+                        );
+                      }
                     },
                   );
                 },
@@ -503,19 +598,35 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           // District Guidelines
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    "District Guidelines",
-                    style: GoogleFonts.poppins(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w800,
-                      color: Colors.grey.shade900,
-                    ),
+                  Row(
+                    children: [
+                      Container(
+                        width: 4,
+                        height: 24,
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFF43E97B), Color(0xFF38F9D7)],
+                          ),
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        "District Guidelines",
+                        style: GoogleFonts.poppins(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.grey.shade900,
+                          letterSpacing: -0.5,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 16),
                   const _GuidelinesCard(isDark: false),
                   const SizedBox(height: 100),
                 ],
@@ -525,15 +636,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         ],
       ),
 
-      // Premium Bottom Navigation
+      // Premium Bottom Navigation with SOS
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              const Color(0xFF667EEA),
-              const Color(0xFF764BA2),
-            ],
-          ),
+          color: Colors.white,
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.1),
@@ -542,57 +648,76 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             ),
           ],
         ),
-        child: BottomNavigationBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          selectedItemColor: Colors.white,
-          unselectedItemColor: Colors.white.withValues(alpha: 0.6),
-          currentIndex: _selectedIndex,
-          onTap: _onItemTapped,
-          type: BottomNavigationBarType.fixed,
-          selectedFontSize: 11,
-          unselectedFontSize: 11,
-          items: [
-            BottomNavigationBarItem(
-              icon: Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: _selectedIndex == 0
-                      ? Colors.white.withValues(alpha: 0.2)
-                      : Colors.transparent,
-                  borderRadius: BorderRadius.circular(10),
+        child: SafeArea(
+          child: Container(
+            height: 70,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                // Home
+                Expanded(
+                  child: _NavItem(
+                    icon: Icons.home_rounded,
+                    label: "Home",
+                    isSelected: _selectedIndex == 0,
+                    onTap: () {
+                      setState(() => _selectedIndex = 0);
+                    },
+                  ),
                 ),
-                child: const Icon(Icons.home_rounded, size: 22),
-              ),
-              label: "Home",
-            ),
-            BottomNavigationBarItem(
-              icon: Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: _selectedIndex == 1
-                      ? Colors.white.withValues(alpha: 0.2)
-                      : Colors.transparent,
-                  borderRadius: BorderRadius.circular(10),
+                // SOS - Prominent center button
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => HelpPage(user: _currentUser)),
+                    );
+                  },
+                  child: Container(
+                    width: 56,
+                    height: 56,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFFE53935), Color(0xFFC62828)],
+                      ),
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFFE53935).withValues(alpha: 0.4),
+                          blurRadius: 15,
+                          offset: const Offset(0, 5),
+                        ),
+                      ],
+                    ),
+                    child: const Icon(
+                      Icons.sos_rounded,
+                      color: Colors.white,
+                      size: 26,
+                    ),
+                  ),
                 ),
-                child: const Icon(Icons.notifications_rounded, size: 22),
-              ),
-              label: "Alerts",
-            ),
-            BottomNavigationBarItem(
-              icon: Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: _selectedIndex == 2
-                      ? Colors.white.withValues(alpha: 0.2)
-                      : Colors.transparent,
-                  borderRadius: BorderRadius.circular(10),
+                // Profile
+                Expanded(
+                  child: _NavItem(
+                    icon: Icons.person_rounded,
+                    label: "Profile",
+                    isSelected: _selectedIndex == 2,
+                    onTap: () async {
+                      setState(() => _selectedIndex = 2);
+                      final updatedUser = await Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => ProfilePage(user: _currentUser)),
+                      );
+                      if (updatedUser != null && mounted) {
+                        updateUser(updatedUser is Map ? updatedUser : _currentUser);
+                      }
+                    },
+                  ),
                 ),
-                child: const Icon(Icons.person_rounded, size: 22),
-              ),
-              label: "Profile",
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -694,57 +819,67 @@ class _PremiumFeatureCardState extends State<_PremiumFeatureCard>
               ),
               // Content
               Padding(
-                padding: const EdgeInsets.all(14.0),
+                padding: const EdgeInsets.all(12.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Icon(
-                            widget.icon,
-                            color: Colors.white,
-                            size: 22,
+                        Flexible(
+                          child: Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.2),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Icon(
+                              widget.icon,
+                              color: Colors.white,
+                              size: 20,
+                            ),
                           ),
                         ),
                         if (widget.badge != null)
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 3,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.3),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              widget.badge!,
-                              style: GoogleFonts.poppins(
-                                color: Colors.white,
-                                fontSize: 8,
-                                fontWeight: FontWeight.w700,
+                          Flexible(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 5,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.3),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                widget.badge!,
+                                style: GoogleFonts.poppins(
+                                  color: Colors.white,
+                                  fontSize: 7,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
                               ),
                             ),
                           ),
                       ],
                     ),
-                    Text(
-                      widget.title,
-                      style: GoogleFonts.poppins(
-                        color: Colors.white,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: -0.3,
+                    const SizedBox(height: 4),
+                    Flexible(
+                      child: Text(
+                        widget.title,
+                        style: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: -0.3,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
@@ -757,7 +892,7 @@ class _PremiumFeatureCardState extends State<_PremiumFeatureCard>
   }
 }
 
-// Stat Card Widget - Compact
+// Stat Card Widget - Enhanced
 class _StatCard extends StatelessWidget {
   final IconData icon;
   final String value;
@@ -776,15 +911,15 @@ class _StatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 3),
+            color: Colors.black.withValues(alpha: 0.06),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -792,32 +927,97 @@ class _StatCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(10),
+              gradient: LinearGradient(
+                colors: [
+                  color.withValues(alpha: 0.15),
+                  color.withValues(alpha: 0.08),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(icon, color: color, size: 20),
+            child: Icon(icon, color: color, size: 22),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           Text(
             value,
             style: GoogleFonts.poppins(
-              fontSize: 18,
+              fontSize: 20,
               fontWeight: FontWeight.w800,
               color: Colors.grey.shade900,
+              letterSpacing: -0.5,
             ),
           ),
-          const SizedBox(height: 2),
+          const SizedBox(height: 4),
           Text(
             label,
             style: GoogleFonts.poppins(
-              fontSize: 11,
+              fontSize: 12,
               color: Colors.grey.shade600,
               fontWeight: FontWeight.w500,
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+// Navigation Item Widget
+class _NavItem extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _NavItem({
+    required this.icon,
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? const Color(0xFF667EEA).withValues(alpha: 0.1)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              color: isSelected
+                  ? const Color(0xFF667EEA)
+                  : const Color(0xFF9CA3AF),
+              size: 24,
+            ),
+            const SizedBox(height: 4),
+            Flexible(
+              child: Text(
+                label,
+                style: GoogleFonts.poppins(
+                  fontSize: 11,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                  color: isSelected
+                      ? const Color(0xFF667EEA)
+                      : const Color(0xFF9CA3AF),
+                ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

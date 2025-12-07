@@ -19,7 +19,6 @@ enum AuthMode { login, signup }
 class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin {
   late AnimationController _flipController;
   late Animation<double> _flipAnimation;
-  AuthMode _currentMode = AuthMode.login;
   bool _isFlipped = false;
 
   // Login Controllers
@@ -42,7 +41,6 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
   @override
   void initState() {
     super.initState();
-    _currentMode = widget.initialMode;
     _isFlipped = widget.initialMode == AuthMode.signup;
     
     _flipController = AnimationController(
@@ -53,6 +51,11 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
     _flipAnimation = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(parent: _flipController, curve: Curves.easeInOut),
     );
+
+    // Set initial animation state
+    if (_isFlipped) {
+      _flipController.value = 1.0;
+    }
   }
 
   @override
@@ -75,7 +78,6 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
     }
     setState(() {
       _isFlipped = !_isFlipped;
-      _currentMode = _isFlipped ? AuthMode.signup : AuthMode.login;
     });
   }
 
@@ -192,48 +194,34 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              AppTheme.primaryColor.withOpacity(0.1),
-              AppTheme.secondaryColor.withOpacity(0.05),
-              AppTheme.backgroundColor,
-            ],
-          ),
-        ),
-        child: SafeArea(
-          child: AnimatedPage(
-            child: Center(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(AppTheme.paddingLarge),
-                child: Container(
-                  constraints: const BoxConstraints(maxWidth: 420),
-                  child: AnimatedBuilder(
-                    animation: _flipAnimation,
-                    builder: (context, child) {
-                      final angle = _flipAnimation.value * math.pi;
-                      final isFront = _flipAnimation.value < 0.5;
-                      
-                      // Show front card (login) when angle is less than 90 degrees
-                      // Show back card (signup) when angle is 90+ degrees
-                      return Transform(
-                        alignment: Alignment.center,
-                        transform: Matrix4.identity()
-                          ..setEntry(3, 2, 0.001)
-                          ..rotateY(angle),
-                        child: isFront
-                            ? _buildLoginCard()
-                            : Transform(
-                                alignment: Alignment.center,
-                                transform: Matrix4.identity()..rotateY(math.pi),
-                                child: _buildSignupCard(),
-                              ),
-                      );
-                    },
-                  ),
+      backgroundColor: AppTheme.backgroundColor,
+      body: SafeArea(
+        child: AnimatedPage(
+          child: Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(AppTheme.paddingLarge),
+              child: Container(
+                constraints: const BoxConstraints(maxWidth: 420),
+                child: AnimatedBuilder(
+                  animation: _flipAnimation,
+                  builder: (context, child) {
+                    final angle = _flipAnimation.value * math.pi;
+                    final isFront = _flipAnimation.value < 0.5;
+                    
+                    return Transform(
+                      alignment: Alignment.center,
+                      transform: Matrix4.identity()
+                        ..setEntry(3, 2, 0.001)
+                        ..rotateY(angle),
+                      child: isFront
+                          ? _buildLoginCard()
+                          : Transform(
+                              alignment: Alignment.center,
+                              transform: Matrix4.identity()..rotateY(math.pi),
+                              child: _buildSignupCard(),
+                            ),
+                    );
+                  },
                 ),
               ),
             ),
@@ -293,7 +281,7 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
                   Text(
                     'Smart Wayanad',
                     style: AppTheme.headingLarge.copyWith(
-                      color: AppTheme.textPrimary,
+                      color: const Color(0xFF1A1F3A),
                       fontWeight: FontWeight.w800,
                     ),
                   ),
@@ -301,7 +289,7 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
                   Text(
                     'Welcome Back 👋',
                     style: AppTheme.bodyMedium.copyWith(
-                      color: AppTheme.textSecondary,
+                      color: const Color(0xFF6B7280),
                       fontSize: 16,
                     ),
                   ),
@@ -313,13 +301,29 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
               TextFormField(
                 controller: _loginEmail,
                 keyboardType: TextInputType.emailAddress,
-                style: AppTheme.bodyLarge.copyWith(color: AppTheme.textPrimary),
-                decoration: AppTheme.inputDecoration(
-                  context: context,
-                  label: "Email",
-                  prefixIcon: Icons.email_outlined,
-                ).copyWith(
-                  prefixIconColor: AppTheme.primaryColor,
+                style: const TextStyle(
+                  color: Color(0xFF1A1F3A),
+                  fontSize: 16,
+                ),
+                decoration: InputDecoration(
+                  labelText: "Email",
+                  labelStyle: const TextStyle(color: Color(0xFF6B7280)),
+                  prefixIcon: const Icon(Icons.email_outlined, color: AppTheme.primaryColor),
+                  filled: true,
+                  fillColor: AppTheme.backgroundColor,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppTheme.primaryColor, width: 2),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -337,20 +341,36 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
               TextFormField(
                 controller: _loginPassword,
                 obscureText: !_showLoginPassword,
-                style: AppTheme.bodyLarge.copyWith(color: AppTheme.textPrimary),
-                decoration: AppTheme.inputDecoration(
-                  context: context,
-                  label: "Password",
-                  prefixIcon: Icons.lock_outline,
-                ).copyWith(
-                  prefixIconColor: AppTheme.primaryColor,
+                style: const TextStyle(
+                  color: Color(0xFF1A1F3A),
+                  fontSize: 16,
+                ),
+                decoration: InputDecoration(
+                  labelText: "Password",
+                  labelStyle: const TextStyle(color: Color(0xFF6B7280)),
+                  prefixIcon: const Icon(Icons.lock_outline, color: AppTheme.primaryColor),
                   suffixIcon: IconButton(
                     icon: Icon(
                       _showLoginPassword ? Icons.visibility_off : Icons.visibility,
-                      color: AppTheme.textSecondary,
+                      color: const Color(0xFF6B7280),
                     ),
                     onPressed: () => setState(() => _showLoginPassword = !_showLoginPassword),
                   ),
+                  filled: true,
+                  fillColor: AppTheme.backgroundColor,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppTheme.primaryColor, width: 2),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -366,17 +386,17 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
 
               // Login Button
               _loginLoading
-                  ? Center(
+                  ? const Center(
                       child: CircularProgressIndicator(
                         color: AppTheme.primaryColor,
                       ),
                     )
                   : Container(
                       decoration: BoxDecoration(
-                        gradient: LinearGradient(
+                        gradient: const LinearGradient(
                           colors: [AppTheme.primaryColor, AppTheme.secondaryColor],
                         ),
-                        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+                        borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
                             color: AppTheme.primaryColor.withOpacity(0.4),
@@ -392,12 +412,12 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
                           shadowColor: Colors.transparent,
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+                            borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        child: Text(
+                        child: const Text(
                           "Login",
-                          style: AppTheme.bodyLarge.copyWith(
+                          style: TextStyle(
                             fontWeight: FontWeight.w700,
                             color: Colors.white,
                             fontSize: 16,
@@ -412,19 +432,21 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
+                  const Text(
                     "Don't have an account? ",
-                    style: AppTheme.bodyMedium.copyWith(
-                      color: AppTheme.textSecondary,
+                    style: TextStyle(
+                      color: Color(0xFF6B7280),
+                      fontSize: 14,
                     ),
                   ),
                   GestureDetector(
                     onTap: _flipCard,
-                    child: Text(
+                    child: const Text(
                       "Sign Up",
-                      style: AppTheme.bodyMedium.copyWith(
+                      style: TextStyle(
                         color: AppTheme.primaryColor,
                         fontWeight: FontWeight.w700,
+                        fontSize: 14,
                         decoration: TextDecoration.underline,
                       ),
                     ),
@@ -466,7 +488,7 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
                     width: 80,
                     height: 80,
                     decoration: BoxDecoration(
-                      gradient: LinearGradient(
+                      gradient: const LinearGradient(
                         colors: [AppTheme.secondaryColor, AppTheme.primaryColor],
                       ),
                       shape: BoxShape.circle,
@@ -488,7 +510,7 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
                   Text(
                     'Create Account',
                     style: AppTheme.headingLarge.copyWith(
-                      color: AppTheme.textPrimary,
+                      color: const Color(0xFF1A1F3A),
                       fontWeight: FontWeight.w800,
                     ),
                   ),
@@ -496,7 +518,7 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
                   Text(
                     'Join Smart Wayanad 🚀',
                     style: AppTheme.bodyMedium.copyWith(
-                      color: AppTheme.textSecondary,
+                      color: const Color(0xFF6B7280),
                       fontSize: 16,
                     ),
                   ),
@@ -507,13 +529,29 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
               // Name Field
               TextFormField(
                 controller: _signupName,
-                style: AppTheme.bodyLarge.copyWith(color: AppTheme.textPrimary),
-                decoration: AppTheme.inputDecoration(
-                  context: context,
-                  label: "Full Name",
-                  prefixIcon: Icons.person_outline,
-                ).copyWith(
-                  prefixIconColor: AppTheme.secondaryColor,
+                style: const TextStyle(
+                  color: Color(0xFF1A1F3A),
+                  fontSize: 16,
+                ),
+                decoration: InputDecoration(
+                  labelText: "Full Name",
+                  labelStyle: const TextStyle(color: Color(0xFF6B7280)),
+                  prefixIcon: const Icon(Icons.person_outline, color: AppTheme.secondaryColor),
+                  filled: true,
+                  fillColor: AppTheme.backgroundColor,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppTheme.secondaryColor, width: 2),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -528,13 +566,29 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
               TextFormField(
                 controller: _signupEmail,
                 keyboardType: TextInputType.emailAddress,
-                style: AppTheme.bodyLarge.copyWith(color: AppTheme.textPrimary),
-                decoration: AppTheme.inputDecoration(
-                  context: context,
-                  label: "Email",
-                  prefixIcon: Icons.email_outlined,
-                ).copyWith(
-                  prefixIconColor: AppTheme.secondaryColor,
+                style: const TextStyle(
+                  color: Color(0xFF1A1F3A),
+                  fontSize: 16,
+                ),
+                decoration: InputDecoration(
+                  labelText: "Email",
+                  labelStyle: const TextStyle(color: Color(0xFF6B7280)),
+                  prefixIcon: const Icon(Icons.email_outlined, color: AppTheme.secondaryColor),
+                  filled: true,
+                  fillColor: AppTheme.backgroundColor,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppTheme.secondaryColor, width: 2),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -552,20 +606,36 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
               TextFormField(
                 controller: _signupPassword,
                 obscureText: !_showSignupPassword,
-                style: AppTheme.bodyLarge.copyWith(color: AppTheme.textPrimary),
-                decoration: AppTheme.inputDecoration(
-                  context: context,
-                  label: "Password",
-                  prefixIcon: Icons.lock_outline,
-                ).copyWith(
-                  prefixIconColor: AppTheme.secondaryColor,
+                style: const TextStyle(
+                  color: Color(0xFF1A1F3A),
+                  fontSize: 16,
+                ),
+                decoration: InputDecoration(
+                  labelText: "Password",
+                  labelStyle: const TextStyle(color: Color(0xFF6B7280)),
+                  prefixIcon: const Icon(Icons.lock_outline, color: AppTheme.secondaryColor),
                   suffixIcon: IconButton(
                     icon: Icon(
                       _showSignupPassword ? Icons.visibility_off : Icons.visibility,
-                      color: AppTheme.textSecondary,
+                      color: const Color(0xFF6B7280),
                     ),
                     onPressed: () => setState(() => _showSignupPassword = !_showSignupPassword),
                   ),
+                  filled: true,
+                  fillColor: AppTheme.backgroundColor,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppTheme.secondaryColor, width: 2),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -583,20 +653,36 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
               TextFormField(
                 controller: _signupConfirmPassword,
                 obscureText: !_showSignupConfirmPassword,
-                style: AppTheme.bodyLarge.copyWith(color: AppTheme.textPrimary),
-                decoration: AppTheme.inputDecoration(
-                  context: context,
-                  label: "Confirm Password",
-                  prefixIcon: Icons.lock_outline,
-                ).copyWith(
-                  prefixIconColor: AppTheme.secondaryColor,
+                style: const TextStyle(
+                  color: Color(0xFF1A1F3A),
+                  fontSize: 16,
+                ),
+                decoration: InputDecoration(
+                  labelText: "Confirm Password",
+                  labelStyle: const TextStyle(color: Color(0xFF6B7280)),
+                  prefixIcon: const Icon(Icons.lock_outline, color: AppTheme.secondaryColor),
                   suffixIcon: IconButton(
                     icon: Icon(
                       _showSignupConfirmPassword ? Icons.visibility_off : Icons.visibility,
-                      color: AppTheme.textSecondary,
+                      color: const Color(0xFF6B7280),
                     ),
                     onPressed: () => setState(() => _showSignupConfirmPassword = !_showSignupConfirmPassword),
                   ),
+                  filled: true,
+                  fillColor: AppTheme.backgroundColor,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppTheme.secondaryColor, width: 2),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -612,17 +698,17 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
 
               // Signup Button
               _signupLoading
-                  ? Center(
+                  ? const Center(
                       child: CircularProgressIndicator(
                         color: AppTheme.secondaryColor,
                       ),
                     )
                   : Container(
                       decoration: BoxDecoration(
-                        gradient: LinearGradient(
+                        gradient: const LinearGradient(
                           colors: [AppTheme.secondaryColor, AppTheme.primaryColor],
                         ),
-                        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+                        borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
                             color: AppTheme.secondaryColor.withOpacity(0.4),
@@ -638,12 +724,12 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
                           shadowColor: Colors.transparent,
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+                            borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        child: Text(
+                        child: const Text(
                           "Create Account",
-                          style: AppTheme.bodyLarge.copyWith(
+                          style: TextStyle(
                             fontWeight: FontWeight.w700,
                             color: Colors.white,
                             fontSize: 16,
@@ -658,19 +744,21 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
+                  const Text(
                     "Already have an account? ",
-                    style: AppTheme.bodyMedium.copyWith(
-                      color: AppTheme.textSecondary,
+                    style: TextStyle(
+                      color: Color(0xFF6B7280),
+                      fontSize: 14,
                     ),
                   ),
                   GestureDetector(
                     onTap: _flipCard,
-                    child: Text(
+                    child: const Text(
                       "Login",
-                      style: AppTheme.bodyMedium.copyWith(
+                      style: TextStyle(
                         color: AppTheme.secondaryColor,
                         fontWeight: FontWeight.w700,
+                        fontSize: 14,
                         decoration: TextDecoration.underline,
                       ),
                     ),
@@ -684,4 +772,3 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
     );
   }
 }
-

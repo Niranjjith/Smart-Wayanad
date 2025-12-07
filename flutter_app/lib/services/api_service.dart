@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// 🌿 Smart Wayanad API Service
 /// Handles all backend communication between Flutter app ↔ Node.js backend.
@@ -76,15 +77,109 @@ class ApiService {
 
   static Future<Map<String, dynamic>?> loginUser(
       String email, String password) async {
-    return await _post("auth/login", {
+    final result = await _post("auth/login", {
       "email": email,
       "password": password,
     });
+    // Save token if present
+    if (result != null && result['token'] != null) {
+      await saveToken(result['token']);
+    }
+    return result;
   }
 
   static Future<List<dynamic>> getUsers() async {
     final data = await _get("users");
     return data is List ? data : [];
+  }
+
+  // Get user profile (requires token)
+  static Future<Map<String, dynamic>?> getProfile() async {
+    try {
+      final token = await _getToken();
+      final res = await http.get(
+        Uri.parse("$_baseUrl/auth/profile"),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+      );
+
+      if (res.statusCode == 200) {
+        return jsonDecode(res.body);
+      }
+      return null;
+    } catch (e) {
+      print("⚠️ Get profile error: $e");
+      return null;
+    }
+  }
+
+  // Update user profile
+  static Future<Map<String, dynamic>?> updateProfile({
+    String? name,
+    String? email,
+    String? password,
+    String? phone,
+    String? profilePhoto,
+  }) async {
+    try {
+      final token = await _getToken();
+      final body = <String, dynamic>{};
+      if (name != null) body['name'] = name;
+      if (email != null) body['email'] = email;
+      if (password != null) body['password'] = password;
+      if (phone != null) body['phone'] = phone;
+      if (profilePhoto != null) body['profilePhoto'] = profilePhoto;
+
+      final res = await http.put(
+        Uri.parse("$_baseUrl/auth/profile"),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+        body: jsonEncode(body),
+      );
+
+      if (res.statusCode == 200) {
+        final data = jsonDecode(res.body);
+        return data['user'] ?? data;
+      }
+      return null;
+    } catch (e) {
+      print("⚠️ Update profile error: $e");
+      return null;
+    }
+  }
+
+  // Helper to get token from storage
+  static Future<String?> _getToken() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      return prefs.getString('token');
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // Helper to save token
+  static Future<void> saveToken(String token) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('token', token);
+    } catch (e) {
+      print("Error saving token: $e");
+    }
+  }
+
+  // Helper to clear token
+  static Future<void> clearToken() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('token');
+    } catch (e) {
+      print("Error clearing token: $e");
+    }
   }
 
   // ---------------------------------------------------------------------------

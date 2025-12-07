@@ -29,6 +29,19 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   bool _loading = false;
+  late Map _currentUser;
+  
+  @override
+  void initState() {
+    super.initState();
+    _currentUser = widget.user;
+  }
+  
+  void _refreshUser(Map newUser) {
+    setState(() {
+      _currentUser = newUser;
+    });
+  }
 
   Future<void> _logout() async {
     Navigator.pushAndRemoveUntil(
@@ -56,9 +69,15 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+
   String _getProfilePhotoUrl() {
-    final profilePhoto = widget.user['profilePhoto'];
+    final profilePhoto = _currentUser['profilePhoto'];
     if (profilePhoto != null && profilePhoto.toString().isNotEmpty) {
+      // Check if it's already a full URL (base64 or http)
+      if (profilePhoto.toString().startsWith('data:image') || 
+          profilePhoto.toString().startsWith('http')) {
+        return profilePhoto.toString();
+      }
       final baseUrl = (Platform.isWindows || Platform.isMacOS) 
           ? "http://localhost:5000" 
           : "http://192.168.1.2:5000";
@@ -69,8 +88,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    final name = widget.user['name'] ?? 'User';
-    final email = widget.user['email'] ?? '—';
+    final name = _currentUser['name'] ?? 'User';
+    final email = _currentUser['email'] ?? '—';
     const isDark = false;
     final profilePhotoUrl = _getProfilePhotoUrl();
 
@@ -223,7 +242,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => HelpPage(user: widget.user),
+                            builder: (_) => HelpPage(user: _currentUser),
                           ),
                         ),
                       ),
@@ -352,18 +371,14 @@ class _ProfilePageState extends State<ProfilePage> {
                       final result = await Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => EditProfilePage(user: widget.user),
+                          builder: (_) => EditProfilePage(user: _currentUser),
                         ),
                       );
                       if (result != null && mounted) {
-                        // Refresh profile if needed
-                        Navigator.pop(context);
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => ProfilePage(user: {...widget.user, ...result}),
-                          ),
-                        );
+                        // Update local state
+                        _refreshUser(result);
+                        // Return updated user to previous page
+                        Navigator.pop(context, result);
                       }
                     },
                   ),
