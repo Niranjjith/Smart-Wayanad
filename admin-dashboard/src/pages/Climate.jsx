@@ -118,8 +118,10 @@ export default function Climate() {
       "☁️": <Cloud sx={{ fontSize: 40, color: "#78909C" }} />,
       "🌧️": <WaterDrop sx={{ fontSize: 40, color: "#42A5F5" }} />,
       "🌩️": <Warning sx={{ fontSize: 40, color: "#EF5350" }} />,
+      "🌫️": <Cloud sx={{ fontSize: 40, color: "#B0BEC5" }} />,
+      "🌨️": <Cloud sx={{ fontSize: 40, color: "#90CAF9" }} />,
     };
-    return iconMap[icon] || <WbSunny sx={{ fontSize: 40 }} />;
+    return iconMap[icon] || <Cloud sx={{ fontSize: 40, color: "#78909C" }} />;
   };
 
   const getSeverityColor = (severity) => {
@@ -199,7 +201,7 @@ export default function Climate() {
                   🌤️ Climate Information
                 </Typography>
                 <Typography variant="body2" sx={{ opacity: 0.9 }}>
-                  Real-time weather data and forecasts for Wayanad region
+                  Live weather from Open-Meteo for Wayanad region
                 </Typography>
               </Box>
               <Stack direction="row" spacing={2} alignItems="center">
@@ -277,6 +279,13 @@ export default function Climate() {
               </motion.div>
             ))}
           </Box>
+        )}
+
+        {/* No data / API error */}
+        {!loading && !refreshing && !currentWeather && (
+          <Alert severity="warning" sx={{ mb: 3, borderRadius: 2 }}>
+            Could not load weather for this location. Check your connection and try again, or choose another location.
+          </Alert>
         )}
 
         {/* Current Weather Card */}

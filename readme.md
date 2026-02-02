@@ -41,19 +41,21 @@
 
 ## 🎯 Overview
 
-**Smart Wayanad** is a comprehensive digital platform designed for citizens of Wayanad District, Kerala. It provides emergency assistance, transport information, district resources, climate updates, and AI-powered chatbot support through a unified mobile and web interface.
+**Smart Wayanad** is a civic-oriented prototype platform designed for citizens of Wayanad District, Kerala. It provides emergency assistance, transport information, district resources, climate-triggered advisories, and a Guided Civic Assistant through a unified mobile and web interface.
+
+Smart Wayanad is a civic-tech prototype that demonstrates how emergency reporting, offline-tolerant civic data access, and role-governed administrative response workflows can be designed and integrated into a single platform for a geographically sensitive district.
 
 ### Key Highlights
 
-- 🚨 **Emergency SOS** - Real-time emergency alerts with GPS location tracking
+- 🚨 **Emergency SOS** - Persist-first emergency pipeline with GPS location tracking and auditable status transitions
 - 🚌 **Bus Routes** - Complete bus route management with sub-routes
 - 🏥 **Healthcare** - Hospitals, clinics, and medical facilities directory
-- 🌤️ **Climate Info** - Real-time weather and climate data with forecasts
-- 🤖 **AI Chatbot** - Intelligent assistance with regional language support
+- 🌤️ **Disaster Readiness** - Weather-triggered informational advisories based on predefined rules for Wayanad
+- 🧭 **Guided Civic Assistant** - Rule-driven, government-approved responses with full logging (no AI hallucinations)
 - 📍 **Location Services** - Taxi stands, helplines, and essential services
-- 🎨 **Premium UI** - Modern, responsive design with smooth animations
-- 📊 **Admin Dashboard** - Comprehensive management interface
-- 🔄 **Real-Time Updates** - Socket.IO for live data synchronization
+- 📶 **Offline-Cached Core Data** - Bus routes, hospitals, and helplines cached for low-connectivity terrain
+- 📊 **Operations Dashboard** - Geographic grouping of incidents with resolved vs pending status
+- 🔄 **Event-Driven Updates** - Event-driven updates for connected clients using Socket.IO
 
 ---
 
@@ -62,49 +64,51 @@
 ### 📱 Citizen Mobile App (Flutter)
 
 #### Core Features
-- ✅ **Emergency SOS** - Send help alerts with live GPS location sharing
+- ✅ **Emergency SOS** - Persist-first SOS alerts with GPS location and status lifecycle (PENDING → RECEIVED → IN_PROGRESS → CLOSED)
 - ✅ **Bus Routes** - Search and view bus routes with expandable sub-routes
 - ✅ **Healthcare Directory** - Find hospitals, clinics, and medical facilities
-- ✅ **Climate Information** - Real-time weather updates and 7-day forecasts
-- ✅ **AI Chatbot** - Get instant answers with Malayalam language support
+- ✅ **Disaster Readiness Advisories** - Weather-triggered warnings with local guidance
+- ✅ **Guided Civic Assistant** - Deterministic, rule-based civic help with Malayalam support
 - ✅ **Location Services** - Access taxi stands, helplines, and emergency contacts
+- ✅ **Offline Cache** - Bus routes, hospitals, and helplines available even with limited connectivity
 - ✅ **Profile Management** - Update profile, photo, and settings
 - ✅ **Real-Time Notifications** - Get alerts and updates instantly
 
 #### Advanced Features
-- ✅ **AR Navigation** - Camera-based AR overlay for finding nearby services
 - ✅ **Voice Reporting** - Report incidents using voice commands
-- ✅ **Incident Heatmap** - Interactive map with incident clustering
-- ✅ **Smart Route Finder** - AI-powered route recommendations
+- ✅ **Geographic Grouping of Incidents** - Map view grouped by area, showing counts, resolved vs pending, and recent failures
+- ✅ **Smart Route Finder** - Rule-based route recommendations using current conditions
 - ✅ **Dark Mode** - Beautiful dark theme support
 - ✅ **Multi-language** - English and Malayalam support
 
 ### 🖥️ Admin Dashboard (React)
 
 #### Dashboard Features
-- ✅ **Real-Time Dashboard** - Live statistics and analytics
-- ✅ **Help Alerts Management** - Monitor and respond to SOS alerts
+- ✅ **Real-Time Dashboard** - Live operational statistics and indicators
+- ✅ **Help Alerts Management** - Monitor, acknowledge, and progress SOS alerts through defined lifecycle states
 - ✅ **Bus Route Management** - Full CRUD operations for routes and sub-routes
 - ✅ **Location Management** - Manage hospitals, clinics, taxi stands, and helplines
 - ✅ **User Management** - View and manage user accounts
-- ✅ **Chatbot Logs** - Monitor and manage chatbot conversations
-- ✅ **Climate Dashboard** - Weather data visualization with forecasts
+- ✅ **Role-Based Access** - Operator, Supervisor, and Auditor roles with scoped permissions
+- ✅ **Civic Assistant Logs** - Monitor and audit civic assistant conversations
+- ✅ **Disaster Readiness Dashboard** - Weather-triggered informational advisories
 - ✅ **Send Alerts** - Broadcast emergency alerts to all users
 - ✅ **Profile Settings** - Update admin profile, username, password, and photo
 
 #### Advanced Features
-- ✅ **AI Analytics** - Predictive analytics and anomaly detection
-- ✅ **Real-Time Updates** - Socket.IO for live data synchronization
+- ✅ **Rule- and Threshold-Based Alert Summaries** - Simple rule + threshold checks for operational awareness
+- ✅ **Event-Driven Updates** - Event-driven updates for connected clients using Socket.IO
 - ✅ **Data Export** - Export data in JSON format
 - ✅ **System Status** - Monitor API, database, and WebSocket status
-- ✅ **Modern UI** - Material-UI with gradient themes and animations
 
 ### 🔧 Backend API (Node.js + Express)
 
 - ✅ **RESTful API** - Complete REST API for all services
-- ✅ **Real-Time Communication** - Socket.IO for live updates
+- ✅ **Real-Time Communication** - Socket.IO-based updates for connected clients
 - ✅ **Authentication** - JWT-based secure authentication
 - ✅ **Database Management** - MongoDB with Mongoose ODM
+- ✅ **SOS Workflow Engine** - Persist-first emergency pipeline with auditable status transitions
+- ✅ **Role-Based Access Control** - Enforced roles for operators, supervisors, and auditors
 - ✅ **File Upload** - Profile photo upload with base64 encoding
 - ✅ **Error Handling** - Comprehensive error handling and validation
 - ✅ **Security** - Helmet.js, CORS, and input validation
@@ -411,9 +415,9 @@ http://localhost:5000/api
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| POST | `/help` | Send SOS alert | No |
+| POST | `/help` | Create SOS alert (persisted with status `PENDING`) | No |
 | POST | `/help/admin` | Broadcast admin alert | Yes (Admin) |
-| GET | `/help` | Get all alerts | Yes (Admin) |
+| GET | `/help` | Get all alerts with status and history | Yes (Admin) |
 | POST | `/help/live-location` | Update live location | No |
 
 ### Location Endpoints
@@ -434,22 +438,22 @@ http://localhost:5000/api
 | GET | `/climate/alerts?city=Wayanad` | Get weather alerts | No |
 | GET | `/climate/stats?city=Wayanad&days=30` | Get weather statistics | No |
 
-### Chatbot Endpoints
+### Civic Assistant Endpoints
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| POST | `/chatbot` | Send message to AI chatbot | No |
-| GET | `/chatbot/analytics` | Get chatbot analytics | Yes (Admin) |
-| GET | `/chat` | Get chat logs | Yes (Admin) |
+| POST | `/chatbot` | Send message to Guided Civic Assistant (rule-based responses only) | No |
+| GET | `/chatbot/analytics` | Get assistant usage and rule hit statistics | Yes (Admin) |
+| GET | `/chat` | Get assistant conversation logs | Yes (Admin) |
 | POST | `/chat` | Send chat message | No |
 
-### Analytics Endpoints
+### Risk Monitoring Endpoints
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| GET | `/analytics/alerts/predictions` | Get alert predictions | No |
-| GET | `/analytics/alerts/anomalies` | Detect anomalies | No |
-| GET | `/analytics/routes/recommendations` | Smart route recommendations | No |
+| GET | `/analytics/alerts/predictions` | Get threshold-based alert summaries (no ML predictions) | No |
+| GET | `/analytics/alerts/anomalies` | Rule-defined anomaly flags over SOS volume and patterns | No |
+| GET | `/analytics/routes/recommendations` | Route recommendations based on rules and thresholds | No |
 
 ### Example API Request
 
@@ -577,7 +581,7 @@ smart-wayanad/
   lat: Number,
   lng: Number,
   alertType: String,
-  status: String
+  status: String (PENDING, RECEIVED, IN_PROGRESS, CLOSED)
 }
 ```
 
@@ -628,8 +632,8 @@ smart-wayanad/
   user: String,
   message: String,
   response: String,
-  intent: String,
-  confidence: Number
+  intent: String,      // mapped to predefined civic intents / decision-tree nodes
+  confidence: Number   // rule match strength for audit (no ML prediction)
 }
 ```
 
@@ -646,6 +650,8 @@ smart-wayanad/
 - ✅ **Input Validation** - Request validation and sanitization
 - ✅ **Error Handling** - Secure error messages
 - ✅ **Token Storage** - Secure token management
+- ✅ **Role-Based Access Control** - Operator, Supervisor, and Auditor roles with scoped permissions
+- ✅ **Action Logging** - Immutable history of SOS and admin actions with timestamps
 
 ### Security Best Practices
 
@@ -709,11 +715,11 @@ flutter build web
 ## 🌟 Key Features in Detail
 
 ### 🚨 Emergency SOS System
-- Real-time GPS location tracking
-- Live location updates every 30 seconds
-- Automatic alert broadcasting
-- Admin can respond and manage alerts
-- Priority-based alert system
+- Persist-first SOS storage with status lifecycle (PENDING → RECEIVED → IN_PROGRESS → CLOSED)
+- GPS location tracking tied to each alert
+- Event-driven location updates (on movement and SOS state changes)
+- Automatic alert broadcasting to authorized operators
+- Full audit trail of acknowledgements and actions
 
 ### 🚌 Bus Route Management
 - Complete route information with sub-routes
@@ -722,26 +728,28 @@ flutter build web
 - Real-time route updates
 - Admin can add/edit/delete routes
 
-### 🤖 AI Chatbot
-- Natural Language Processing (NLP)
-- Intent recognition (greeting, emergency, hospital, police, bus, weather, etc.)
+### 🧭 Guided Civic Assistant
+- Deterministic decision trees with predefined civic responses
+- Intent recognition using rule-based matching (greeting, emergency, hospital, police, bus, weather, etc.)
 - Regional language support (English + Malayalam)
-- Context-aware responses
-- Confidence scoring
-- Real-time database integration
+- Fully logged and auditable conversations
+- No external AI model calls; responses come from curated content
+- Real-time database integration for logging and analytics
 
-### 🌤️ Climate Dashboard
+### 🌤️ Disaster Readiness & Climate
 - Current weather conditions
 - 7-day weather forecast
 - Historical weather data
 - Weather alerts and warnings
+- Weather-triggered informational civic advisories (landslide, transport, safety)
 - Interactive charts and graphs
 - Multiple location support
 
 ### 📊 Admin Dashboard
-- Real-time statistics
+- Real-time statistics and indicators
 - Interactive charts and visualizations
 - User-friendly interface
+- Role-bound actions (operator, supervisor, auditor)
 - Profile management (username, password, photo)
 - System status monitoring
 - Data export functionality
@@ -752,10 +760,10 @@ flutter build web
 
 - [ ] **KSRTC Live Tracking** - Real-time bus location tracking
 - [ ] **Push Notifications** - Firebase Cloud Messaging integration
-- [ ] **Multi-role Admin Panel** - Role-based access control
-- [ ] **Advanced AI Chatbot** - LLM integration (GPT/Claude)
+- [ ] **Role Policy Refinement** - More granular permissions and approval flows on top of existing roles
+- [ ] **Extended Civic Content Packs** - More curated, government-approved assistant content (still deterministic)
 - [ ] **GIS Map Integration** - Interactive maps with route visualization
-- [ ] **Offline Mode** - Offline data caching for mobile app
+- [ ] **Deeper Offline Capabilities** - Advanced sync and conflict resolution for fully offline use
 - [ ] **Multi-language Support** - Full Malayalam translation
 - [ ] **Analytics Dashboard** - Advanced usage statistics and insights
 - [ ] **Payment Integration** - For premium features
