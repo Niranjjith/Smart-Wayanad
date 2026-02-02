@@ -52,3 +52,4 @@ climateSchema.index({ city: 1, createdAt: -1 });
 export default mongoose.model("Climate", climateSchema);
 
 
+
