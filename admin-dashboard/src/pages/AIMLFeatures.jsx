@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 import Sidebar from "../layout/Sidebar.jsx";
 import Topbar from "../layout/Topbar.jsx";
-import API from "../services/api.js";
+import API, { SOCKET_URL } from "../services/api.js";
 import { toast } from "react-toastify";
 import { motion } from "framer-motion";
 import {
@@ -70,7 +70,7 @@ export default function AIMLFeatures() {
   }, []);
 
   const setupSocket = () => {
-    const newSocket = io("http://localhost:5000", { transports: ["websocket"] });
+    const newSocket = io(SOCKET_URL, { transports: ["websocket"] });
     setSocket(newSocket);
 
     newSocket.on("alert:new", (alert) => {

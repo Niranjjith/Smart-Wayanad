@@ -172,7 +172,7 @@ export default function Login() {
                   </Typography>
                   {error.includes("Cannot connect") && (
                     <Typography variant="caption" sx={{ mt: 1, display: "block" }}>
-                      Make sure the backend server is running on http://localhost:5000
+                      Make sure the backend is running (or set VITE_API_BASE_URL for production)
                     </Typography>
                   )}
                 </Alert>

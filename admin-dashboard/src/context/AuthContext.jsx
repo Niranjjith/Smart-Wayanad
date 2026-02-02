@@ -2,6 +2,7 @@
 import { createContext, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { API_BASE_URL } from "../services/api.js";
 
 const AuthContext = createContext();
 
@@ -14,7 +15,7 @@ function AuthProvider({ children }) {
   const login = async (email, password) => {
     setLoading(true);
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/login", {
+      const res = await axios.post(`${API_BASE_URL}/auth/login`, {
         email,
         password,
       });

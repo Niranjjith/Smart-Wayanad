@@ -19,7 +19,7 @@ import {
 
 import Sidebar from "../layout/Sidebar.jsx";
 import Topbar from "../layout/Topbar.jsx";
-import API from "../services/api.js";
+import API, { SOCKET_URL } from "../services/api.js";
 import { DataGrid } from "@mui/x-data-grid";
 import { io } from "socket.io-client";
 import { toast } from "react-toastify";
@@ -49,10 +49,10 @@ export default function HelpAlerts() {
   const [selectedAlert, setSelectedAlert] = useState(null);
   const [viewDialog, setViewDialog] = useState(false);
 
-  // WebSocket
+  // WebSocket (uses same origin as API, without /api)
   const socket = useMemo(() => {
     try {
-      return io("http://localhost:5000", { transports: ["websocket"] });
+      return io(SOCKET_URL, { transports: ["websocket"] });
     } catch (err) {
       console.error("Socket connection error:", err);
       return null;
