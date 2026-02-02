@@ -10,7 +10,7 @@ import connectDB from "./src/config/db.js";
 // Route Imports
 import userRoutes from "./src/routes/userRoutes.js";
 import authRoutes from "./src/routes/authRoutes.js";
-import busRoutes from "./src/routes/busRoutes.js";
+import busRoutes from "./src/routes/BusRoutes.js";
 import locationRoutes from "./src/routes/locationRoutes.js";
 import chatRoutes from "./src/routes/chatRoutes.js";
 import climateRoutes from "./src/routes/climateRoutes.js";

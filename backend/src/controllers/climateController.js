@@ -1,52 +1,64 @@
 // backend/src/controllers/climateController.js
 import Climate from "../models/Climate.js";
-import { fetchOpenMeteoWeather, mapToAppWeather } from "../services/weatherService.js";
+import { fetchOpenMeteoWeather, mapToAppWeather, generateFallbackWeather } from "../services/weatherService.js";
 
-// GET /api/climate/current - Get current weather (real data from Open-Meteo)
+// GET /api/climate/current - Get current weather (real data from Open-Meteo with fallback)
 export async function getClimate(req, res) {
+  const { city = "Wayanad" } = req.query;
+  const normalizedCity = String(city).trim() || "Wayanad";
+  let data = null;
+  let climateData = null;
+
   try {
-    const { city = "Wayanad" } = req.query;
-    const normalizedCity = String(city).trim() || "Wayanad";
+    // fetchOpenMeteoWeather always returns data (never throws) - uses cache/fallback on failure
+    data = await fetchOpenMeteoWeather(normalizedCity);
+  } catch (err) {
+    console.warn(`⚠️ fetchOpenMeteoWeather threw (unexpected):`, err.message);
+    data = null; // Will use fallback
+  }
 
-    const data = await fetchOpenMeteoWeather(normalizedCity);
-    const climateData = mapToAppWeather(normalizedCity, data);
+  try {
+    // Always generate valid climate data (uses fallback if data is null)
+    climateData = mapToAppWeather(normalizedCity, data || generateFallbackWeather(normalizedCity));
 
-    // Save current snapshot to DB for history/stats (only current fields)
-    await Climate.create({
-      city: normalizedCity,
-      temp: climateData.temp,
-      feelsLike: climateData.feelsLike,
-      humidity: climateData.humidity,
-      wind: climateData.wind,
-      windDirection: climateData.windDirection,
-      pressure: climateData.pressure,
-      visibility: climateData.visibility,
-      uvIndex: climateData.uvIndex,
-      description: climateData.description,
-      icon: climateData.icon,
-      code: climateData.code,
-      sunrise: climateData.sunrise,
-      sunset: climateData.sunset,
-      forecast: climateData.forecast,
-      alerts: climateData.alerts,
-    }).catch((err) => console.warn("Climate save (history):", err.message));
+    // Save current snapshot to DB for history/stats (only if we got real data, not fallback)
+    if (data && !data._isFallback) {
+      await Climate.create({
+        city: normalizedCity,
+        temp: climateData.temp,
+        feelsLike: climateData.feelsLike,
+        humidity: climateData.humidity,
+        wind: climateData.wind,
+        windDirection: climateData.windDirection,
+        pressure: climateData.pressure,
+        visibility: climateData.visibility,
+        uvIndex: climateData.uvIndex,
+        description: climateData.description,
+        icon: climateData.icon,
+        code: climateData.code,
+        sunrise: climateData.sunrise,
+        sunset: climateData.sunset,
+        forecast: climateData.forecast,
+        alerts: climateData.alerts,
+      }).catch((err) => console.warn("Climate save (history):", err.message));
+    }
 
-    res.json(climateData);
+    // Always return successful response with data (even if fallback)
+    return res.status(200).json(climateData);
   } catch (error) {
-    console.error("❌ Climate fetch error:", error);
-    res.status(500).json({
-      error: "Failed to fetch climate data",
-      details: error.message,
-    });
+    console.error("❌ Climate controller mapping error:", error);
+    // Last resort fallback - generate and return immediately
+    const emergencyFallback = mapToAppWeather(normalizedCity, generateFallbackWeather(normalizedCity));
+    return res.status(200).json(emergencyFallback);
   }
 }
 
-// GET /api/climate/forecast - Get weather forecast (real data from Open-Meteo)
+// GET /api/climate/forecast - Get weather forecast (real data from Open-Meteo with fallback)
 export async function getForecast(req, res) {
   try {
     const { city = "Wayanad", days = 7 } = req.query;
     const normalizedCity = String(city).trim() || "Wayanad";
-    const data = await fetchOpenMeteoWeather(normalizedCity);
+    const data = await fetchOpenMeteoWeather(normalizedCity).catch(() => generateFallbackWeather(normalizedCity));
     const mapped = mapToAppWeather(normalizedCity, data);
     const forecast = (mapped.forecast || []).slice(0, parseInt(days, 10) || 7);
 
@@ -55,10 +67,12 @@ export async function getForecast(req, res) {
       forecast,
     });
   } catch (error) {
-    console.error("❌ Forecast fetch error:", error);
-    res.status(500).json({
-      error: "Failed to fetch forecast",
-      details: error.message,
+    console.error("❌ Forecast controller error:", error);
+    // Return fallback forecast
+    const fallback = mapToAppWeather(req.query.city || "Wayanad", generateFallbackWeather(req.query.city || "Wayanad"));
+    res.json({
+      city: req.query.city || "Wayanad",
+      forecast: (fallback.forecast || []).slice(0, parseInt(req.query.days, 10) || 7),
     });
   }
 }
@@ -86,12 +100,12 @@ export async function getHistory(req, res) {
   }
 }
 
-// GET /api/climate/alerts - Get weather alerts (rule-based from real current weather)
+// GET /api/climate/alerts - Get weather alerts (rule-based from real current weather with fallback)
 export async function getAlerts(req, res) {
   try {
     const { city = "Wayanad" } = req.query;
     const normalizedCity = String(city).trim() || "Wayanad";
-    const data = await fetchOpenMeteoWeather(normalizedCity);
+    const data = await fetchOpenMeteoWeather(normalizedCity).catch(() => generateFallbackWeather(normalizedCity));
     const mapped = mapToAppWeather(normalizedCity, data);
 
     res.json({
@@ -99,10 +113,11 @@ export async function getAlerts(req, res) {
       alerts: mapped.alerts || [],
     });
   } catch (error) {
-    console.error("❌ Alerts fetch error:", error);
-    res.status(500).json({
-      error: "Failed to fetch alerts",
-      details: error.message,
+    console.error("❌ Alerts controller error:", error);
+    // Return empty alerts array (fallback data won't trigger alerts)
+    res.json({
+      city: req.query.city || "Wayanad",
+      alerts: [],
     });
   }
 }
