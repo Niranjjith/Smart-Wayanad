@@ -315,8 +315,8 @@ export default function Chatbot() {
           </Paper>
         </motion.div>
 
-        {/* Statistics Cards */}
-        {stats && (
+        {/* Statistics Cards (show even if /chatbot/analytics failed) */}
+        {!loading && (
           <Grid container spacing={3} sx={{ mb: 3 }}>
             <Grid item xs={12} sm={6} md={3}>
               <motion.div
@@ -339,7 +339,7 @@ export default function Chatbot() {
                           Total Conversations
                         </Typography>
                         <Typography variant="h4" fontWeight={800}>
-                          {stats.totalChats || chats.length}
+                          {stats?.totalChats ?? chats.length}
                         </Typography>
                       </Box>
                       <Message sx={{ fontSize: 40, opacity: 0.3 }} />

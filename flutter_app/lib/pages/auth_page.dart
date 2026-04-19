@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import '../services/api_service.dart';
 import '../utils/app_theme.dart';
+import '../constants/branding.dart';
 import '../widgets/animated_page.dart';
 import 'home_page.dart';
 
@@ -313,25 +314,23 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
               Column(
                 children: [
                   Container(
-                    width: 80,
-                    height: 80,
+                    width: 88,
+                    height: 88,
+                    padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [AppTheme.primaryColor, AppTheme.secondaryColor],
-                      ),
+                      color: Colors.white,
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: AppTheme.primaryColor.withOpacity(0.3),
+                          color: AppTheme.primaryColor.withOpacity(0.25),
                           blurRadius: 20,
                           offset: const Offset(0, 5),
                         ),
                       ],
                     ),
-                    child: const Icon(
-                      Icons.login_rounded,
-                      color: Colors.white,
-                      size: 40,
+                    child: Image.asset(
+                      Branding.logoAsset,
+                      fit: BoxFit.contain,
                     ),
                   ),
                   const SizedBox(height: AppTheme.paddingLarge),
@@ -586,25 +585,23 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
               Column(
                 children: [
                   Container(
-                    width: 80,
-                    height: 80,
+                    width: 88,
+                    height: 88,
+                    padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [AppTheme.secondaryColor, AppTheme.primaryColor],
-                      ),
+                      color: Colors.white,
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: AppTheme.secondaryColor.withOpacity(0.3),
+                          color: AppTheme.secondaryColor.withOpacity(0.25),
                           blurRadius: 20,
                           offset: const Offset(0, 5),
                         ),
                       ],
                     ),
-                    child: const Icon(
-                      Icons.person_add_rounded,
-                      color: Colors.white,
-                      size: 40,
+                    child: Image.asset(
+                      Branding.logoAsset,
+                      fit: BoxFit.contain,
                     ),
                   ),
                   const SizedBox(height: AppTheme.paddingLarge),

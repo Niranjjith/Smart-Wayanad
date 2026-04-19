@@ -20,8 +20,8 @@ import {
   Lock,
   Visibility,
   VisibilityOff,
-  AdminPanelSettings,
 } from "@mui/icons-material";
+import { APP_LOGO_SRC } from "../constants/branding.js";
 
 export default function Login() {
   const { user, login, loading: authLoading } = useContext(AuthContext);
@@ -119,19 +119,18 @@ export default function Login() {
                 }}
               >
                 <Box
+                  component="img"
+                  src={APP_LOGO_SRC}
+                  alt="Smart Wayanad"
                   sx={{
-                    width: 80,
-                    height: 80,
+                    width: 88,
+                    height: 88,
                     borderRadius: 3,
-                    background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    boxShadow: "0 8px 24px rgba(102, 126, 234, 0.3)",
+                    objectFit: "contain",
+                    background: "rgba(102, 126, 234, 0.08)",
+                    boxShadow: "0 8px 24px rgba(102, 126, 234, 0.25)",
                   }}
-                >
-                  <AdminPanelSettings sx={{ fontSize: 40, color: "white" }} />
-                </Box>
+                />
               </motion.div>
               <Typography
                 variant="h4"

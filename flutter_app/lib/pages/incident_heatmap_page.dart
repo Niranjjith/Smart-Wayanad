@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
+import '../constants/branding.dart';
 import '../services/api_service.dart';
 import 'dart:math' as math;
 
@@ -100,14 +101,14 @@ class _IncidentHeatmapPageState extends State<IncidentHeatmapPage> {
     final clusters = _clusteredAlerts;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
+      backgroundColor: AppPalette.screenBackground,
       appBar: AppBar(
         title: Text(
           'Incident Heatmap',
           style: GoogleFonts.poppins(fontWeight: FontWeight.w700),
         ),
         elevation: 0,
-        backgroundColor: const Color(0xFF667EEA),
+        backgroundColor: AppPalette.pine,
         foregroundColor: Colors.white,
         actions: [
           IconButton(
@@ -117,7 +118,9 @@ class _IncidentHeatmapPageState extends State<IncidentHeatmapPage> {
         ],
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator())
+          ? Center(
+              child: CircularProgressIndicator(color: AppPalette.leaf),
+            )
           : Column(
               children: [
                 // Filter Chips
@@ -180,7 +183,7 @@ class _IncidentHeatmapPageState extends State<IncidentHeatmapPage> {
                               height: 40,
                               child: Container(
                                 decoration: BoxDecoration(
-                                  color: Colors.blue,
+                                  color: AppPalette.leaf,
                                   shape: BoxShape.circle,
                                   border: Border.all(color: Colors.white, width: 3),
                                 ),
@@ -311,10 +314,10 @@ class _FilterChip extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: selected ? const Color(0xFF667EEA) : Colors.white,
+          color: selected ? AppPalette.leaf : Colors.white,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: selected ? const Color(0xFF667EEA) : Colors.grey.shade300,
+            color: selected ? AppPalette.leaf : Colors.grey.shade300,
           ),
         ),
         child: Text(

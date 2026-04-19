@@ -21,6 +21,7 @@ import {
 } from "@mui/icons-material";
 import { Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
+import { APP_LOGO_SRC } from "../constants/branding.js";
 
 // Sidebar menu items
 const items = [
@@ -62,21 +63,18 @@ export default function Sidebar() {
       >
         <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
           <Box
+            component="img"
+            src={APP_LOGO_SRC}
+            alt="Smart Wayanad"
             sx={{
-              width: 40,
-              height: 40,
+              width: 44,
+              height: 44,
               borderRadius: 2,
-              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              boxShadow: "0 4px 12px rgba(102, 126, 234, 0.4)",
+              objectFit: "contain",
+              background: "rgba(255,255,255,0.08)",
+              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.25)",
             }}
-          >
-            <Typography variant="h6" sx={{ fontWeight: 900, color: "white" }}>
-              SW
-            </Typography>
-          </Box>
+          />
           <Typography
             variant="h6"
             sx={{

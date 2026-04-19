@@ -30,6 +30,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { WAYANAD_HERO_IMAGE, APP_LOGO_SRC } from "../constants/branding.js";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -140,12 +141,22 @@ export default function Dashboard() {
         >
           <Paper
             sx={{
+              position: "relative",
+              overflow: "hidden",
               p: 3,
               mb: 3,
               borderRadius: 3,
-              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
               color: "white",
-              boxShadow: "0 8px 32px rgba(102, 126, 234, 0.3)",
+              boxShadow: "0 8px 32px rgba(0, 0, 0, 0.2)",
+              backgroundColor: "#1a1f3a",
+              backgroundImage: `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.62)), url(${WAYANAD_HERO_IMAGE})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              transition: "background-image 0.35s ease, box-shadow 0.35s ease",
+              "&:hover": {
+                backgroundImage: `linear-gradient(rgba(0,0,0,0.62), rgba(0,0,0,0.78)), url(${WAYANAD_HERO_IMAGE})`,
+                boxShadow: "0 12px 40px rgba(0, 0, 0, 0.35)",
+              },
             }}
           >
             <Stack
@@ -153,13 +164,29 @@ export default function Dashboard() {
               justifyContent="space-between"
               alignItems="center"
             >
-              <Box>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 2, flexWrap: "wrap" }}>
+                <Box
+                  component="img"
+                  src={APP_LOGO_SRC}
+                  alt=""
+                  sx={{
+                    width: 52,
+                    height: 52,
+                    borderRadius: 2,
+                    objectFit: "contain",
+                    bgcolor: "rgba(255,255,255,0.12)",
+                    p: 0.5,
+                    boxShadow: "0 4px 16px rgba(0,0,0,0.3)",
+                  }}
+                />
+                <Box>
                 <Typography variant="h4" fontWeight={800} mb={1}>
                   Dashboard Overview
                 </Typography>
-                <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                <Typography variant="body2" sx={{ opacity: 0.95 }}>
                   Welcome to Smart Wayanad Admin Panel
                 </Typography>
+                </Box>
               </Box>
               <Stack direction="row" spacing={2}>
                 <Button

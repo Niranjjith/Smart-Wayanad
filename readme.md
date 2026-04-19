@@ -8,7 +8,6 @@
 [![React](https://img.shields.io/badge/React-19.1-61DAFB?logo=react)](https://reactjs.org)
 [![Node.js](https://img.shields.io/badge/Node.js-18+-339933?logo=node.js)](https://nodejs.org)
 [![MongoDB](https://img.shields.io/badge/MongoDB-8.4-47A248?logo=mongodb)](https://www.mongodb.com)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 *Empowering Citizens, Digitally.*
 
@@ -34,8 +33,6 @@
 - [Security](#-security)
 - [Deployment](#-deployment)
 - [Contributing](#-contributing)
-- [License](#-license)
-- [Contact](#-contact)
 
 ---
 
@@ -270,9 +267,9 @@ MONGO_URI=mongodb://127.0.0.1:27017/smartwayanad
 # JWT Configuration
 JWT_SECRET=your_super_secret_jwt_key_change_this_in_production
 
-# Admin Configuration
-ADMIN_EMAIL=admin@smartwayanad.com
-ADMIN_PASSWORD=your_secure_password
+# Dashboard operator (set strong values locally; never commit real credentials)
+ADMIN_EMAIL=your_admin_email_here
+ADMIN_PASSWORD=your_strong_password_here
 ADMIN_FORCE_RESET=false
 ```
 
@@ -323,8 +320,8 @@ Replace `YOUR_IP_ADDRESS` with your local network IP for mobile testing.
 | `PORT` | Backend server port | `5000` |
 | `MONGO_URI` | MongoDB connection string | `mongodb://127.0.0.1:27017/smartwayanad` |
 | `JWT_SECRET` | Secret key for JWT tokens | Required |
-| `ADMIN_EMAIL` | Admin account email | Required |
-| `ADMIN_PASSWORD` | Admin account password | Required |
+| `ADMIN_EMAIL` | Dashboard operator email | Set in `.env` (required to run) |
+| `ADMIN_PASSWORD` | Dashboard operator password | Set in `.env` (required to run) |
 | `ADMIN_FORCE_RESET` | Force admin account reset on startup | `false` |
 
 ---
@@ -361,9 +358,7 @@ npm run dev
 
 Admin Dashboard will open at: **http://localhost:5173**
 
-**Default Admin Credentials:**
-- Email: `admin@smartwayanad.com` (or as set in `.env`)
-- Password: (as set in `.env`)
+Sign in with the email and password you configured in the backend `.env` (`ADMIN_EMAIL` / `ADMIN_PASSWORD`).
 
 ### Run Flutter App
 
@@ -655,7 +650,7 @@ smart-wayanad/
 
 ### Security Best Practices
 
-1. **Change Default Credentials**: Update admin email and password in production
+1. **Operator credentials**: Use a strong, unique email and password in production; rotate if exposed
 2. **Use Strong JWT Secret**: Generate a strong random string for `JWT_SECRET`
 3. **Enable HTTPS**: Use SSL/TLS certificates in production
 4. **Environment Variables**: Never commit `.env` files to version control
@@ -791,14 +786,6 @@ We welcome contributions! Please follow these steps:
 
 ---
 
-## 📄 License
-
-This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
-
-**Free for academic and public-service use.**
-
----
-
 ## 👨‍💻 Author
 
 **Niranjan**
@@ -815,14 +802,6 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 - Kerala State Road Transport Corporation (KSRTC)
 - All contributors and testers
 - Open source community
-
----
-
-## 📞 Contact & Support
-
-- **Issues**: [GitHub Issues](https://github.com/your-username/smart-wayanad/issues)
-- **Email**: support@smartwayanad.com
-- **Documentation**: [Full Documentation](https://docs.smartwayanad.com)
 
 ---
 

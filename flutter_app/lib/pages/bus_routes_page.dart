@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../constants/branding.dart';
 import '../services/api_service.dart';
 
 /// 🚌 Premium Bus Routes Page with Sub-Routes Support
@@ -87,7 +88,7 @@ class _BusRoutesPageState extends State<BusRoutesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
+      backgroundColor: AppPalette.screenBackground,
       body: CustomScrollView(
         slivers: [
           // Premium App Bar with Gradient
@@ -104,8 +105,8 @@ class _BusRoutesPageState extends State<BusRoutesPage> {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      const Color(0xFF667EEA),
-                      const Color(0xFF764BA2),
+                      AppPalette.leaf,
+                      AppPalette.pine,
                     ],
                   ),
                 ),
@@ -192,7 +193,7 @@ class _BusRoutesPageState extends State<BusRoutesPage> {
                     ),
                     prefixIcon: Icon(
                       Icons.search_rounded,
-                      color: const Color(0xFF667EEA),
+                      color: AppPalette.leaf,
                     ),
                     border: InputBorder.none,
                     contentPadding: const EdgeInsets.symmetric(
@@ -210,7 +211,7 @@ class _BusRoutesPageState extends State<BusRoutesPage> {
               ? SliverFillRemaining(
                   child: Center(
                     child: CircularProgressIndicator(
-                      color: const Color(0xFF667EEA),
+                      color: AppPalette.leaf,
                     ),
                   ),
                 )
@@ -268,7 +269,7 @@ class _BusRoutesPageState extends State<BusRoutesPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _load,
-        backgroundColor: const Color(0xFF667EEA),
+        backgroundColor: AppPalette.leaf,
         child: const Icon(Icons.refresh_rounded, color: Colors.white),
       ),
     );
@@ -300,7 +301,7 @@ class _PremiumRouteCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: isActive
-              ? const Color(0xFF667EEA).withOpacity(0.2)
+              ? AppPalette.leaf.withOpacity(0.2)
               : Colors.grey.shade300,
           width: 2,
         ),
@@ -332,8 +333,8 @@ class _PremiumRouteCard extends StatelessWidget {
                           vertical: 8,
                         ),
                         decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
+                          gradient: LinearGradient(
+                            colors: AppPalette.accentGradient,
                           ),
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -379,7 +380,7 @@ class _PremiumRouteCard extends StatelessWidget {
                             vertical: 6,
                           ),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF667EEA).withOpacity(0.1),
+                            color: AppPalette.leaf.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Row(
@@ -388,13 +389,13 @@ class _PremiumRouteCard extends StatelessWidget {
                               Icon(
                                 Icons.route,
                                 size: 14,
-                                color: const Color(0xFF667EEA),
+                                color: AppPalette.leaf,
                               ),
                               const SizedBox(width: 4),
                               Text(
                                 '${subRoutes.length}',
                                 style: GoogleFonts.poppins(
-                                  color: const Color(0xFF667EEA),
+                                  color: AppPalette.leaf,
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -409,7 +410,7 @@ class _PremiumRouteCard extends StatelessWidget {
                           isExpanded
                               ? Icons.expand_less_rounded
                               : Icons.expand_more_rounded,
-                          color: const Color(0xFF667EEA),
+                          color: AppPalette.leaf,
                         ),
                     ],
                   ),
@@ -420,7 +421,7 @@ class _PremiumRouteCard extends StatelessWidget {
                       Expanded(
                         child: _LocationRow(
                           icon: Icons.location_on_rounded,
-                          iconColor: const Color(0xFF667EEA),
+                          iconColor: AppPalette.leaf,
                           text: route['origin'] ?? '--',
                           label: 'From',
                         ),
@@ -436,7 +437,7 @@ class _PremiumRouteCard extends StatelessWidget {
                       Expanded(
                         child: _LocationRow(
                           icon: Icons.location_on_rounded,
-                          iconColor: const Color(0xFFF5576C),
+                          iconColor: AppPalette.pine,
                           text: route['destination'] ?? '--',
                           label: 'To',
                         ),
@@ -518,7 +519,7 @@ class _PremiumRouteCard extends StatelessWidget {
                         Icon(
                           Icons.route_rounded,
                           size: 18,
-                          color: const Color(0xFF667EEA),
+                          color: AppPalette.leaf,
                         ),
                         const SizedBox(width: 8),
                         Text(
@@ -663,7 +664,7 @@ class _SubRouteCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: const Color(0xFF667EEA).withOpacity(0.2),
+          color: AppPalette.leaf.withOpacity(0.2),
           width: 1.5,
         ),
       ),
@@ -679,7 +680,7 @@ class _SubRouteCard extends StatelessWidget {
                   vertical: 4,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF667EEA),
+                  color: AppPalette.leaf,
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(

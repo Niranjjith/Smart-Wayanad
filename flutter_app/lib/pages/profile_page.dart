@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import '../constants/branding.dart';
 import '../widgets/profile_image_widget.dart';
 import 'dart:io';
-import '../services/api_service.dart';
 import 'splash_page.dart';
 import 'help_page.dart';
 import 'notifications_page.dart';
@@ -95,7 +94,7 @@ class _ProfilePageState extends State<ProfilePage> {
     final profilePhotoUrl = _getProfilePhotoUrl();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
+      backgroundColor: AppPalette.screenBackground,
       body: CustomScrollView(
         slivers: [
           // Premium App Bar with Profile Photo
@@ -112,9 +111,8 @@ class _ProfilePageState extends State<ProfilePage> {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      const Color(0xFF667EEA),
-                      const Color(0xFF764BA2),
-                      const Color(0xFFF093FB),
+                      ...AppPalette.screenHeroGradient,
+                      AppPalette.mint,
                     ],
                   ),
                 ),
@@ -202,7 +200,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     style: GoogleFonts.poppins(
                       fontSize: 20,
                       fontWeight: FontWeight.w800,
-                      color: Colors.grey.shade900,
+                      color: AppPalette.forest,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -228,7 +226,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       _ActionButton(
                         icon: Icons.notifications_rounded,
                         label: "Alerts",
-                        color: const Color(0xFF667EEA),
+                        color: AppPalette.leaf,
                         onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -239,7 +237,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       _ActionButton(
                         icon: Icons.directions_bus_rounded,
                         label: "Routes",
-                        color: const Color(0xFF4FACFE),
+                        color: AppPalette.mint,
                         onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -250,7 +248,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       _ActionButton(
                         icon: Icons.wb_sunny_rounded,
                         label: "Weather",
-                        color: const Color(0xFFF5576C),
+                        color: AppPalette.forest,
                         onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -261,7 +259,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       _ActionButton(
                         icon: Icons.local_hospital_rounded,
                         label: "Hospitals",
-                        color: const Color(0xFFFA709A),
+                        color: AppPalette.leaf,
                         onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -272,7 +270,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       _ActionButton(
                         icon: Icons.healing_rounded,
                         label: "Clinics",
-                        color: const Color(0xFF43E97B),
+                        color: AppPalette.pine,
                         onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -290,7 +288,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     style: GoogleFonts.poppins(
                       fontSize: 20,
                       fontWeight: FontWeight.w800,
-                      color: Colors.grey.shade900,
+                      color: AppPalette.forest,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -298,7 +296,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     icon: Icons.local_police_rounded,
                     label: "Police",
                     number: "100",
-                    color: const Color(0xFF667EEA),
+                    color: AppPalette.forest,
                     onTap: () => _callNumber("100"),
                   ),
                   _EmergencyButton(
@@ -312,21 +310,21 @@ class _ProfilePageState extends State<ProfilePage> {
                     icon: Icons.fire_extinguisher_rounded,
                     label: "Fire Department",
                     number: "101",
-                    color: const Color(0xFFF5576C),
+                    color: const Color(0xFFE65100),
                     onTap: () => _callNumber("101"),
                   ),
                   _EmergencyButton(
                     icon: Icons.phone_rounded,
                     label: "Women Helpline",
                     number: "1091",
-                    color: const Color(0xFFF093FB),
+                    color: AppPalette.leaf,
                     onTap: () => _callNumber("1091"),
                   ),
                   _EmergencyButton(
                     icon: Icons.child_care_rounded,
                     label: "Child Helpline",
                     number: "1098",
-                    color: const Color(0xFF4FACFE),
+                    color: AppPalette.mint,
                     onTap: () => _callNumber("1098"),
                   ),
                   const SizedBox(height: 32),
@@ -337,7 +335,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     style: GoogleFonts.poppins(
                       fontSize: 20,
                       fontWeight: FontWeight.w800,
-                      color: Colors.grey.shade900,
+                      color: AppPalette.forest,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -345,7 +343,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     icon: Icons.edit_rounded,
                     label: "Edit Profile",
                     subtitle: "Update your profile information",
-                    color: const Color(0xFF667EEA),
+                    color: AppPalette.leaf,
                     onTap: () async {
                       final result = await Navigator.push(
                         context,
@@ -365,7 +363,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     icon: Icons.settings_rounded,
                     label: "Settings",
                     subtitle: "Dark mode, notifications & more",
-                    color: const Color(0xFF764BA2),
+                    color: AppPalette.pine,
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -381,7 +379,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     style: GoogleFonts.poppins(
                       fontSize: 20,
                       fontWeight: FontWeight.w800,
-                      color: Colors.grey.shade900,
+                      color: AppPalette.forest,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -389,7 +387,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     icon: Icons.camera_alt_rounded,
                     label: "AR Navigation",
                     subtitle: "Find services with AR",
-                    color: const Color(0xFF4FACFE),
+                    color: AppPalette.mint,
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -401,7 +399,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     icon: Icons.mic_rounded,
                     label: "Voice Report",
                     subtitle: "Report incidents with voice",
-                    color: const Color(0xFFF5576C),
+                    color: AppPalette.forest,
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -413,7 +411,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     icon: Icons.map_rounded,
                     label: "Incident Heatmap",
                     subtitle: "View incident hotspots",
-                    color: const Color(0xFF43E97B),
+                    color: AppPalette.leaf,
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -429,7 +427,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     style: GoogleFonts.poppins(
                       fontSize: 20,
                       fontWeight: FontWeight.w800,
-                      color: Colors.grey.shade900,
+                      color: AppPalette.forest,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -437,7 +435,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     icon: Icons.call_rounded,
                     label: "Helpline",
                     subtitle: "District helpline numbers",
-                    color: const Color(0xFF43E97B),
+                    color: AppPalette.mint,
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -449,7 +447,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     icon: Icons.local_taxi_rounded,
                     label: "Taxi Stands",
                     subtitle: "Find nearby taxi stands",
-                    color: const Color(0xFFFA709A),
+                    color: AppPalette.pine,
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -461,22 +459,35 @@ class _ProfilePageState extends State<ProfilePage> {
                     icon: Icons.info_rounded,
                     label: "About Smart Wayanad",
                     subtitle: "Learn more about the app",
-                    color: const Color(0xFF667EEA),
+                    color: AppPalette.leaf,
                     onTap: () {
                       showDialog(
                         context: context,
                         builder: (_) => AlertDialog(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
                           title: Text(
                             "Smart Wayanad",
-                            style: GoogleFonts.poppins(fontWeight: FontWeight.w700),
+                            style: GoogleFonts.poppins(
+                              fontWeight: FontWeight.w700,
+                              color: AppPalette.forest,
+                            ),
                           ),
                           content: Text(
                             "A comprehensive digital platform for citizens of Wayanad District, Kerala. Providing emergency assistance, transport information, healthcare services, and more.",
-                            style: GoogleFonts.poppins(),
+                            style: GoogleFonts.poppins(
+                              color: Colors.grey.shade800,
+                              height: 1.45,
+                            ),
                           ),
                           actions: [
-                            TextButton(
+                            FilledButton(
                               onPressed: () => Navigator.pop(context),
+                              style: FilledButton.styleFrom(
+                                backgroundColor: AppPalette.leaf,
+                                foregroundColor: Colors.white,
+                              ),
                               child: const Text("Close"),
                             ),
                           ],
@@ -687,18 +698,21 @@ class _ServiceButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
+            color: AppPalette.leaf.withValues(alpha: 0.08),
+            blurRadius: 12,
             offset: const Offset(0, 4),
           ),
         ],
+        border: Border.all(
+          color: AppPalette.leaf.withValues(alpha: 0.1),
+        ),
       ),
       child: ListTile(
         leading: Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [color, color.withValues(alpha: 0.8)],
+              colors: [color, color.withValues(alpha: 0.82)],
             ),
             borderRadius: BorderRadius.circular(12),
           ),

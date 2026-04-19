@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../constants/branding.dart';
 import '../utils/app_theme.dart';
 import '../widgets/animated_page.dart';
 import '../widgets/animated_card.dart';
@@ -26,18 +27,24 @@ class StandardPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: isDark ? AppTheme.darkBackgroundColor : AppTheme.backgroundColor,
+      backgroundColor:
+          isDark ? AppTheme.darkBackgroundColor : theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(
           title,
-          style: AppTheme.headingSmall.copyWith(
-            color: Colors.white,
-          ),
+          style: theme.appBarTheme.titleTextStyle ??
+              AppTheme.headingSmall.copyWith(color: Colors.white),
         ),
-        backgroundColor: isDark ? AppTheme.darkPrimaryColor : AppTheme.primaryColor,
-        elevation: 0,
+        backgroundColor: isDark
+            ? AppTheme.darkPrimaryColor
+            : (theme.appBarTheme.backgroundColor ?? AppPalette.pine),
+        foregroundColor: theme.appBarTheme.foregroundColor ?? Colors.white,
+        elevation: theme.appBarTheme.elevation ?? 0,
+        scrolledUnderElevation: theme.appBarTheme.scrolledUnderElevation ?? 0,
+        surfaceTintColor: Colors.transparent,
         automaticallyImplyLeading: showBackButton,
         actions: actions,
         bottom: bottom,
@@ -72,18 +79,24 @@ class StandardScrollablePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: isDark ? AppTheme.darkBackgroundColor : AppTheme.backgroundColor,
+      backgroundColor:
+          isDark ? AppTheme.darkBackgroundColor : theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(
           title,
-          style: AppTheme.headingSmall.copyWith(
-            color: Colors.white,
-          ),
+          style: theme.appBarTheme.titleTextStyle ??
+              AppTheme.headingSmall.copyWith(color: Colors.white),
         ),
-        backgroundColor: isDark ? AppTheme.darkPrimaryColor : AppTheme.primaryColor,
-        elevation: 0,
+        backgroundColor: isDark
+            ? AppTheme.darkPrimaryColor
+            : (theme.appBarTheme.backgroundColor ?? AppPalette.pine),
+        foregroundColor: theme.appBarTheme.foregroundColor ?? Colors.white,
+        elevation: theme.appBarTheme.elevation ?? 0,
+        scrolledUnderElevation: theme.appBarTheme.scrolledUnderElevation ?? 0,
+        surfaceTintColor: Colors.transparent,
         automaticallyImplyLeading: showBackButton,
         actions: actions,
       ),
@@ -123,18 +136,24 @@ class StandardListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: isDark ? AppTheme.darkBackgroundColor : AppTheme.backgroundColor,
+      backgroundColor:
+          isDark ? AppTheme.darkBackgroundColor : theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(
           title,
-          style: AppTheme.headingSmall.copyWith(
-            color: Colors.white,
-          ),
+          style: theme.appBarTheme.titleTextStyle ??
+              AppTheme.headingSmall.copyWith(color: Colors.white),
         ),
-        backgroundColor: isDark ? AppTheme.darkPrimaryColor : AppTheme.primaryColor,
-        elevation: 0,
+        backgroundColor: isDark
+            ? AppTheme.darkPrimaryColor
+            : (theme.appBarTheme.backgroundColor ?? AppPalette.pine),
+        foregroundColor: theme.appBarTheme.foregroundColor ?? Colors.white,
+        elevation: theme.appBarTheme.elevation ?? 0,
+        scrolledUnderElevation: theme.appBarTheme.scrolledUnderElevation ?? 0,
+        surfaceTintColor: Colors.transparent,
         automaticallyImplyLeading: showBackButton,
         actions: actions,
       ),

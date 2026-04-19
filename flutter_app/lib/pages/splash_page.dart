@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'auth_page.dart';
 import 'dart:math' as math;
+import '../constants/branding.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -15,7 +16,6 @@ class _SplashPageState extends State<SplashPage>
   late AnimationController _logoController;
   late AnimationController _backgroundController;
   late Animation<double> _logoScale;
-  late Animation<double> _logoRotation;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
 
@@ -33,13 +33,6 @@ class _SplashPageState extends State<SplashPage>
       CurvedAnimation(
         parent: _logoController,
         curve: Curves.elasticOut,
-      ),
-    );
-
-    _logoRotation = Tween<double>(begin: 0.0, end: 2 * math.pi).animate(
-      CurvedAnimation(
-        parent: _logoController,
-        curve: Curves.easeInOut,
       ),
     );
 
@@ -116,9 +109,9 @@ class _SplashPageState extends State<SplashPage>
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  const Color(0xFF667EEA),
-                  const Color(0xFF764BA2),
-                  const Color(0xFFF093FB),
+                  AppPalette.deepGreen,
+                  AppPalette.pine,
+                  AppPalette.leaf.withValues(alpha: 0.95),
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -156,35 +149,27 @@ class _SplashPageState extends State<SplashPage>
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // Logo with animation
+                      // App logo
                       ScaleTransition(
                         scale: _logoScale,
-                        child: RotationTransition(
-                          turns: _logoRotation,
-                          child: Container(
-                            width: 140,
-                            height: 140,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              gradient: LinearGradient(
-                                colors: [
-                                  Colors.white.withValues(alpha: 0.3),
-                                  Colors.white.withValues(alpha: 0.1),
-                                ],
+                        child: Container(
+                          width: 148,
+                          height: 148,
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.white.withValues(alpha: 0.22),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.25),
+                                blurRadius: 28,
+                                offset: const Offset(0, 12),
                               ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.2),
-                                  blurRadius: 30,
-                                  offset: const Offset(0, 15),
-                                ),
-                              ],
-                            ),
-                            child: const Icon(
-                              Icons.public_rounded,
-                              color: Colors.white,
-                              size: 80,
-                            ),
+                            ],
+                          ),
+                          child: Image.asset(
+                            Branding.logoAsset,
+                            fit: BoxFit.contain,
                           ),
                         ),
                       ),
@@ -314,14 +299,14 @@ class _AnimatedButtonState extends State<_AnimatedButton>
                 style: GoogleFonts.poppins(
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
-                  color: const Color(0xFF667EEA),
+                  color: AppPalette.leaf,
                   letterSpacing: 0.5,
                 ),
               ),
               const SizedBox(width: 12),
-              const Icon(
+              Icon(
                 Icons.arrow_forward_rounded,
-                color: Color(0xFF667EEA),
+                color: AppPalette.leaf,
                 size: 24,
               ),
             ],

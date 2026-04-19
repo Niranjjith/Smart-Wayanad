@@ -3,10 +3,10 @@ import 'package:google_fonts/google_fonts.dart';
 
 /// 🎨 Shared UI Theme Constants for Consistent Design
 class AppTheme {
-  // Colors - Light Theme
-  static const Color primaryColor = Color(0xFF667EEA);
-  static const Color secondaryColor = Color(0xFF764BA2);
-  static const Color backgroundColor = Color(0xFFF5F7FA);
+  // Colors - Light Theme (green district — keep in sync with AppPalette)
+  static const Color primaryColor = Color(0xFF1B6B45);
+  static const Color secondaryColor = Color(0xFF14532D);
+  static const Color backgroundColor = Color(0xFFF4FAF6);
   static const Color cardColor = Colors.white;
   static const Color textPrimary = Color(0xFF1A1F3A);
   static const Color textSecondary = Color(0xFF6B7280);
@@ -85,7 +85,7 @@ class AppTheme {
       borderRadius: BorderRadius.circular(radiusLarge),
       boxShadow: [
         BoxShadow(
-          color: Colors.black.withOpacity(isDark ? 0.3 : 0.05),
+          color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
           blurRadius: 10,
           offset: const Offset(0, 2),
         ),

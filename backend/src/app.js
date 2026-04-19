@@ -21,6 +21,7 @@ import climateRoutes from "./routes/climateRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 
 import { ensureAdmin } from "./utils/seedAdmin.js";
+import seedDemoDataIfNeeded from "./utils/seedDemoData.js";
 
 // Initialize app
 export const app = express();
@@ -50,6 +51,11 @@ app.use("/api/users", userRoutes);
 export async function bootstrap() {
   await connectDB();
   await ensureAdmin();
+  try {
+    await seedDemoDataIfNeeded();
+  } catch (e) {
+    console.error("❌ Demo seed error:", e.message);
+  }
 }
 
 // Global Error Handler

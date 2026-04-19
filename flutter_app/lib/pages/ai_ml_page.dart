@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../constants/branding.dart';
 import '../services/api_service.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'dart:io';
@@ -138,7 +139,7 @@ class _AIMLPageState extends State<AIMLPage> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
+      backgroundColor: AppPalette.screenBackground,
       body: CustomScrollView(
         slivers: [
           // Premium App Bar
@@ -155,9 +156,8 @@ class _AIMLPageState extends State<AIMLPage> with TickerProviderStateMixin {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      const Color(0xFF667EEA),
-                      const Color(0xFF764BA2),
-                      const Color(0xFFF093FB),
+                      ...AppPalette.screenHeroGradient,
+                      AppPalette.mint,
                     ],
                   ),
                 ),
@@ -227,7 +227,7 @@ class _AIMLPageState extends State<AIMLPage> with TickerProviderStateMixin {
             SliverFillRemaining(
               child: Center(
                 child: CircularProgressIndicator(
-                  color: const Color(0xFF667EEA),
+                  color: AppPalette.leaf,
                 ),
               ),
             )
@@ -447,10 +447,7 @@ class _PredictionsCard extends StatelessWidget {
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [
-                      const Color(0xFF4FACFE),
-                      const Color(0xFF00F2FE),
-                    ],
+                    colors: AppPalette.accentGradient,
                   ),
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -488,7 +485,7 @@ class _PredictionsCard extends StatelessWidget {
                 return Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
-                    color: isNext ? const Color(0xFF4FACFE) : Colors.grey.shade100,
+                    color: isNext ? AppPalette.leaf : Colors.grey.shade100,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
@@ -506,12 +503,12 @@ class _PredictionsCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.blue.shade50,
+              color: AppPalette.sage.withValues(alpha: 0.25),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Row(
               children: [
-                const Icon(Icons.schedule_rounded, color: Color(0xFF4FACFE)),
+                Icon(Icons.schedule_rounded, color: AppPalette.leaf),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(

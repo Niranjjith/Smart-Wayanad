@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../constants/branding.dart';
 import '../services/api_service.dart';
 import 'dart:math' as math;
 
@@ -147,7 +148,7 @@ class _SmartRoutePageState extends State<SmartRoutePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
+      backgroundColor: AppPalette.screenBackground,
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
@@ -163,8 +164,8 @@ class _SmartRoutePageState extends State<SmartRoutePage> {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      const Color(0xFF43E97B),
-                      const Color(0xFF38F9D7),
+                      AppPalette.leaf,
+                      AppPalette.mint,
                     ],
                   ),
                 ),

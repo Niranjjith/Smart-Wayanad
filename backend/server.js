@@ -21,6 +21,7 @@ import analyticsRoutes from "./src/routes/analyticsRoutes.js";
 import alertRoutes from "./src/routes/alertRoutes.js";
 
 import User from "./src/models/User.js";
+import seedDemoDataIfNeeded from "./src/utils/seedDemoData.js";
 
 dotenv.config();
 
@@ -50,8 +51,14 @@ app.use(
   })
 );
 
-// MongoDB
-connectDB();
+// MongoDB + optional demo data for admin Chatbot / AI-ML pages
+connectDB().then(async () => {
+  try {
+    await seedDemoDataIfNeeded();
+  } catch (e) {
+    console.error("❌ Demo seed error:", e.message);
+  }
+});
 
 // Ensure Admin
 const createAdminIfMissing = async () => {

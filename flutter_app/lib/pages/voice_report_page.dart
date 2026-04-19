@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:geolocator/geolocator.dart';
-import '../services/api_service.dart';
+import '../constants/branding.dart';
 import 'dart:io' show Platform;
 import 'dart:async';
 
@@ -119,7 +119,7 @@ class _VoiceReportPageState extends State<VoiceReportPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Voice report submitted successfully! 🎉'),
-            backgroundColor: Colors.green,
+            backgroundColor: AppPalette.leaf,
           ),
         );
         Navigator.pop(context);
@@ -136,14 +136,14 @@ class _VoiceReportPageState extends State<VoiceReportPage> {
     final isUnsupported = Platform.isWindows || Platform.isLinux;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
+      backgroundColor: AppPalette.screenBackground,
       appBar: AppBar(
         title: Text(
           'Voice Report',
           style: GoogleFonts.poppins(fontWeight: FontWeight.w700),
         ),
         elevation: 0,
-        backgroundColor: const Color(0xFF667EEA),
+        backgroundColor: AppPalette.pine,
         foregroundColor: Colors.white,
       ),
       body: Column(
@@ -195,7 +195,7 @@ class _VoiceReportPageState extends State<VoiceReportPage> {
                       height: _isRecording ? 200 : 150,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: _isRecording ? Colors.red : const Color(0xFF667EEA),
+                        color: _isRecording ? Colors.red : AppPalette.leaf,
                         boxShadow: _isRecording
                             ? [
                                 BoxShadow(
@@ -237,11 +237,11 @@ class _VoiceReportPageState extends State<VoiceReportPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.check_circle_rounded, color: Colors.green),
+                          Icon(Icons.check_circle_rounded, color: AppPalette.leaf),
                           const SizedBox(width: 8),
                           Text(
                             'Recording saved',
-                            style: GoogleFonts.poppins(color: Colors.green),
+                            style: GoogleFonts.poppins(color: AppPalette.leaf),
                           ),
                         ],
                       ),
@@ -269,7 +269,7 @@ class _VoiceReportPageState extends State<VoiceReportPage> {
               ),
               child: Row(
                 children: [
-                  Icon(Icons.location_on_rounded, color: const Color(0xFF667EEA)),
+                  Icon(Icons.location_on_rounded, color: AppPalette.leaf),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(
@@ -313,7 +313,7 @@ class _VoiceReportPageState extends State<VoiceReportPage> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: isUnsupported
                           ? Colors.grey
-                          : (_isRecording ? Colors.red : const Color(0xFF667EEA)),
+                          : (_isRecording ? Colors.red : AppPalette.leaf),
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -350,7 +350,7 @@ class _VoiceReportPageState extends State<VoiceReportPage> {
                     child: ElevatedButton(
                       onPressed: _submitReport,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
+                        backgroundColor: AppPalette.leaf,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),

@@ -5,6 +5,7 @@ import { AuthContext } from "../context/AuthContext.jsx";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import API from "../services/api.js";
+import { APP_LOGO_SRC } from "../constants/branding.js";
 
 export default function Topbar({ title = "Dashboard", notifCount = 0 }) {
   const { logout, user } = useContext(AuthContext);
@@ -66,7 +67,19 @@ export default function Topbar({ title = "Dashboard", notifCount = 0 }) {
         boxShadow: "0 2px 20px rgba(0, 0, 0, 0.05)",
       }}
     >
-      <Toolbar sx={{ minHeight: 72, px: 3 }}>
+      <Toolbar sx={{ minHeight: 72, px: 3, gap: 2 }}>
+        <Box
+          component="img"
+          src={APP_LOGO_SRC}
+          alt=""
+          sx={{
+            width: 40,
+            height: 40,
+            borderRadius: 1.5,
+            objectFit: "contain",
+            display: { xs: "none", sm: "block" },
+          }}
+        />
         <Typography
           variant="h6"
           sx={{

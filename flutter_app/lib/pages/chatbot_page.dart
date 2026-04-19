@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../services/api_service.dart';
+import '../constants/branding.dart';
 import 'dart:math' as math;
 
 class ChatbotPage extends StatefulWidget {
-  const ChatbotPage({super.key});
+  /// Passed from home so chat logs show a stable user id in the admin dashboard.
+  final Map<dynamic, dynamic>? user;
+
+  const ChatbotPage({super.key, this.user});
 
   @override
   State<ChatbotPage> createState() => _ChatbotPageState();
@@ -72,7 +76,12 @@ class _ChatbotPageState extends State<ChatbotPage>
 
     try {
       // Call AI chatbot - messages are automatically saved to database for admin
-      final response = await ApiService.sendChatbotMessage(text, null);
+      final uid = widget.user == null
+          ? null
+          : (widget.user!['email']?.toString() ??
+              widget.user!['name']?.toString() ??
+              widget.user!['_id']?.toString());
+      final response = await ApiService.sendChatbotMessage(text, uid);
       
       if (!mounted) return;
       
@@ -171,7 +180,7 @@ class _ChatbotPageState extends State<ChatbotPage>
               Navigator.pop(context);
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF4FACFE),
+              backgroundColor: AppPalette.leaf,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -192,19 +201,20 @@ class _ChatbotPageState extends State<ChatbotPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
+      backgroundColor: AppPalette.cream,
       body: Column(
         children: [
           // Modern App Bar with Back Button
           Container(
             height: 200,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  const Color(0xFF4FACFE),
-                  const Color(0xFF00F2FE),
+                  AppPalette.pine,
+                  AppPalette.leaf,
+                  AppPalette.mint,
                 ],
               ),
             ),
@@ -453,14 +463,14 @@ class _ChatbotPageState extends State<ChatbotPage>
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             colors: [
-                              const Color(0xFF4FACFE),
-                              const Color(0xFF00F2FE),
+                              AppPalette.leaf,
+                              AppPalette.mint,
                             ],
                           ),
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFF4FACFE).withValues(alpha: 0.4),
+                              color: AppPalette.leaf.withValues(alpha: 0.4),
                               blurRadius: 15,
                               offset: const Offset(0, 6),
                             ),
@@ -525,14 +535,14 @@ class _ChatBubble extends StatelessWidget {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    const Color(0xFF4FACFE),
-                    const Color(0xFF00F2FE),
+                    AppPalette.leaf,
+                    AppPalette.mint,
                   ],
                 ),
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF4FACFE).withValues(alpha: 0.3),
+                    color: AppPalette.leaf.withValues(alpha: 0.3),
                     blurRadius: 8,
                     offset: const Offset(0, 4),
                   ),
@@ -553,8 +563,8 @@ class _ChatBubble extends StatelessWidget {
                 gradient: isUser
                     ? LinearGradient(
                         colors: [
-                          const Color(0xFF667EEA),
-                          const Color(0xFF764BA2),
+                          AppPalette.pine,
+                          AppPalette.leaf,
                         ],
                       )
                     : null,
@@ -670,14 +680,14 @@ class _ChatBubble extends StatelessWidget {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    const Color(0xFF667EEA),
-                    const Color(0xFF764BA2),
+                    AppPalette.pine,
+                    AppPalette.leaf,
                   ],
                 ),
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF667EEA).withValues(alpha: 0.3),
+                    color: AppPalette.leaf.withValues(alpha: 0.35),
                     blurRadius: 8,
                     offset: const Offset(0, 4),
                   ),
@@ -713,8 +723,8 @@ class _TypingIndicator extends StatelessWidget {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  const Color(0xFF4FACFE),
-                  const Color(0xFF00F2FE),
+                  AppPalette.leaf,
+                  AppPalette.mint,
                 ],
               ),
               shape: BoxShape.circle,
@@ -772,7 +782,7 @@ class _Dot extends StatelessWidget {
           width: 10,
           height: 10,
           decoration: BoxDecoration(
-            color: const Color(0xFF4FACFE).withValues(
+            color: AppPalette.mint.withValues(
               alpha: 0.3 + (math.sin(value * math.pi * 2) * 0.5 + 0.5) * 0.7,
             ),
             shape: BoxShape.circle,

@@ -60,6 +60,7 @@ export default function AIMLFeatures() {
     riskLevel: "normal",
   });
   const [socket, setSocket] = useState(null);
+  const [chatbotAnalytics, setChatbotAnalytics] = useState(null);
 
   useEffect(() => {
     loadAllData();
@@ -95,10 +96,11 @@ export default function AIMLFeatures() {
   const loadAllData = async () => {
     try {
       setLoading(true);
-      const [predData, anomData, dashData] = await Promise.allSettled([
+      const [predData, anomData, dashData, chatData] = await Promise.allSettled([
         API.get("/analytics/alerts/predictions"),
         API.get("/analytics/alerts/anomalies"),
         API.get("/analytics/dashboard"),
+        API.get("/chatbot/analytics"),
       ]);
 
       if (predData.status === "fulfilled") {
@@ -117,6 +119,9 @@ export default function AIMLFeatures() {
           ...prev,
           activeAlerts: dashData.value.data?.overview?.totalAlerts || 0,
         }));
+      }
+      if (chatData.status === "fulfilled") {
+        setChatbotAnalytics(chatData.value.data);
       }
     } catch (err) {
       console.error("AI/ML data error:", err);
@@ -210,6 +215,68 @@ export default function AIMLFeatures() {
         </motion.div>
 
         <Grid container spacing={3}>
+          {/* App chatbot usage (same data as mobile app /api/chatbot) */}
+          {chatbotAnalytics && (
+            <Grid item xs={12}>
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.15 }}
+              >
+                <Card sx={{ borderRadius: 3, boxShadow: "0 4px 20px rgba(0,0,0,0.08)" }}>
+                  <CardContent>
+                    <Stack direction="row" alignItems="center" justifyContent="space-between" flexWrap="wrap" gap={2} mb={2}>
+                      <Box>
+                        <Typography variant="h6" fontWeight={700}>
+                          App chatbot activity
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          Logged from the Flutter app via POST /api/chatbot (same pipeline as admin Chatbot page)
+                        </Typography>
+                      </Box>
+                      <Chip
+                        label={`${chatbotAnalytics.totalChats ?? 0} total messages stored`}
+                        color="primary"
+                        variant="outlined"
+                      />
+                    </Stack>
+                    <Grid container spacing={2}>
+                      {(chatbotAnalytics.intents || []).slice(0, 6).map((row, idx) => (
+                        <Grid item xs={6} sm={4} md={2} key={`${row._id}-${idx}`}>
+                          <Paper variant="outlined" sx={{ p: 1.5, borderRadius: 2, textAlign: "center" }}>
+                            <Typography variant="caption" color="text.secondary" display="block">
+                              {row._id || "—"}
+                            </Typography>
+                            <Typography variant="h6" fontWeight={800}>
+                              {row.count}
+                            </Typography>
+                          </Paper>
+                        </Grid>
+                      ))}
+                    </Grid>
+                    {(chatbotAnalytics.popularQueries || []).length > 0 && (
+                      <Box mt={2}>
+                        <Typography variant="subtitle2" fontWeight={700} mb={1}>
+                          Frequent user phrases
+                        </Typography>
+                        <Stack direction="row" flexWrap="wrap" gap={1}>
+                          {(chatbotAnalytics.popularQueries || []).slice(0, 5).map((q, i) => (
+                            <Chip
+                              key={i}
+                              size="small"
+                              label={`"${String(q._id).slice(0, 32)}${String(q._id).length > 32 ? "…" : ""}" (${q.count})`}
+                              variant="outlined"
+                            />
+                          ))}
+                        </Stack>
+                      </Box>
+                    )}
+                  </CardContent>
+                </Card>
+              </motion.div>
+            </Grid>
+          )}
+
           {/* Real-Time Risk Assessment */}
           <Grid item xs={12} md={4}>
             <motion.div

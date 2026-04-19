@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../constants/branding.dart';
 
 class AppGuidePage extends StatelessWidget {
   const AppGuidePage({super.key});
@@ -7,7 +8,7 @@ class AppGuidePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
+      backgroundColor: AppPalette.screenBackground,
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
@@ -22,10 +23,7 @@ class AppGuidePage extends StatelessWidget {
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [
-                      const Color(0xFF667EEA),
-                      const Color(0xFF764BA2),
-                    ],
+                    colors: AppPalette.accentGradient,
                   ),
                 ),
                 child: SafeArea(
@@ -93,7 +91,7 @@ class AppGuidePage extends StatelessWidget {
                   _GuideSection(
                     icon: Icons.home_rounded,
                     title: 'Getting Started',
-                    color: const Color(0xFF667EEA),
+                    color: AppPalette.leaf,
                     items: [
                       _GuideItem(
                         title: 'Welcome to Smart Wayanad',
@@ -139,7 +137,7 @@ class AppGuidePage extends StatelessWidget {
                   _GuideSection(
                     icon: Icons.directions_bus_rounded,
                     title: 'Transportation',
-                    color: const Color(0xFF43E97B),
+                    color: AppPalette.mint,
                     items: [
                       _GuideItem(
                         title: 'Bus Routes',
@@ -162,7 +160,7 @@ class AppGuidePage extends StatelessWidget {
                   _GuideSection(
                     icon: Icons.smart_toy_rounded,
                     title: 'AI Chatbot',
-                    color: const Color(0xFF4FACFE),
+                    color: AppPalette.pine,
                     items: [
                       _GuideItem(
                         title: 'Ask Anything',
@@ -185,7 +183,7 @@ class AppGuidePage extends StatelessWidget {
                   _GuideSection(
                     icon: Icons.location_on_rounded,
                     title: 'Location Services',
-                    color: const Color(0xFFFA709A),
+                    color: AppPalette.forest,
                     items: [
                       _GuideItem(
                         title: 'Hospitals & Clinics',
@@ -213,7 +211,7 @@ class AppGuidePage extends StatelessWidget {
                   _GuideSection(
                     icon: Icons.wb_sunny_rounded,
                     title: 'Weather & Climate',
-                    color: const Color(0xFFFEE140),
+                    color: const Color(0xFFC9A227),
                     items: [
                       _GuideItem(
                         title: 'Current Weather',
@@ -236,7 +234,7 @@ class AppGuidePage extends StatelessWidget {
                   _GuideSection(
                     icon: Icons.person_rounded,
                     title: 'Profile & Settings',
-                    color: const Color(0xFF764BA2),
+                    color: AppPalette.leaf,
                     items: [
                       _GuideItem(
                         title: 'Edit Profile',
@@ -259,7 +257,7 @@ class AppGuidePage extends StatelessWidget {
                   _GuideSection(
                     icon: Icons.help_outline_rounded,
                     title: 'Tips & Tricks',
-                    color: const Color(0xFF30CFD0),
+                    color: AppPalette.mint,
                     items: [
                       _GuideItem(
                         title: 'Quick Access',

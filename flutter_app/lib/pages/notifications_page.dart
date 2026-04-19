@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../constants/branding.dart';
 import '../services/api_service.dart';
 import 'dart:math' as math;
 
@@ -55,7 +56,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
       case 'medical':
         return const Color(0xFFf093fb);
       default:
-        return const Color(0xFF667eea);
+        return AppPalette.leaf;
     }
   }
 
@@ -103,7 +104,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
     final adminAlerts = _alerts.where((a) => a['source'] == 'admin').toList();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
+      backgroundColor: AppPalette.screenBackground,
       body: CustomScrollView(
         slivers: [
           // Premium App Bar
@@ -119,10 +120,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [
-                      const Color(0xFF667EEA),
-                      const Color(0xFF764BA2),
-                    ],
+                    colors: AppPalette.accentGradient,
                   ),
                 ),
                 child: SafeArea(
@@ -191,7 +189,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
             SliverFillRemaining(
               child: Center(
                 child: CircularProgressIndicator(
-                  color: const Color(0xFF667EEA),
+                  color: AppPalette.leaf,
                 ),
               ),
             )

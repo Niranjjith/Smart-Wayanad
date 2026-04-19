@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'dart:io';
+import '../constants/branding.dart';
 import '../main.dart';
 import '../services/api_service.dart';
 
@@ -41,7 +42,7 @@ class _SettingsPageState extends State<SettingsPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Settings saved!'),
-          backgroundColor: Colors.green,
+          backgroundColor: AppPalette.leaf,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -69,14 +70,14 @@ class _SettingsPageState extends State<SettingsPage> {
     final name = widget.user['name'] ?? 'User';
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
+      backgroundColor: AppPalette.screenBackground,
       appBar: AppBar(
         title: Text(
           'Settings',
           style: GoogleFonts.poppins(fontWeight: FontWeight.w700),
         ),
         elevation: 0,
-        backgroundColor: const Color(0xFF667EEA),
+        backgroundColor: AppPalette.pine,
         foregroundColor: Colors.white,
       ),
       body: ListView(
@@ -92,7 +93,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: const Color(0xFF667EEA),
+                      color: AppPalette.leaf,
                       width: 3,
                     ),
                     boxShadow: [
@@ -114,7 +115,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
                                   valueColor: AlwaysStoppedAnimation<Color>(
-                                    isDark ? const Color(0xFF2196F3) : const Color(0xFF667EEA),
+                                    isDark ? const Color(0xFF2196F3) : AppPalette.leaf,
                                   ),
                                 ),
                               ),
@@ -179,12 +180,14 @@ class _SettingsPageState extends State<SettingsPage> {
             subtitle: 'Receive alerts and updates',
             leading: Icon(
               Icons.notifications_rounded,
-              color: const Color(0xFF667EEA),
+              color: AppPalette.leaf,
             ),
             trailing: Switch(
               value: _notifications,
               onChanged: (val) => setState(() => _notifications = val),
-              activeColor: const Color(0xFF667EEA),
+              activeTrackColor: AppPalette.leaf,
+              inactiveThumbColor: Colors.grey.shade400,
+              inactiveTrackColor: AppPalette.sage.withValues(alpha: 0.45),
             ),
             isDark: false,
           ),
@@ -197,7 +200,7 @@ class _SettingsPageState extends State<SettingsPage> {
             subtitle: 'Choose your preferred language',
             leading: Icon(
               Icons.language_rounded,
-              color: const Color(0xFF667EEA),
+              color: AppPalette.leaf,
             ),
             trailing: DropdownButton<String>(
               value: _language,
@@ -225,7 +228,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ElevatedButton(
             onPressed: _saveSettings,
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF667EEA),
+              backgroundColor: AppPalette.leaf,
               padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),

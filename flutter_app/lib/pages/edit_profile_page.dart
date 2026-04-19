@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'dart:convert';
+import '../constants/branding.dart';
 import '../services/api_service.dart';
 
 class EditProfilePage extends StatefulWidget {
@@ -114,7 +115,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              leading: const Icon(Icons.photo_library_rounded, color: Color(0xFF667EEA)),
+              leading: const Icon(Icons.photo_library_rounded, color: AppPalette.leaf),
               title: Text('Gallery', style: GoogleFonts.poppins()),
               onTap: () {
                 Navigator.pop(context);
@@ -122,7 +123,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.camera_alt_rounded, color: Color(0xFF667EEA)),
+              leading: const Icon(Icons.camera_alt_rounded, color: AppPalette.leaf),
               title: Text('Camera', style: GoogleFonts.poppins()),
               onTap: () {
                 Navigator.pop(context);
@@ -190,7 +191,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('Profile updated successfully! 🎉'),
-            backgroundColor: Colors.green,
+            backgroundColor: AppPalette.leaf,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           ),
@@ -239,14 +240,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
     final profileImageUrl = _getProfileImageUrl();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
+      backgroundColor: AppPalette.screenBackground,
       appBar: AppBar(
         title: Text(
           'Edit Profile',
           style: GoogleFonts.poppins(fontWeight: FontWeight.w700),
         ),
         elevation: 0,
-        backgroundColor: const Color(0xFF667EEA),
+        backgroundColor: AppPalette.pine,
         foregroundColor: Colors.white,
       ),
       body: SingleChildScrollView(
@@ -266,7 +267,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: const Color(0xFF667EEA),
+                          color: AppPalette.leaf,
                           width: 3,
                         ),
                         boxShadow: [
@@ -288,7 +289,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                     profileImageUrl,
                                     fit: BoxFit.cover,
                                     errorBuilder: (context, error, stackTrace) => Container(
-                                      color: const Color(0xFF667EEA),
+                                      color: AppPalette.leaf,
                                       child: Center(
                                         child: Text(
                                           (_nameController.text.isNotEmpty
@@ -305,7 +306,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                     ),
                                   )
                                 : Container(
-                                    color: const Color(0xFF667EEA),
+                                    color: AppPalette.leaf,
                                     child: Center(
                                       child: Text(
                                         (_nameController.text.isNotEmpty
@@ -329,7 +330,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
                           gradient: const LinearGradient(
-                            colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
+                            colors: [AppPalette.leaf, AppPalette.pine],
                           ),
                           shape: BoxShape.circle,
                           border: Border.all(color: Colors.white, width: 3),
@@ -364,7 +365,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 decoration: InputDecoration(
                   labelText: 'Full Name',
                   labelStyle: GoogleFonts.poppins(color: Colors.grey.shade600),
-                  prefixIcon: const Icon(Icons.person_rounded, color: Color(0xFF667EEA)),
+                  prefixIcon: const Icon(Icons.person_rounded, color: AppPalette.leaf),
                   filled: true,
                   fillColor: Colors.white,
                   border: OutlineInputBorder(
@@ -377,7 +378,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Color(0xFF667EEA), width: 2),
+                    borderSide: const BorderSide(color: AppPalette.leaf, width: 2),
                   ),
                 ),
                 validator: (val) => val?.isEmpty ?? true ? 'Name is required' : null,
@@ -391,7 +392,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 decoration: InputDecoration(
                   labelText: 'Email',
                   labelStyle: GoogleFonts.poppins(color: Colors.grey.shade600),
-                  prefixIcon: const Icon(Icons.email_rounded, color: Color(0xFF667EEA)),
+                  prefixIcon: const Icon(Icons.email_rounded, color: AppPalette.leaf),
                   filled: true,
                   fillColor: Colors.white,
                   border: OutlineInputBorder(
@@ -404,7 +405,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Color(0xFF667EEA), width: 2),
+                    borderSide: const BorderSide(color: AppPalette.leaf, width: 2),
                   ),
                 ),
                 keyboardType: TextInputType.emailAddress,
@@ -423,7 +424,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 decoration: InputDecoration(
                   labelText: 'Phone Number (Optional)',
                   labelStyle: GoogleFonts.poppins(color: Colors.grey.shade600),
-                  prefixIcon: const Icon(Icons.phone_rounded, color: Color(0xFF667EEA)),
+                  prefixIcon: const Icon(Icons.phone_rounded, color: AppPalette.leaf),
                   filled: true,
                   fillColor: Colors.white,
                   border: OutlineInputBorder(
@@ -436,7 +437,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Color(0xFF667EEA), width: 2),
+                    borderSide: const BorderSide(color: AppPalette.leaf, width: 2),
                   ),
                 ),
                 keyboardType: TextInputType.phone,
@@ -470,7 +471,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       decoration: InputDecoration(
                         labelText: 'New Password',
                         labelStyle: GoogleFonts.poppins(color: Colors.grey.shade600),
-                        prefixIcon: const Icon(Icons.lock_rounded, color: Color(0xFF667EEA)),
+                        prefixIcon: const Icon(Icons.lock_rounded, color: AppPalette.leaf),
                         suffixIcon: IconButton(
                           icon: Icon(
                             _showPassword ? Icons.visibility_off : Icons.visibility,
@@ -490,7 +491,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: Color(0xFF667EEA), width: 2),
+                          borderSide: const BorderSide(color: AppPalette.leaf, width: 2),
                         ),
                       ),
                     ),
@@ -502,7 +503,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       decoration: InputDecoration(
                         labelText: 'Confirm Password',
                         labelStyle: GoogleFonts.poppins(color: Colors.grey.shade600),
-                        prefixIcon: const Icon(Icons.lock_rounded, color: Color(0xFF667EEA)),
+                        prefixIcon: const Icon(Icons.lock_rounded, color: AppPalette.leaf),
                         suffixIcon: IconButton(
                           icon: Icon(
                             _showConfirmPassword ? Icons.visibility_off : Icons.visibility,
@@ -522,7 +523,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: Color(0xFF667EEA), width: 2),
+                          borderSide: const BorderSide(color: AppPalette.leaf, width: 2),
                         ),
                       ),
                     ),
@@ -538,7 +539,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 child: ElevatedButton(
                   onPressed: _loading ? null : _saveProfile,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF667EEA),
+                    backgroundColor: AppPalette.leaf,
                     shadowColor: Colors.transparent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),

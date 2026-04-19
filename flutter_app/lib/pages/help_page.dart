@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../constants/branding.dart';
 import '../services/api_service.dart';
 import '../services/location_service.dart';
 import 'dart:math' as math;
@@ -83,7 +84,7 @@ class _HelpPageState extends State<HelpPage> with TickerProviderStateMixin {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text("✅ Location captured: ${_lat!.toStringAsFixed(4)}, ${_lng!.toStringAsFixed(4)}"),
-          backgroundColor: Colors.green,
+          backgroundColor: AppPalette.leaf,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         ),
@@ -135,7 +136,7 @@ class _HelpPageState extends State<HelpPage> with TickerProviderStateMixin {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text("✅ Emergency alert sent! Live location sharing active."),
-            backgroundColor: Colors.green,
+            backgroundColor: AppPalette.leaf,
             behavior: SnackBarBehavior.floating,
             duration: const Duration(seconds: 3),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -203,7 +204,7 @@ class _HelpPageState extends State<HelpPage> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
+      backgroundColor: AppPalette.screenBackground,
       body: CustomScrollView(
         slivers: [
           // Premium App Bar

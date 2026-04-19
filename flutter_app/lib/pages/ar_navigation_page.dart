@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:camera/camera.dart';
 import 'package:geolocator/geolocator.dart';
 import 'dart:math' as math;
+import '../constants/branding.dart';
 
 class ARNavigationPage extends StatefulWidget {
   const ARNavigationPage({super.key});
@@ -122,7 +123,7 @@ class _ARNavigationPageState extends State<ARNavigationPage> {
           'distance': 0.5,
           'bearing': 45,
           'icon': Icons.local_hospital_rounded,
-          'color': const Color(0xFFF5576C),
+          'color': AppPalette.leaf,
         },
         {
           'name': 'Police Station',
@@ -130,7 +131,7 @@ class _ARNavigationPageState extends State<ARNavigationPage> {
           'distance': 0.8,
           'bearing': 120,
           'icon': Icons.local_police_rounded,
-          'color': const Color(0xFF667EEA),
+          'color': AppPalette.forest,
         },
         {
           'name': 'Fire Station',
@@ -146,7 +147,7 @@ class _ARNavigationPageState extends State<ARNavigationPage> {
           'distance': 0.3,
           'bearing': 90,
           'icon': Icons.directions_bus_rounded,
-          'color': const Color(0xFF43E97B),
+          'color': AppPalette.mint,
         },
         {
           'name': 'Taxi Stand',
@@ -154,7 +155,7 @@ class _ARNavigationPageState extends State<ARNavigationPage> {
           'distance': 0.6,
           'bearing': 270,
           'icon': Icons.local_taxi_rounded,
-          'color': const Color(0xFFFA709A),
+          'color': AppPalette.pine,
         },
       ];
     });
@@ -322,12 +323,12 @@ class _ARNavigationPageState extends State<ARNavigationPage> {
                         Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF4FACFE).withValues(alpha: 0.2),
+                            color: AppPalette.mint.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: const Icon(
                             Icons.location_on_rounded,
-                            color: Color(0xFF4FACFE),
+                            color: AppPalette.mint,
                             size: 20,
                           ),
                         ),
@@ -364,7 +365,7 @@ class _ARNavigationPageState extends State<ARNavigationPage> {
                         vertical: 8,
                       ),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF43E97B).withValues(alpha: 0.2),
+                        color: AppPalette.leaf.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Row(
@@ -372,14 +373,14 @@ class _ARNavigationPageState extends State<ARNavigationPage> {
                         children: [
                           Icon(
                             Icons.explore_rounded,
-                            color: const Color(0xFF43E97B),
+                            color: AppPalette.leaf,
                             size: 16,
                           ),
                           const SizedBox(width: 6),
                           Text(
                             '${_nearbyServices.length} services nearby',
                             style: GoogleFonts.poppins(
-                              color: const Color(0xFF43E97B),
+                              color: AppPalette.leaf,
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
                             ),
