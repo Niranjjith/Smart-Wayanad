@@ -326,7 +326,7 @@ class _ClimatePageState extends State<ClimatePage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            helpline['label'] ?? 'Helpline',
+                            helpline?['label'] ?? 'Helpline',
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 12,
@@ -335,13 +335,13 @@ class _ClimatePageState extends State<ClimatePage> {
                           ),
                           GestureDetector(
                             onTap: () {
-                              Clipboard.setData(ClipboardData(text: helpline['number'] ?? ''));
+                              Clipboard.setData(ClipboardData(text: helpline?['number'] ?? ''));
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(content: Text("Number copied to clipboard")),
                               );
                             },
                             child: Text(
-                              helpline['number'] ?? '',
+                              helpline?['number'] ?? '',
                               style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -373,7 +373,7 @@ class _ClimatePageState extends State<ClimatePage> {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        transportWarning['message'] ?? '',
+                        transportWarning?['message'] ?? '',
                         style: const TextStyle(
                           fontSize: 13,
                           color: Colors.orange,
